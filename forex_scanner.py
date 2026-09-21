@@ -51,6 +51,10 @@ SL_ATR_BUFFER = 0.35
 MAX_READY_DISTANCE_ATR = 0.75
 MAX_BREAK_TO_RETEST_BARS = 3
 MAX_RETEST_TO_CONFIRM_BARS = 2
+H1_SWING_LEFT = 15
+H1_SWING_RIGHT = 15
+H1_SWING_PROMINENCE_ATR = 0.50
+BREAK_CLOSE_BUFFER_ATR = 0.05
 
 
 @dataclass(frozen=True)
@@ -431,22 +435,76 @@ def calculate_trade_plan(
     return entry, stop, target, rr, rr >= MIN_RR
 
 
+def find_key_h1_level(direction: str, h1: pd.DataFrame):
+    """
+    Find a CONFIRMED H1 swing resistance/support.
+
+    We deliberately use a much wider pivot window than the old 3-candle rule:
+    15 candles left + 15 candles right, close to the support/resistance logic
+    the user follows on TradingView.
+
+    LONG  -> latest confirmed swing HIGH = resistance to break.
+    SHORT -> latest confirmed swing LOW  = support to break.
+    """
+    if direction not in {"LONG", "SHORT"} or h1 is None:
+        return None, None
+
+    data = h1.tail(180).copy()
+    min_bars = H1_SWING_LEFT + H1_SWING_RIGHT + 5
+    if len(data) < min_bars:
+        return None, None
+
+    highs = data["High"].astype(float).tolist()
+    lows = data["Low"].astype(float).tolist()
+    atr = current_atr(h1)
+    min_prominence = (
+        H1_SWING_PROMINENCE_ATR * atr
+        if atr is not None and atr > 0
+        else 0.0
+    )
+
+    pivots = []
+    for i in range(H1_SWING_LEFT, len(data) - H1_SWING_RIGHT):
+        left = i - H1_SWING_LEFT
+        right = i + H1_SWING_RIGHT + 1
+
+        window_high = max(highs[left:right])
+        window_low = min(lows[left:right])
+
+        if direction == "LONG":
+            level = highs[i]
+            is_pivot = level >= window_high
+            prominence = level - window_low
+        else:
+            level = lows[i]
+            is_pivot = level <= window_low
+            prominence = window_high - level
+
+        if is_pivot and prominence >= min_prominence:
+            pivots.append((i, float(level)))
+
+    if not pivots:
+        return None, None
+
+    # Latest confirmed major H1 pivot.
+    return pivots[-1]
+
+
 def detect_brc(direction: str, h1: pd.DataFrame):
     """
-    Strict H1 Break -> Retest -> Confirmation.
+    H1 Break -> Retest -> Confirmation using a CONFIRMED major swing level.
 
-    READY only when:
-    - the break is recent,
-    - the retest happens within a few H1 candles after the break,
-    - the confirmation is the LATEST completed H1 candle,
-    - the latest close is not already too far from the retest zone.
+    This replaces the old 3-candle high/low rule that could mark small local
+    noise as BREAK.
 
-    This prevents old/extended moves from being shown as READY.
+    Status flow:
+    WAIT FOR BREAK -> BREAK -> RETEST -> READY
+    or WAIT NEW RETEST if the confirmation became stale/price ran away.
     """
-    if direction not in {"LONG", "SHORT"} or h1 is None or len(h1) < 20:
+    if direction not in {"LONG", "SHORT"} or h1 is None or len(h1) < 40:
         return "WAIT", None
 
-    data = h1.tail(24).copy()
+    data = h1.tail(180).copy()
     candles = [
         {
             "open": float(row["Open"]),
@@ -457,8 +515,17 @@ def detect_brc(direction: str, h1: pd.DataFrame):
         for _, row in data.iterrows()
     ]
 
+    pivot_i, level = find_key_h1_level(direction, data)
+    if pivot_i is None or level is None:
+        return "WAIT", None
+
     atr = current_atr(h1)
     tolerance = 0.25 * atr if atr else 0.0015 * candles[-1]["close"]
+    break_buffer = (
+        BREAK_CLOSE_BUFFER_ATR * atr
+        if atr
+        else 0.0003 * candles[-1]["close"]
+    )
     max_ready_distance = (
         MAX_READY_DISTANCE_ATR * atr
         if atr
@@ -466,91 +533,89 @@ def detect_brc(direction: str, h1: pd.DataFrame):
     )
 
     latest_i = len(candles) - 1
-    latest_progress = ("WAIT", None)
-    stale_zone = None
 
-    # Only recent breaks are relevant.
-    start = max(3, len(candles) - 9)
+    # Search for a real H1 CLOSE through the confirmed swing level.
+    break_i = None
+    for i in range(pivot_i + 1, len(candles)):
+        close = candles[i]["close"]
+        if direction == "LONG":
+            broke = close > level + break_buffer
+        else:
+            broke = close < level - break_buffer
 
-    for break_i in range(start, len(candles) - 2):
-        previous = candles[break_i - 3:break_i]
-        break_candle = candles[break_i]
+        if broke:
+            break_i = i
+            break
+
+    if break_i is None:
+        return "WAIT FOR BREAK", level
+
+    # Break happened, but we only care about a recent actionable sequence.
+    if latest_i - break_i > (
+        MAX_BREAK_TO_RETEST_BARS + MAX_RETEST_TO_CONFIRM_BARS + 2
+    ):
+        return "WAIT NEW RETEST", level
+
+    max_retest_i = min(
+        break_i + MAX_BREAK_TO_RETEST_BARS,
+        latest_i - 1,
+    )
+
+    retest_i = None
+    for i in range(break_i + 1, max_retest_i + 1):
+        retest = candles[i]
 
         if direction == "LONG":
-            level = max(c["high"] for c in previous)
-            broke = break_candle["close"] > level
+            touched = retest["low"] <= level + tolerance
+            held = retest["close"] >= level - tolerance
         else:
-            level = min(c["low"] for c in previous)
-            broke = break_candle["close"] < level
+            touched = retest["high"] >= level - tolerance
+            held = retest["close"] <= level + tolerance
 
-        if not broke:
-            continue
+        if touched and held:
+            retest_i = i
+            break
 
-        latest_progress = ("BREAK", level)
+    if retest_i is None:
+        return "BREAK", level
 
-        max_retest_i = min(
-            break_i + MAX_BREAK_TO_RETEST_BARS,
-            latest_i - 1,
-        )
+    max_confirm_i = min(
+        retest_i + MAX_RETEST_TO_CONFIRM_BARS,
+        latest_i,
+    )
 
-        for retest_i in range(break_i + 1, max_retest_i + 1):
-            retest = candles[retest_i]
+    for confirm_i in range(retest_i + 1, max_confirm_i + 1):
+        confirm = candles[confirm_i]
 
-            if direction == "LONG":
-                touched = retest["low"] <= level + tolerance
-                held = retest["close"] >= level - tolerance
-            else:
-                touched = retest["high"] >= level - tolerance
-                held = retest["close"] <= level + tolerance
-
-            if not (touched and held):
-                continue
-
-            latest_progress = ("RETEST", level)
-
-            # Confirmation must happen very soon after the retest.
-            max_confirm_i = min(
-                retest_i + MAX_RETEST_TO_CONFIRM_BARS,
-                latest_i,
+        if direction == "LONG":
+            confirmed = (
+                confirm["close"] > confirm["open"]
+                and confirm["close"] > level
+            )
+        else:
+            confirmed = (
+                confirm["close"] < confirm["open"]
+                and confirm["close"] < level
             )
 
-            for confirm_i in range(retest_i + 1, max_confirm_i + 1):
-                confirm = candles[confirm_i]
+        if not confirmed:
+            continue
 
-                if direction == "LONG":
-                    confirmed = (
-                        confirm["close"] > confirm["open"]
-                        and confirm["close"] > level
-                    )
-                else:
-                    confirmed = (
-                        confirm["close"] < confirm["open"]
-                        and confirm["close"] < level
-                    )
+        # Confirmation must be the latest completed H1 candle.
+        if confirm_i != latest_i:
+            return "WAIT NEW RETEST", level
 
-                if not confirmed:
-                    continue
+        # Don't chase a move that has already extended away from the zone.
+        if abs(confirm["close"] - level) > max_ready_distance:
+            return "WAIT NEW RETEST", level
 
-                # Old confirmation is no longer an entry signal.
-                if confirm_i != latest_i:
-                    stale_zone = level
-                    continue
+        return "READY", level
 
-                # Do not chase price if it already extended too far from zone.
-                distance = abs(confirm["close"] - level)
-                if distance > max_ready_distance:
-                    return "WAIT NEW RETEST", level
+    # Retest exists but no fresh confirmation yet.
+    if latest_i - retest_i <= MAX_RETEST_TO_CONFIRM_BARS:
+        return "RETEST", level
 
-                return "READY", level
-
-    if stale_zone is not None:
-        return "WAIT NEW RETEST", stale_zone
-
-    # A retest from many candles ago is no longer "live".
-    if latest_progress[0] == "RETEST":
-        return "WAIT NEW RETEST", latest_progress[1]
-
-    return latest_progress
+    return "WAIT NEW RETEST", level
 
 
 def calc_quality(
@@ -583,6 +648,7 @@ def calc_quality(
 
     brc_score = {
         "WAIT": 0,
+        "WAIT FOR BREAK": 0,
         "BREAK": 6,
         "RETEST": 12,
         "READY": 20,
@@ -862,7 +928,7 @@ def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") 
         "- **EMA50 3/3:** τιμή και κλίση EMA50 συμφωνούν με την κατεύθυνση και στα 3 TF.",
         "- **D1/H4 Struct:** BULL ή BEAR από ολοκληρωμένα swing highs/lows.",
         "- **ADX:** πάνω από ~20 δείχνει ισχυρότερη τάση· δεν είναι μόνο του σήμα εισόδου.",
-        "- **BRC WAIT/BREAK/RETEST/READY:** πρόοδος του H1 Break → Retest → Confirmation. **WAIT NEW RETEST** σημαίνει ότι το παλιό confirmation θεωρείται πλέον ξεπερασμένο ή η τιμή έχει απομακρυνθεί πολύ από τη zone.",
+        "- **BRC WAIT FOR BREAK/BREAK/RETEST/READY:** το break γίνεται μόνο σε **επιβεβαιωμένο H1 swing resistance/support (15 κεριά αριστερά + 15 δεξιά)**, όχι σε μικρό 3-candle high/low. **WAIT NEW RETEST** σημαίνει ότι το παλιό setup έχει ξεπεραστεί ή η τιμή απομακρύνθηκε από τη zone.",
         "- **Entry/SL/TP:** εμφανίζονται μόνο όταν το BRC είναι READY. Entry = τελευταίο κλεισμένο H1, SL = H1 zone ± 0.35×ATR, TP = κοντινότερο ολοκληρωμένο H4 swing target.",
         f"- **RR:** ✅ όταν RR ≥ {MIN_RR:.1f}, ❌ όταν είναι χαμηλότερο. Το A+ READY απαιτεί RR pass.",
         "- **A+ READY:** το αυστηρότερο φίλτρο. Πριν από trade χρειάζεται τελικός οπτικός έλεγχος chart, spread/news και sizing.",
