@@ -1,6 +1,6 @@
 # Latest Forex Scan
 
-**Τελευταία ενημέρωση:** 21/09/2026 15:32 (Europe/Athens)
+**Τελευταία ενημέρωση:** 21/09/2026 15:42 (Europe/Athens)
 
 **Pairs:** 28  |  **Aligned:** 7  |  **A+ READY:** 0
 
@@ -15,20 +15,20 @@
 | # | Pair | Dir | Setup | Bias | EMA50 | D1 Struct | H4 Struct | ADX H4 | ADX H1 | B→R→C | H1 Zone | Entry | SL | TP | RR | Quality |
 |---:|---|---|---|---|---:|---|---|---:|---:|---|---:|---:|---:|---:|---:|---:|
 | 1 | **EURAUD** | SHORT | **WATCH** | ALIGNED | 3/3 | BEAR | BEAR | 16.6 | 15.0 | **WAIT NEW RETEST** | 1.61023 | — | — | — | **—** | **52.6/100** |
-| 2 | **AUDCHF** | LONG | **WATCH** | ALIGNED | 3/3 | BULL | BULL | 12.7 | 20.7 | **WAIT NEW RETEST** | 0.58650 | — | — | — | **—** | **47.5/100** |
-| 3 | **AUDCAD** | LONG | **WATCH** | ALIGNED | 3/3 | BEAR | BULL | 18.9 | 23.5 | **WAIT NEW RETEST** | 0.99834 | — | — | — | **—** | **46.9/100** |
-| 4 | **GBPCAD** | LONG | **WATCH** | ALIGNED | 2/3 | BULL | BULL | 13.5 | 27.7 | **WAIT NEW RETEST** | 1.87432 | — | — | — | **—** | **46.8/100** |
-| 5 | **EURCAD** | LONG | **WATCH** | ALIGNED | 2/3 | BULL | BULL | 14.8 | 22.3 | **WAIT NEW RETEST** | 1.60896 | — | — | — | **—** | **45.4/100** |
-| 6 | **AUDJPY** | LONG | **WATCH** | ALIGNED | 2/3 | BEAR | BULL | 30.0 | 17.3 | **WAIT NEW RETEST** | 112.088 | — | — | — | **—** | **40.6/100** |
-| 7 | **GBPAUD** | SHORT | **WATCH** | ALIGNED | 3/3 | BULL | BULL | 15.7 | 17.0 | **WAIT NEW RETEST** | 1.87757 | — | — | — | **—** | **33.4/100** |
+| 2 | **NZDCHF** | SHORT | **WATCH** | ALIGNED | 3/3 | BEAR | BEAR | 19.9 | 17.6 | **WAIT** | — | — | — | — | **—** | **50.0/100** |
+| 3 | **AUDCAD** | LONG | **WATCH** | ALIGNED | 3/3 | BEAR | BULL | 18.9 | 23.5 | **WAIT NEW RETEST** | 0.99834 | — | — | — | **—** | **45.4/100** |
+| 4 | **GBPCAD** | LONG | **WATCH** | ALIGNED | 2/3 | BULL | BULL | 13.5 | 27.1 | **WAIT NEW RETEST** | 1.87432 | — | — | — | **—** | **44.4/100** |
+| 5 | **EURCAD** | LONG | **WATCH** | ALIGNED | 2/3 | BULL | BULL | 14.8 | 22.3 | **WAIT NEW RETEST** | 1.60896 | — | — | — | **—** | **42.2/100** |
+| 6 | **AUDJPY** | LONG | **WATCH** | ALIGNED | 2/3 | BEAR | BULL | 30.0 | 17.3 | **WAIT NEW RETEST** | 112.088 | — | — | — | **—** | **39.3/100** |
+| 7 | **GBPAUD** | SHORT | **WATCH** | ALIGNED | 3/3 | BULL | BULL | 15.7 | 17.0 | **WAIT NEW RETEST** | 1.87757 | — | — | — | **—** | **33.8/100** |
 
 ### Rating detail
 
 | Pair | D1 | H4 | H1 | Direction |
 |---|---|---|---|---|
 | EURAUD | SELL | STRONG SELL | SELL | SHORT |
-| AUDCHF | BUY | BUY | BUY | LONG |
-| AUDCAD | STRONG BUY | STRONG BUY | BUY | LONG |
+| NZDCHF | SELL | STRONG SELL | SELL | SHORT |
+| AUDCAD | STRONG BUY | BUY | BUY | LONG |
 | GBPCAD | BUY | BUY | BUY | LONG |
 | EURCAD | BUY | BUY | BUY | LONG |
 | AUDJPY | BUY | STRONG BUY | BUY | LONG |
@@ -38,32 +38,32 @@
 
 | Pair | D1 | H4 | H1 | Dir | EMA | D1 Struct | H4 Struct | BRC | RR | Quality |
 |---|---|---|---|---|---:|---|---|---|---:|---:|
-| AUDCAD | STRONG BUY | STRONG BUY | BUY | LONG | 3/3 | BEAR | BULL | WAIT NEW RETEST | — | 46.9 |
-| AUDCHF | BUY | BUY | BUY | LONG | 3/3 | BULL | BULL | WAIT NEW RETEST | — | 47.5 |
-| AUDJPY | BUY | STRONG BUY | BUY | LONG | 2/3 | BEAR | BULL | WAIT NEW RETEST | — | 40.6 |
+| AUDCAD | STRONG BUY | BUY | BUY | LONG | 3/3 | BEAR | BULL | WAIT NEW RETEST | — | 45.4 |
+| AUDCHF | BUY | BUY | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| AUDJPY | BUY | STRONG BUY | BUY | LONG | 2/3 | BEAR | BULL | WAIT NEW RETEST | — | 39.3 |
 | AUDNZD | BUY | BUY | NEUTRAL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
 | AUDUSD | NEUTRAL | BUY | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
 | CADCHF | BUY | SELL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
 | CADJPY | SELL | BUY | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
 | CHFJPY | SELL | BUY | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
 | EURAUD | SELL | STRONG SELL | SELL | SHORT | 3/3 | BEAR | BEAR | WAIT NEW RETEST | — | 52.6 |
-| EURCAD | BUY | BUY | BUY | LONG | 2/3 | BULL | BULL | WAIT NEW RETEST | — | 45.4 |
+| EURCAD | BUY | BUY | BUY | LONG | 2/3 | BULL | BULL | WAIT NEW RETEST | — | 42.2 |
 | EURCHF | BUY | SELL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
 | EURGBP | BUY | NEUTRAL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| EURJPY | SELL | BUY | STRONG BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| EURJPY | SELL | BUY | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
 | EURNZD | BUY | NEUTRAL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| EURUSD | SELL | NEUTRAL | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| GBPAUD | STRONG SELL | STRONG SELL | SELL | SHORT | 3/3 | BULL | BULL | WAIT NEW RETEST | — | 33.4 |
-| GBPCAD | BUY | BUY | BUY | LONG | 2/3 | BULL | BULL | WAIT NEW RETEST | — | 46.8 |
+| EURUSD | SELL | SELL | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| GBPAUD | STRONG SELL | STRONG SELL | SELL | SHORT | 3/3 | BULL | BULL | WAIT NEW RETEST | — | 33.8 |
+| GBPCAD | BUY | BUY | BUY | LONG | 2/3 | BULL | BULL | WAIT NEW RETEST | — | 44.4 |
 | GBPCHF | BUY | SELL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| GBPJPY | SELL | BUY | STRONG BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| GBPJPY | SELL | BUY | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
 | GBPNZD | BUY | NEUTRAL | NEUTRAL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| GBPUSD | SELL | NEUTRAL | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| GBPUSD | SELL | SELL | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
 | NZDCAD | SELL | NEUTRAL | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| NZDCHF | SELL | STRONG SELL | NEUTRAL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| NZDCHF | SELL | STRONG SELL | SELL | SHORT | 3/3 | BEAR | BEAR | WAIT | — | 50.0 |
 | NZDJPY | SELL | BUY | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
 | NZDUSD | SELL | NEUTRAL | NEUTRAL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| USDCAD | BUY | BUY | NEUTRAL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| USDCAD | BUY | BUY | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
 | USDCHF | BUY | NEUTRAL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
 | USDJPY | NEUTRAL | BUY | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
 
