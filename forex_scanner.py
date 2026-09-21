@@ -973,3 +973,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# Manual scan trigger
