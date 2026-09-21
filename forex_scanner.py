@@ -2,15 +2,15 @@
 Advanced Forex Scanner — 28 liquid pairs
 ==========================================
 
-Method:
-1) D1 + H4 + H1 TradingView technical alignment.
-2) EMA50 direction + slope on all 3 timeframes.
-3) ADX trend-strength check on H4/H1.
-4) D1/H4 market-structure proxy from completed swing highs/lows.
-5) H1 Break -> Retest -> Confirmation from completed candles.
-6) Transparent quality score (NOT a probability of winning).
+Primary source: TradingView Screener (ratings, EMA50, ADX).
+Secondary candle source: Yahoo Finance via yfinance (H1 candles used to derive
+H4/D1 market structure and H1 Break -> Retest -> Confirmation).
 
-The scanner writes LATEST_FOREX_SCAN.md after each run.
+Important:
+- Quality Score is a confluence score, NOT a win probability.
+- A+ READY is a strict filter, NOT an automatic trade instruction.
+- H4/D1 candles derived from Yahoo H1 data can differ slightly from TradingView
+  candle boundaries/provider data.
 """
 
 from __future__ import annotations
@@ -22,6 +22,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 from zoneinfo import ZoneInfo
+
+import pandas as pd
+import yfinance as yf
 
 from tvscreener import ForexField, ForexScreener
 
@@ -43,10 +46,6 @@ PROVIDER_PRIORITY = [
 STRONG_LEVEL = 0.5
 DIRECTION_LEVEL = 0.1
 ADX_MIN = 20.0
-
-# We use completed candles only:
-STRUCTURE_BARS = 7
-BRC_BARS = 10
 
 
 @dataclass(frozen=True)
@@ -82,6 +81,7 @@ class PairScan:
     zone: Optional[float]
     quality_score: float
     setup_grade: str
+    candles: str
 
 
 def q(field_name: str, label: str) -> QueryField:
@@ -127,46 +127,21 @@ def exact_pair_from_symbol(symbol: str) -> str:
     return ""
 
 
-def build_query_fields():
-    fields = [
-        ForexField.NAME,
-        ForexField.TECHNICAL_RATING,   # D1
-        ForexField.RECOMMEND_ALL_240,  # H4
-        ForexField.RECOMMEND_ALL_60,   # H1
-        ForexField.PRICE,
-        q("EMA50", "EMA50 D1"),
-        q("EMA50[1]", "EMA50 D1 Prev"),
-        q("EMA50|240", "EMA50 H4"),
-        q("EMA50[1]|240", "EMA50 H4 Prev"),
-        q("EMA50|60", "EMA50 H1"),
-        q("EMA50[1]|60", "EMA50 H1 Prev"),
-        q("ADX|240", "ADX H4"),
-        q("ADX|60", "ADX H1"),
-        q("ATR|60", "ATR H1"),
-    ]
-
-    # D1/H4 completed highs & lows for structure detection.
-    for i in range(1, STRUCTURE_BARS + 1):
-        fields += [
-            q(f"high[{i}]", f"D1 High {i}"),
-            q(f"low[{i}]", f"D1 Low {i}"),
-            q(f"high[{i}]|240", f"H4 High {i}"),
-            q(f"low[{i}]|240", f"H4 Low {i}"),
-        ]
-
-    # H1 completed OHLC candles for Break -> Retest -> Confirmation.
-    for i in range(1, BRC_BARS + 1):
-        fields += [
-            q(f"open[{i}]|60", f"H1 Open {i}"),
-            q(f"high[{i}]|60", f"H1 High {i}"),
-            q(f"low[{i}]|60", f"H1 Low {i}"),
-            q(f"close[{i}]|60", f"H1 Close {i}"),
-        ]
-
-    return fields
-
-
-QUERY_FIELDS = build_query_fields()
+QUERY_FIELDS = [
+    ForexField.NAME,
+    ForexField.TECHNICAL_RATING,   # D1
+    ForexField.RECOMMEND_ALL_240,  # H4
+    ForexField.RECOMMEND_ALL_60,   # H1
+    ForexField.PRICE,
+    q("EMA50", "EMA50 D1"),
+    q("EMA50[1]", "EMA50 D1 Prev"),
+    q("EMA50|240", "EMA50 H4"),
+    q("EMA50[1]|240", "EMA50 H4 Prev"),
+    q("EMA50|60", "EMA50 H1"),
+    q("EMA50[1]|60", "EMA50 H1 Prev"),
+    q("ADX|240", "ADX H4"),
+    q("ADX|60", "ADX H1"),
+]
 
 
 def fetch_pair(pair: str):
@@ -217,45 +192,104 @@ def ema_frame_ok(direction: str, price, ema, ema_prev) -> bool:
     return False
 
 
-def detect_structure(highs: list[Optional[float]], lows: list[Optional[float]]) -> str:
+def fetch_candle_history(pair: str):
     """
-    Uses completed candles, oldest -> newest.
-    First preference: last two local swing highs + last two local swing lows.
-    Fallback: compare recent 3-bar average high/low with the older 3-bar average.
+    Yahoo Finance H1 data. H4 and D1 are derived from H1 so structure and BRC
+    use one consistent candle source.
     """
-    if any(v is None for v in highs + lows):
+    ticker = f"{pair}=X"
+    df = yf.download(
+        ticker,
+        period="60d",
+        interval="1h",
+        auto_adjust=False,
+        progress=False,
+        threads=False,
+    )
+
+    if df is None or df.empty:
+        return None
+
+    if isinstance(df.columns, pd.MultiIndex):
+        if ticker in df.columns.get_level_values(-1):
+            try:
+                df = df.xs(ticker, axis=1, level=-1)
+            except Exception:
+                df.columns = df.columns.get_level_values(0)
+        else:
+            df.columns = df.columns.get_level_values(0)
+
+    wanted = ["Open", "High", "Low", "Close"]
+    if not all(col in df.columns for col in wanted):
+        return None
+
+    h1 = df[wanted].dropna().copy()
+    if len(h1) < 80:
+        return None
+
+    # Exclude newest H1 candle in case it is still forming.
+    h1 = h1.iloc[:-1]
+
+    agg = {"Open": "first", "High": "max", "Low": "min", "Close": "last"}
+    h4 = h1.resample("4h").agg(agg).dropna()
+    d1 = h1.resample("1D").agg(agg).dropna()
+
+    # Exclude potentially incomplete current H4/D1 aggregates.
+    if len(h4) > 1:
+        h4 = h4.iloc[:-1]
+    if len(d1) > 1:
+        d1 = d1.iloc[:-1]
+
+    if len(h1) < 30 or len(h4) < 20 or len(d1) < 15:
+        return None
+
+    return h1, h4, d1
+
+
+def detect_structure(frame: pd.DataFrame, lookback: int = 30) -> str:
+    """
+    Market-structure proxy from completed candles.
+    Prefers the last two local swing highs and lows.
+    """
+    if frame is None or len(frame) < 9:
         return "N/A"
 
-    highs_f = [float(v) for v in highs]
-    lows_f = [float(v) for v in lows]
+    data = frame.tail(lookback)
+    highs = data["High"].astype(float).tolist()
+    lows = data["Low"].astype(float).tolist()
 
     swing_highs = []
     swing_lows = []
-    for i in range(1, len(highs_f) - 1):
-        if highs_f[i] > highs_f[i - 1] and highs_f[i] > highs_f[i + 1]:
-            swing_highs.append(highs_f[i])
-        if lows_f[i] < lows_f[i - 1] and lows_f[i] < lows_f[i + 1]:
-            swing_lows.append(lows_f[i])
+    for i in range(1, len(highs) - 1):
+        if highs[i] > highs[i - 1] and highs[i] > highs[i + 1]:
+            swing_highs.append(highs[i])
+        if lows[i] < lows[i - 1] and lows[i] < lows[i + 1]:
+            swing_lows.append(lows[i])
 
     if len(swing_highs) >= 2 and len(swing_lows) >= 2:
         hh = swing_highs[-1] > swing_highs[-2]
         hl = swing_lows[-1] > swing_lows[-2]
         lh = swing_highs[-1] < swing_highs[-2]
         ll = swing_lows[-1] < swing_lows[-2]
+
         if hh and hl:
             return "BULL"
         if lh and ll:
             return "BEAR"
 
-    recent_high = sum(highs_f[-3:]) / 3
-    old_high = sum(highs_f[:3]) / 3
-    recent_low = sum(lows_f[-3:]) / 3
-    old_low = sum(lows_f[:3]) / 3
+    recent = data.tail(6)
+    older = data.iloc[-12:-6]
+    if len(older) == 6:
+        recent_high = float(recent["High"].mean())
+        recent_low = float(recent["Low"].mean())
+        older_high = float(older["High"].mean())
+        older_low = float(older["Low"].mean())
 
-    if recent_high > old_high and recent_low > old_low:
-        return "BULL"
-    if recent_high < old_high and recent_low < old_low:
-        return "BEAR"
+        if recent_high > older_high and recent_low > older_low:
+            return "BULL"
+        if recent_high < older_high and recent_low < older_low:
+            return "BEAR"
+
     return "MIXED"
 
 
@@ -265,36 +299,66 @@ def structure_matches(direction: str, structure: str) -> bool:
     )
 
 
-def detect_brc(direction: str, candles: list[dict], atr: Optional[float]):
+def current_atr(frame: pd.DataFrame, period: int = 14) -> Optional[float]:
+    if frame is None or len(frame) < period + 2:
+        return None
+
+    high = frame["High"].astype(float)
+    low = frame["Low"].astype(float)
+    close = frame["Close"].astype(float)
+    prev_close = close.shift(1)
+
+    tr = pd.concat(
+        [
+            high - low,
+            (high - prev_close).abs(),
+            (low - prev_close).abs(),
+        ],
+        axis=1,
+    ).max(axis=1)
+
+    atr = tr.rolling(period).mean().iloc[-1]
+    return safe_float(atr)
+
+
+def detect_brc(direction: str, h1: pd.DataFrame):
     """
-    candles: oldest -> newest, completed H1 candles only.
-    We search for a recent sequence:
-      Break above/below the prior 3-candle level
-      -> later retest of that level
-      -> later confirmation candle.
+    Searches recent COMPLETED H1 candles for:
+    Break -> Retest -> Confirmation.
+
+    READY is returned only when confirmation occurred in one of the latest
+    two completed H1 candles, so old patterns do not remain "ready".
     """
-    if direction not in {"LONG", "SHORT"} or len(candles) < 7:
+    if direction not in {"LONG", "SHORT"} or h1 is None or len(h1) < 20:
         return "WAIT", None
 
-    if any(c[k] is None for c in candles for k in ("open", "high", "low", "close")):
-        return "WAIT", None
+    data = h1.tail(24).copy()
+    candles = [
+        {
+            "open": float(row["Open"]),
+            "high": float(row["High"]),
+            "low": float(row["Low"]),
+            "close": float(row["Close"]),
+        }
+        for _, row in data.iterrows()
+    ]
 
-    atr_value = float(atr) if atr is not None and atr > 0 else None
-    fallback_price = float(candles[-1]["close"])
-    tolerance = (0.25 * atr_value) if atr_value else (0.0015 * fallback_price)
+    atr = current_atr(h1)
+    tolerance = 0.25 * atr if atr else 0.0015 * candles[-1]["close"]
 
     latest_progress = ("WAIT", None)
+    start = max(3, len(candles) - 10)
 
-    for break_i in range(3, len(candles) - 2):
+    for break_i in range(start, len(candles) - 2):
         previous = candles[break_i - 3:break_i]
         break_candle = candles[break_i]
 
         if direction == "LONG":
-            level = max(float(c["high"]) for c in previous)
-            broke = float(break_candle["close"]) > level
+            level = max(c["high"] for c in previous)
+            broke = break_candle["close"] > level
         else:
-            level = min(float(c["low"]) for c in previous)
-            broke = float(break_candle["close"]) < level
+            level = min(c["low"] for c in previous)
+            broke = break_candle["close"] < level
 
         if not broke:
             continue
@@ -305,11 +369,11 @@ def detect_brc(direction: str, candles: list[dict], atr: Optional[float]):
             retest = candles[retest_i]
 
             if direction == "LONG":
-                touched = float(retest["low"]) <= level + tolerance
-                held = float(retest["close"]) >= level - tolerance
+                touched = retest["low"] <= level + tolerance
+                held = retest["close"] >= level - tolerance
             else:
-                touched = float(retest["high"]) >= level - tolerance
-                held = float(retest["close"]) <= level + tolerance
+                touched = retest["high"] >= level - tolerance
+                held = retest["close"] <= level + tolerance
 
             if not (touched and held):
                 continue
@@ -318,18 +382,19 @@ def detect_brc(direction: str, candles: list[dict], atr: Optional[float]):
 
             for confirm_i in range(retest_i + 1, len(candles)):
                 confirm = candles[confirm_i]
+
                 if direction == "LONG":
                     confirmed = (
-                        float(confirm["close"]) > float(confirm["open"])
-                        and float(confirm["close"]) > level
+                        confirm["close"] > confirm["open"]
+                        and confirm["close"] > level
                     )
                 else:
                     confirmed = (
-                        float(confirm["close"]) < float(confirm["open"])
-                        and float(confirm["close"]) < level
+                        confirm["close"] < confirm["open"]
+                        and confirm["close"] < level
                     )
 
-                if confirmed:
+                if confirmed and confirm_i >= len(candles) - 2:
                     return "READY", level
 
     return latest_progress
@@ -350,7 +415,6 @@ def calc_quality(
 
     valid_ratings = [abs(v) for v in ratings if v is not None]
     rating_score = (sum(valid_ratings) / len(valid_ratings) * 25) if valid_ratings else 0.0
-
     ema_score = (ema_passes / 3) * 20
 
     adx_score = 0.0
@@ -403,18 +467,13 @@ def setup_grade(
     return "WATCH"
 
 
-def row_series(row, prefix: str, n: int):
-    # API response gives bar 1 as newest. Reverse to oldest -> newest.
-    return [safe_float(row.get(f"{prefix} {i}")) for i in range(n, 0, -1)]
-
-
 def scan_pair(pair: str) -> PairScan:
     try:
         row = fetch_pair(pair)
         if row is None:
             return PairScan(
                 pair, "", "", "—", "NO DATA", None, None, None, None,
-                0, 3, None, None, "N/A", "N/A", "WAIT", None, 0.0, "—"
+                0, 3, None, None, "N/A", "N/A", "WAIT", None, 0.0, "—", "N/A"
             )
 
         symbol = str(row.get("Symbol", ""))
@@ -441,26 +500,23 @@ def scan_pair(pair: str) -> PairScan:
 
         adx_h4 = safe_float(row.get("ADX H4"))
         adx_h1 = safe_float(row.get("ADX H1"))
-        atr_h1 = safe_float(row.get("ATR H1"))
 
-        d1_highs = row_series(row, "D1 High", STRUCTURE_BARS)
-        d1_lows = row_series(row, "D1 Low", STRUCTURE_BARS)
-        h4_highs = row_series(row, "H4 High", STRUCTURE_BARS)
-        h4_lows = row_series(row, "H4 Low", STRUCTURE_BARS)
+        d1_structure = "N/A"
+        h4_structure = "N/A"
+        brc_status = "WAIT"
+        zone = None
+        candle_status = "SKIPPED"
 
-        d1_structure = detect_structure(d1_highs, d1_lows)
-        h4_structure = detect_structure(h4_highs, h4_lows)
-
-        candles = []
-        for i in range(BRC_BARS, 0, -1):
-            candles.append({
-                "open": safe_float(row.get(f"H1 Open {i}")),
-                "high": safe_float(row.get(f"H1 High {i}")),
-                "low": safe_float(row.get(f"H1 Low {i}")),
-                "close": safe_float(row.get(f"H1 Close {i}")),
-            })
-
-        brc_status, zone = detect_brc(direction, candles, atr_h1)
+        if direction in {"LONG", "SHORT"}:
+            candle_history = fetch_candle_history(pair)
+            if candle_history is not None:
+                h1_candles, h4_candles, d1_candles = candle_history
+                d1_structure = detect_structure(d1_candles)
+                h4_structure = detect_structure(h4_candles)
+                brc_status, zone = detect_brc(direction, h1_candles)
+                candle_status = "YF"
+            else:
+                candle_status = "N/A"
 
         quality = calc_quality(
             direction,
@@ -504,13 +560,14 @@ def scan_pair(pair: str) -> PairScan:
             zone=zone,
             quality_score=quality,
             setup_grade=grade,
+            candles=candle_status,
         )
 
     except Exception as exc:
         print(f"[WARN] {pair}: {exc}")
         return PairScan(
             pair, "", "", "—", "ERROR", None, None, None, None,
-            0, 3, None, None, "N/A", "N/A", "WAIT", None, 0.0, "—"
+            0, 3, None, None, "N/A", "N/A", "WAIT", None, 0.0, "—", "ERROR"
         )
 
 
@@ -558,7 +615,9 @@ def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") 
         "",
         "> Το Quality Score είναι βαθμός συμφωνίας φίλτρων, **όχι πιθανότητα κέρδους**.",
         "",
-        "> **ENTRY READY** απαιτεί: D1/H4/H1 alignment + EMA50 + D1/H4 structure + ADX + ολοκληρωμένο H1 Break → Retest → Confirmation.",
+        "> Ratings / EMA50 / ADX: TradingView Screener. Structure / BRC: Yahoo Finance H1 candles (H4/D1 derived). Μπορεί να υπάρχουν μικρές διαφορές candle boundaries από TradingView.",
+        "",
+        "> **A+ READY** απαιτεί: D1/H4/H1 alignment + EMA50 3/3 + D1/H4 structure + ADX + φρέσκο H1 Break → Retest → Confirmation.",
         "",
         "## Top candidates",
         "",
@@ -615,7 +674,7 @@ def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") 
         "- **D1/H4 Struct:** BULL ή BEAR από ολοκληρωμένα swing highs/lows.",
         "- **ADX:** πάνω από ~20 δείχνει ισχυρότερη τάση· δεν είναι μόνο του σήμα εισόδου.",
         "- **BRC WAIT/BREAK/RETEST/READY:** πρόοδος του H1 Break → Retest → Confirmation.",
-        "- **A+ READY:** το πιο αυστηρό φίλτρο του scanner. Ακόμα χρειάζεται ανθρώπινος έλεγχος chart πριν από trade.",
+        "- **A+ READY:** το αυστηρότερο φίλτρο. Πριν από trade χρειάζεται τελικός οπτικός έλεγχος του chart και RR.",
         "",
     ]
 
