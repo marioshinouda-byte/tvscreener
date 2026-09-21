@@ -49,6 +49,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: forex-scan-output
+          retention-days: 7
           path: |
             scan_output.txt
             LATEST_FOREX_SCAN.md
