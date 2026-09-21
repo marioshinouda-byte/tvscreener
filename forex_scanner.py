@@ -1,54 +1,65 @@
 """
-Forex Scanner — D1 + H4 + H1 alignment
-=======================================
+Forex Scanner — 28 liquid pairs, D1 + H4 + H1 alignment
+========================================================
 
-Πρώτο λειτουργικό στάδιο του project:
-- Διαβάζει Forex δεδομένα από TradingView Screener μέσω tvscreener.
-- Ελέγχει Technical Rating στα D1, H4 και H1.
-- Κρατά μόνο ζευγάρια όπου και τα 3 timeframes συμφωνούν.
+Τι κάνει:
+- Σκανάρει μόνο 28 γνωστά/ρευστά Forex pairs.
+- Παίρνει TradingView Technical Rating για D1, H4 και H1.
+- Επιλέγει μία καθαρή εγγραφή ανά pair (χωρίς .P / synthetic duplicates).
 - A+ = Strong Buy και στα 3 TF ή Strong Sell και στα 3 TF.
 - WATCH = Buy και στα 3 TF ή Sell και στα 3 TF.
-- Ταξινομεί τα αποτελέσματα με βάση τη δύναμη του alignment.
+- Δημιουργεί το αρχείο LATEST_FOREX_SCAN.md για εύκολη προβολή στο GitHub.
 
 Επόμενο στάδιο:
-Break -> Retest -> Confirmation + zones + EMA50.
+Break -> Retest -> Confirmation + H1 zones + EMA50.
 """
 
 from __future__ import annotations
 
+import time
 from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
 from typing import Optional
+from zoneinfo import ZoneInfo
 
 from tvscreener import ForexField, ForexScreener
 
 
-# TradingView Technical Rating boundaries:
-# Strong Buy:  0.5 < x <= 1.0
-# Buy:         0.1 < x <= 0.5
-# Neutral:    -0.1 <= x <= 0.1
-# Sell:       -0.5 <= x < -0.1
-# Strong Sell:-1.0 <= x < -0.5
+PAIRS = [
+    "EURUSD", "GBPUSD", "USDJPY", "USDCHF", "USDCAD", "AUDUSD", "NZDUSD",
+    "EURGBP", "EURJPY", "EURCHF", "EURCAD", "EURAUD", "EURNZD",
+    "GBPJPY", "GBPCHF", "GBPCAD", "GBPAUD", "GBPNZD",
+    "AUDJPY", "AUDCHF", "AUDCAD", "AUDNZD",
+    "NZDJPY", "NZDCHF", "NZDCAD",
+    "CADJPY", "CADCHF", "CHFJPY",
+]
+
+PROVIDER_PRIORITY = [
+    "OANDA", "FOREXCOM", "FX_IDC", "SAXO", "FXCM",
+    "PEPPERSTONE", "BLACKBULL", "CAPITALCOM",
+]
+
 STRONG_LEVEL = 0.5
 DIRECTION_LEVEL = 0.1
 
 
 @dataclass
-class Setup:
+class PairScan:
+    pair: str
     symbol: str
-    name: str
+    provider: str
+    d1: Optional[float]
+    h4: Optional[float]
+    h1: Optional[float]
     direction: str
     grade: str
-    d1: float
-    h4: float
-    h1: float
     score: float
 
 
 def rating_text(value: Optional[float]) -> str:
-    """Μετατρέπει το numeric TradingView rating σε ευανάγνωστη ένδειξη."""
     if value is None:
         return "N/A"
-
     value = float(value)
     if value > 0.5:
         return "STRONG BUY"
@@ -61,119 +72,203 @@ def rating_text(value: Optional[float]) -> str:
     return "STRONG SELL"
 
 
-def fetch_forex_market():
-    """Ζητά μόνο τα πεδία που χρειαζόμαστε για D1/H4/H1 alignment."""
+def provider_rank(symbol: str) -> int:
+    provider = symbol.split(":", 1)[0] if ":" in symbol else ""
+    try:
+        return PROVIDER_PRIORITY.index(provider)
+    except ValueError:
+        return len(PROVIDER_PRIORITY)
+
+
+def exact_pair_from_symbol(symbol: str) -> str:
+    """
+    Επιστρέφει μόνο καθαρό 6-letter symbol.
+    Π.χ. OANDA:EURUSD -> EURUSD
+    BLACKBULL:EURUSD.P -> "" (απορρίπτεται)
+    """
+    raw = symbol.split(":", 1)[-1].upper()
+    if len(raw) == 6 and raw.isalpha():
+        return raw
+    return ""
+
+
+def fetch_pair(pair: str):
+    """Ψάχνει ένα pair ώστε να μη βασιζόμαστε στα πρώτα N αλφαβητικά αποτελέσματα."""
     screener = ForexScreener()
     screener.select(
         ForexField.NAME,
-        ForexField.TECHNICAL_RATING,   # D1 = Recommend.All
+        ForexField.TECHNICAL_RATING,   # D1
         ForexField.RECOMMEND_ALL_240,  # H4
         ForexField.RECOMMEND_ALL_60,   # H1
     )
-    # Μεγαλύτερο range ώστε να μην περιοριστούμε στα πρώτα 150 αποτελέσματα.
-    screener.set_range(0, 500)
-    return screener.get()
+    screener.search(pair)
+    screener.set_range(0, 50)
+    data = screener.get()
 
+    if data.empty:
+        return None
 
-def build_setups(data) -> list[Setup]:
-    """Βρίσκει τα ζευγάρια με κοινή κατεύθυνση στα D1/H4/H1."""
-    setups: list[Setup] = []
-
+    exact_rows = []
     for _, row in data.iterrows():
+        symbol = str(row.get("Symbol", ""))
+        if exact_pair_from_symbol(symbol) == pair:
+            exact_rows.append(row)
+
+    if not exact_rows:
+        return None
+
+    exact_rows.sort(key=lambda row: provider_rank(str(row.get("Symbol", ""))))
+    return exact_rows[0]
+
+
+def classify(d1: Optional[float], h4: Optional[float], h1: Optional[float]):
+    if d1 is None or h4 is None or h1 is None:
+        return "—", "—", 0.0
+
+    if d1 > STRONG_LEVEL and h4 > STRONG_LEVEL and h1 > STRONG_LEVEL:
+        direction, grade = "LONG", "A+"
+    elif d1 < -STRONG_LEVEL and h4 < -STRONG_LEVEL and h1 < -STRONG_LEVEL:
+        direction, grade = "SHORT", "A+"
+    elif d1 > DIRECTION_LEVEL and h4 > DIRECTION_LEVEL and h1 > DIRECTION_LEVEL:
+        direction, grade = "LONG", "WATCH"
+    elif d1 < -DIRECTION_LEVEL and h4 < -DIRECTION_LEVEL and h1 < -DIRECTION_LEVEL:
+        direction, grade = "SHORT", "WATCH"
+    else:
+        direction, grade = "—", "—"
+
+    score = round((abs(d1) + abs(h4) + abs(h1)) / 3 * 100, 1)
+    return direction, grade, score
+
+
+def scan_pair(pair: str) -> PairScan:
+    try:
+        row = fetch_pair(pair)
+        if row is None:
+            return PairScan(pair, "", "", None, None, None, "—", "—", 0.0)
+
+        symbol = str(row.get("Symbol", ""))
+        provider = symbol.split(":", 1)[0] if ":" in symbol else ""
+
         try:
             d1 = float(row["Technical Rating"])
             h4 = float(row["Recommend All|240"])
             h1 = float(row["Recommend All|60"])
         except (TypeError, ValueError, KeyError):
-            continue
+            d1 = h4 = h1 = None
 
-        # A+ LONG: Strong Buy και στα 3 timeframes.
-        if d1 > STRONG_LEVEL and h4 > STRONG_LEVEL and h1 > STRONG_LEVEL:
-            direction = "LONG"
-            grade = "A+"
+        direction, grade, score = classify(d1, h4, h1)
+        return PairScan(pair, symbol, provider, d1, h4, h1, direction, grade, score)
 
-        # A+ SHORT: Strong Sell και στα 3 timeframes.
-        elif d1 < -STRONG_LEVEL and h4 < -STRONG_LEVEL and h1 < -STRONG_LEVEL:
-            direction = "SHORT"
-            grade = "A+"
+    except Exception as exc:
+        print(f"[WARN] {pair}: {exc}")
+        return PairScan(pair, "", "", None, None, None, "—", "—", 0.0)
 
-        # WATCH LONG: τουλάχιστον Buy και στα 3.
-        elif d1 > DIRECTION_LEVEL and h4 > DIRECTION_LEVEL and h1 > DIRECTION_LEVEL:
-            direction = "LONG"
-            grade = "WATCH"
 
-        # WATCH SHORT: τουλάχιστον Sell και στα 3.
-        elif d1 < -DIRECTION_LEVEL and h4 < -DIRECTION_LEVEL and h1 < -DIRECTION_LEVEL:
-            direction = "SHORT"
-            grade = "WATCH"
-        else:
-            continue
+def scan_all_pairs() -> list[PairScan]:
+    results = []
+    for index, pair in enumerate(PAIRS, start=1):
+        print(f"[{index:02d}/{len(PAIRS)}] Scan {pair}...")
+        results.append(scan_pair(pair))
+        time.sleep(0.15)
+    return results
 
-        # 0–100: μέσος όρος απόλυτης ισχύος των 3 ratings.
-        score = round((abs(d1) + abs(h4) + abs(h1)) / 3 * 100, 1)
 
-        setups.append(
-            Setup(
-                symbol=str(row.get("Symbol", "")),
-                name=str(row.get("Name", "")),
-                direction=direction,
-                grade=grade,
-                d1=d1,
-                h4=h4,
-                h1=h1,
-                score=score,
+def aligned_results(results: list[PairScan]) -> list[PairScan]:
+    aligned = [r for r in results if r.grade in {"A+", "WATCH"}]
+    aligned.sort(key=lambda r: (r.grade != "A+", -r.score, r.pair))
+    return aligned
+
+
+def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") -> None:
+    now = datetime.now(ZoneInfo("Europe/Athens"))
+    aligned = aligned_results(results)
+    a_plus = [r for r in aligned if r.grade == "A+"]
+
+    lines = [
+        "# Latest Forex Scan",
+        "",
+        f"**Τελευταία ενημέρωση:** {now:%d/%m/%Y %H:%M} (Europe/Athens)",
+        "",
+        f"**Pairs που ελέγχθηκαν:** {len(results)}  |  **Aligned:** {len(aligned)}  |  **A+:** {len(a_plus)}",
+        "",
+        "> Alignment δεν σημαίνει entry. Για είσοδο περιμένουμε Break → Retest → Confirmation.",
+        "",
+        "## Top aligned setups",
+        "",
+    ]
+
+    if aligned:
+        lines += [
+            "| # | Pair | Direction | Grade | D1 | H4 | H1 | Score | Provider |",
+            "|---:|---|---|---|---|---|---|---:|---|",
+        ]
+        for i, r in enumerate(aligned, start=1):
+            lines.append(
+                f"| {i} | **{r.pair}** | {r.direction} | **{r.grade}** | "
+                f"{rating_text(r.d1)} | {rating_text(r.h4)} | {rating_text(r.h1)} | "
+                f"{r.score:.1f}% | {r.provider or 'N/A'} |"
             )
+    else:
+        lines.append("Δεν βρέθηκε αυτή τη στιγμή κοινή κατεύθυνση D1 + H4 + H1.")
+
+    lines += [
+        "",
+        "## Όλα τα 28 pairs",
+        "",
+        "| Pair | D1 | H4 | H1 | Direction | Grade | Score |",
+        "|---|---|---|---|---|---|---:|",
+    ]
+    for r in results:
+        lines.append(
+            f"| {r.pair} | {rating_text(r.d1)} | {rating_text(r.h4)} | "
+            f"{rating_text(r.h1)} | {r.direction} | {r.grade} | {r.score:.1f}% |"
         )
 
-    # Πρώτα A+, μετά υψηλότερο score.
-    setups.sort(key=lambda s: (s.grade != "A+", -s.score))
-    return setups
+    lines += [
+        "",
+        "## Επόμενο φίλτρο",
+        "",
+        "H1 zones → Break → Retest → Confirmation candle → EMA50 → τελικό A+ ranking.",
+        "",
+    ]
+
+    Path(path).write_text("\n".join(lines), encoding="utf-8")
 
 
-def print_setups(setups: list[Setup], limit: int = 20) -> None:
-    """Εμφανίζει καθαρό πίνακα αποτελεσμάτων."""
-    print("\n" + "=" * 106)
-    print("FOREX SCANNER — D1 + H4 + H1 ALIGNMENT")
-    print("=" * 106)
+def print_results(results: list[PairScan]) -> None:
+    aligned = aligned_results(results)
+
+    print("\n" + "=" * 108)
+    print("FOREX SCANNER — 28 PAIRS — D1 + H4 + H1")
+    print("=" * 108)
     print(
-        f"{'#':<3} {'PAIR':<18} {'DIR':<7} {'GRADE':<7} "
-        f"{'D1':<13} {'H4':<13} {'H1':<13} {'SCORE':>7}"
+        f"{'#':<3} {'PAIR':<8} {'DIR':<7} {'GRADE':<7} "
+        f"{'D1':<13} {'H4':<13} {'H1':<13} {'SCORE':>7}  PROVIDER"
     )
-    print("-" * 106)
+    print("-" * 108)
 
-    if not setups:
-        print("Δεν βρέθηκε αυτή τη στιγμή κοινό setup D1 + H4 + H1.")
-        return
+    if not aligned:
+        print("Δεν βρέθηκε aligned setup.")
+    else:
+        for i, r in enumerate(aligned, start=1):
+            print(
+                f"{i:<3} {r.pair:<8} {r.direction:<7} {r.grade:<7} "
+                f"{rating_text(r.d1):<13} {rating_text(r.h4):<13} "
+                f"{rating_text(r.h1):<13} {r.score:>6.1f}%  {r.provider}"
+            )
 
-    for i, setup in enumerate(setups[:limit], start=1):
-        print(
-            f"{i:<3} {setup.symbol:<18} {setup.direction:<7} {setup.grade:<7} "
-            f"{rating_text(setup.d1):<13} {rating_text(setup.h4):<13} "
-            f"{rating_text(setup.h1):<13} {setup.score:>6.1f}%"
-        )
-
-    a_plus = sum(1 for s in setups if s.grade == "A+")
-    print("-" * 106)
-    print(f"Σύνολο aligned setups: {len(setups)} | A+: {a_plus}")
-    print("\nΣημείωση: alignment ≠ είσοδος.")
-    print("Για entry περιμένουμε ακόμη Break -> Retest -> Confirmation.")
+    a_plus = sum(1 for r in aligned if r.grade == "A+")
+    print("-" * 108)
+    print(f"Checked: {len(results)} | Aligned: {len(aligned)} | A+: {a_plus}")
+    print("Alignment != entry. Entry μόνο μετά από Break -> Retest -> Confirmation.")
 
 
 def main():
-    print("Κατεβάζω Forex δεδομένα...")
-    data = fetch_forex_market()
-    print(f"Ελήφθησαν {len(data)} Forex εγγραφές.")
-
-    setups = build_setups(data)
-    print_setups(setups)
-
-    print("\nΕΠΟΜΕΝΟ ΒΗΜΑ:")
-    print("- H1 zones")
-    print("- Break")
-    print("- Retest")
-    print("- Confirmation candle")
-    print("- EMA50 filter")
-    print("- τελικό ranking A+ setups")
+    print("Ξεκινά scanner 28 Forex pairs...")
+    results = scan_all_pairs()
+    print_results(results)
+    write_markdown(results)
+    print("\nΑποθηκεύτηκε: LATEST_FOREX_SCAN.md")
 
 
 if __name__ == "__main__":
