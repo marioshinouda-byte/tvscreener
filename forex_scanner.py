@@ -48,6 +48,9 @@ DIRECTION_LEVEL = 0.1
 ADX_MIN = 20.0
 MIN_RR = 1.2
 SL_ATR_BUFFER = 0.35
+MAX_READY_DISTANCE_ATR = 0.75
+MAX_BREAK_TO_RETEST_BARS = 3
+MAX_RETEST_TO_CONFIRM_BARS = 2
 
 
 @dataclass(frozen=True)
@@ -430,11 +433,15 @@ def calculate_trade_plan(
 
 def detect_brc(direction: str, h1: pd.DataFrame):
     """
-    Searches recent COMPLETED H1 candles for:
-    Break -> Retest -> Confirmation.
+    Strict H1 Break -> Retest -> Confirmation.
 
-    READY is returned only when confirmation occurred in one of the latest
-    two completed H1 candles, so old patterns do not remain "ready".
+    READY only when:
+    - the break is recent,
+    - the retest happens within a few H1 candles after the break,
+    - the confirmation is the LATEST completed H1 candle,
+    - the latest close is not already too far from the retest zone.
+
+    This prevents old/extended moves from being shown as READY.
     """
     if direction not in {"LONG", "SHORT"} or h1 is None or len(h1) < 20:
         return "WAIT", None
@@ -452,9 +459,18 @@ def detect_brc(direction: str, h1: pd.DataFrame):
 
     atr = current_atr(h1)
     tolerance = 0.25 * atr if atr else 0.0015 * candles[-1]["close"]
+    max_ready_distance = (
+        MAX_READY_DISTANCE_ATR * atr
+        if atr
+        else 0.0030 * candles[-1]["close"]
+    )
 
+    latest_i = len(candles) - 1
     latest_progress = ("WAIT", None)
-    start = max(3, len(candles) - 10)
+    stale_zone = None
+
+    # Only recent breaks are relevant.
+    start = max(3, len(candles) - 9)
 
     for break_i in range(start, len(candles) - 2):
         previous = candles[break_i - 3:break_i]
@@ -472,7 +488,12 @@ def detect_brc(direction: str, h1: pd.DataFrame):
 
         latest_progress = ("BREAK", level)
 
-        for retest_i in range(break_i + 1, len(candles) - 1):
+        max_retest_i = min(
+            break_i + MAX_BREAK_TO_RETEST_BARS,
+            latest_i - 1,
+        )
+
+        for retest_i in range(break_i + 1, max_retest_i + 1):
             retest = candles[retest_i]
 
             if direction == "LONG":
@@ -487,7 +508,13 @@ def detect_brc(direction: str, h1: pd.DataFrame):
 
             latest_progress = ("RETEST", level)
 
-            for confirm_i in range(retest_i + 1, len(candles)):
+            # Confirmation must happen very soon after the retest.
+            max_confirm_i = min(
+                retest_i + MAX_RETEST_TO_CONFIRM_BARS,
+                latest_i,
+            )
+
+            for confirm_i in range(retest_i + 1, max_confirm_i + 1):
                 confirm = candles[confirm_i]
 
                 if direction == "LONG":
@@ -501,8 +528,27 @@ def detect_brc(direction: str, h1: pd.DataFrame):
                         and confirm["close"] < level
                     )
 
-                if confirmed and confirm_i >= len(candles) - 2:
-                    return "READY", level
+                if not confirmed:
+                    continue
+
+                # Old confirmation is no longer an entry signal.
+                if confirm_i != latest_i:
+                    stale_zone = level
+                    continue
+
+                # Do not chase price if it already extended too far from zone.
+                distance = abs(confirm["close"] - level)
+                if distance > max_ready_distance:
+                    return "WAIT NEW RETEST", level
+
+                return "READY", level
+
+    if stale_zone is not None:
+        return "WAIT NEW RETEST", stale_zone
+
+    # A retest from many candles ago is no longer "live".
+    if latest_progress[0] == "RETEST":
+        return "WAIT NEW RETEST", latest_progress[1]
 
     return latest_progress
 
@@ -540,6 +586,7 @@ def calc_quality(
         "BREAK": 6,
         "RETEST": 12,
         "READY": 20,
+        "WAIT NEW RETEST": 0,
     }.get(brc_status, 0)
 
     return round(min(rating_score + ema_score + adx_score + structure_score + brc_score, 100), 1)
@@ -756,7 +803,7 @@ def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") 
         "",
         "> Ratings / EMA50 / ADX: TradingView Screener. Structure / BRC: Yahoo Finance H1 candles (H4/D1 derived). Μπορεί να υπάρχουν μικρές διαφορές candle boundaries από TradingView.",
         "",
-        "> **A+ READY** απαιτεί: D1/H4/H1 alignment + EMA50 3/3 + D1/H4 structure + ADX + φρέσκο H1 Break → Retest → Confirmation + **RR ≥ 1.2**.",
+        "> **A+ READY** απαιτεί: D1/H4/H1 alignment + EMA50 3/3 + D1/H4 structure + ADX + **confirmation στο τελευταίο κλεισμένο H1**, χωρίς υπερβολική απόσταση από τη zone + **RR ≥ 1.2**.",
         "",
         "## Top candidates",
         "",
@@ -815,7 +862,7 @@ def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") 
         "- **EMA50 3/3:** τιμή και κλίση EMA50 συμφωνούν με την κατεύθυνση και στα 3 TF.",
         "- **D1/H4 Struct:** BULL ή BEAR από ολοκληρωμένα swing highs/lows.",
         "- **ADX:** πάνω από ~20 δείχνει ισχυρότερη τάση· δεν είναι μόνο του σήμα εισόδου.",
-        "- **BRC WAIT/BREAK/RETEST/READY:** πρόοδος του H1 Break → Retest → Confirmation.",
+        "- **BRC WAIT/BREAK/RETEST/READY:** πρόοδος του H1 Break → Retest → Confirmation. **WAIT NEW RETEST** σημαίνει ότι το παλιό confirmation θεωρείται πλέον ξεπερασμένο ή η τιμή έχει απομακρυνθεί πολύ από τη zone.",
         "- **Entry/SL/TP:** εμφανίζονται μόνο όταν το BRC είναι READY. Entry = τελευταίο κλεισμένο H1, SL = H1 zone ± 0.35×ATR, TP = κοντινότερο ολοκληρωμένο H4 swing target.",
         f"- **RR:** ✅ όταν RR ≥ {MIN_RR:.1f}, ❌ όταν είναι χαμηλότερο. Το A+ READY απαιτεί RR pass.",
         "- **A+ READY:** το αυστηρότερο φίλτρο. Πριν από trade χρειάζεται τελικός οπτικός έλεγχος chart, spread/news και sizing.",
