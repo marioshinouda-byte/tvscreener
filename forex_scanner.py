@@ -46,6 +46,8 @@ PROVIDER_PRIORITY = [
 STRONG_LEVEL = 0.5
 DIRECTION_LEVEL = 0.1
 ADX_MIN = 20.0
+MIN_RR = 1.2
+SL_ATR_BUFFER = 0.35
 
 
 @dataclass(frozen=True)
@@ -82,6 +84,11 @@ class PairScan:
     quality_score: float
     setup_grade: str
     candles: str
+    entry: Optional[float]
+    stop_loss: Optional[float]
+    take_profit: Optional[float]
+    rr: Optional[float]
+    rr_pass: bool
 
 
 def q(field_name: str, label: str) -> QueryField:
@@ -321,6 +328,106 @@ def current_atr(frame: pd.DataFrame, period: int = 14) -> Optional[float]:
     return safe_float(atr)
 
 
+def local_swing_levels(frame: pd.DataFrame, lookback: int = 40):
+    """Return local H4 swing highs/lows from completed candles."""
+    if frame is None or len(frame) < 5:
+        return [], []
+
+    data = frame.tail(lookback)
+    highs = data["High"].astype(float).tolist()
+    lows = data["Low"].astype(float).tolist()
+
+    swing_highs = []
+    swing_lows = []
+    for i in range(1, len(highs) - 1):
+        if highs[i] > highs[i - 1] and highs[i] > highs[i + 1]:
+            swing_highs.append(highs[i])
+        if lows[i] < lows[i - 1] and lows[i] < lows[i + 1]:
+            swing_lows.append(lows[i])
+
+    return swing_highs, swing_lows
+
+
+def calculate_trade_plan(
+    direction: str,
+    brc_status: str,
+    zone: Optional[float],
+    h1: pd.DataFrame,
+    h4: pd.DataFrame,
+):
+    """
+    Conservative plan created only after a fresh H1 BRC confirmation.
+
+    Entry = latest completed H1 close.
+    SL = BRC zone +/- 0.35 * H1 ATR(14).
+    TP = nearest completed H4 swing target beyond entry.
+    RR is rejected when below MIN_RR.
+    """
+    if (
+        direction not in {"LONG", "SHORT"}
+        or brc_status != "READY"
+        or zone is None
+        or h1 is None
+        or h4 is None
+        or h1.empty
+        or h4.empty
+    ):
+        return None, None, None, None, False
+
+    entry = safe_float(h1["Close"].iloc[-1])
+    atr = current_atr(h1)
+    if entry is None or atr is None or atr <= 0:
+        return None, None, None, None, False
+
+    buffer = SL_ATR_BUFFER * atr
+    swing_highs, swing_lows = local_swing_levels(h4)
+
+    if direction == "LONG":
+        stop = float(zone) - buffer
+        if stop >= entry:
+            return entry, None, None, None, False
+
+        candidates = sorted(level for level in swing_highs if level > entry)
+        target = candidates[0] if candidates else None
+        if target is None:
+            fallback = safe_float(h4["High"].tail(20).max())
+            if fallback is not None and fallback > entry:
+                target = fallback
+
+        if target is None:
+            return entry, stop, None, None, False
+
+        risk = entry - stop
+        reward = target - entry
+
+    else:
+        stop = float(zone) + buffer
+        if stop <= entry:
+            return entry, None, None, None, False
+
+        candidates = sorted(
+            (level for level in swing_lows if level < entry),
+            reverse=True,
+        )
+        target = candidates[0] if candidates else None
+        if target is None:
+            fallback = safe_float(h4["Low"].tail(20).min())
+            if fallback is not None and fallback < entry:
+                target = fallback
+
+        if target is None:
+            return entry, stop, None, None, False
+
+        risk = stop - entry
+        reward = entry - target
+
+    if risk <= 0 or reward <= 0:
+        return entry, stop, target, None, False
+
+    rr = round(reward / risk, 2)
+    return entry, stop, target, rr, rr >= MIN_RR
+
+
 def detect_brc(direction: str, h1: pd.DataFrame):
     """
     Searches recent COMPLETED H1 candles for:
@@ -447,6 +554,7 @@ def setup_grade(
     h4_structure: str,
     brc_status: str,
     quality: float,
+    rr_pass: bool,
 ) -> str:
     if direction not in {"LONG", "SHORT"}:
         return "—"
@@ -460,9 +568,11 @@ def setup_grade(
         and adx_h1 is not None and adx_h1 >= ADX_MIN
     )
 
-    if brc_status == "READY" and ema_passes == 3 and structure_both and adx_ok:
+    if brc_status == "READY" and ema_passes == 3 and structure_both and adx_ok and rr_pass:
         return "A+ READY"
-    if brc_status in {"RETEST", "READY"} and ema_passes >= 2 and quality >= 65:
+    if brc_status == "READY" and ema_passes >= 2 and quality >= 65 and rr_pass:
+        return "A"
+    if brc_status == "RETEST" and ema_passes >= 2 and quality >= 65:
         return "A"
     return "WATCH"
 
@@ -473,7 +583,8 @@ def scan_pair(pair: str) -> PairScan:
         if row is None:
             return PairScan(
                 pair, "", "", "—", "NO DATA", None, None, None, None,
-                0, 3, None, None, "N/A", "N/A", "WAIT", None, 0.0, "—", "N/A"
+                0, 3, None, None, "N/A", "N/A", "WAIT", None, 0.0, "—", "N/A",
+                None, None, None, None, False
             )
 
         symbol = str(row.get("Symbol", ""))
@@ -506,6 +617,11 @@ def scan_pair(pair: str) -> PairScan:
         brc_status = "WAIT"
         zone = None
         candle_status = "SKIPPED"
+        entry = None
+        stop_loss = None
+        take_profit = None
+        rr = None
+        rr_pass = False
 
         if direction in {"LONG", "SHORT"}:
             candle_history = fetch_candle_history(pair)
@@ -514,6 +630,9 @@ def scan_pair(pair: str) -> PairScan:
                 d1_structure = detect_structure(d1_candles)
                 h4_structure = detect_structure(h4_candles)
                 brc_status, zone = detect_brc(direction, h1_candles)
+                entry, stop_loss, take_profit, rr, rr_pass = calculate_trade_plan(
+                    direction, brc_status, zone, h1_candles, h4_candles
+                )
                 candle_status = "YF"
             else:
                 candle_status = "N/A"
@@ -538,6 +657,7 @@ def scan_pair(pair: str) -> PairScan:
             h4_structure,
             brc_status,
             quality,
+            rr_pass,
         )
 
         return PairScan(
@@ -561,13 +681,19 @@ def scan_pair(pair: str) -> PairScan:
             quality_score=quality,
             setup_grade=grade,
             candles=candle_status,
+            entry=entry,
+            stop_loss=stop_loss,
+            take_profit=take_profit,
+            rr=rr,
+            rr_pass=rr_pass,
         )
 
     except Exception as exc:
         print(f"[WARN] {pair}: {exc}")
         return PairScan(
             pair, "", "", "—", "ERROR", None, None, None, None,
-            0, 3, None, None, "N/A", "N/A", "WAIT", None, 0.0, "—", "ERROR"
+            0, 3, None, None, "N/A", "N/A", "WAIT", None, 0.0, "—", "ERROR",
+            None, None, None, None, False
         )
 
 
@@ -601,6 +727,19 @@ def fmt_zone(value: Optional[float]) -> str:
     return f"{value:.5f}"
 
 
+def fmt_price(pair: str, value: Optional[float]) -> str:
+    if value is None:
+        return "—"
+    return f"{value:.3f}" if "JPY" in pair else f"{value:.5f}"
+
+
+def fmt_rr(value: Optional[float], passed: bool) -> str:
+    if value is None:
+        return "—"
+    mark = "✅" if passed else "❌"
+    return f"{value:.2f} {mark}"
+
+
 def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") -> None:
     now = datetime.now(ZoneInfo("Europe/Athens"))
     top = candidates(results)
@@ -617,7 +756,7 @@ def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") 
         "",
         "> Ratings / EMA50 / ADX: TradingView Screener. Structure / BRC: Yahoo Finance H1 candles (H4/D1 derived). Μπορεί να υπάρχουν μικρές διαφορές candle boundaries από TradingView.",
         "",
-        "> **A+ READY** απαιτεί: D1/H4/H1 alignment + EMA50 3/3 + D1/H4 structure + ADX + φρέσκο H1 Break → Retest → Confirmation.",
+        "> **A+ READY** απαιτεί: D1/H4/H1 alignment + EMA50 3/3 + D1/H4 structure + ADX + φρέσκο H1 Break → Retest → Confirmation + **RR ≥ 1.2**.",
         "",
         "## Top candidates",
         "",
@@ -625,15 +764,17 @@ def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") 
 
     if top:
         lines += [
-            "| # | Pair | Dir | Setup | Bias | EMA50 | D1 Struct | H4 Struct | ADX H4 | ADX H1 | B→R→C | H1 Zone | Quality |",
-            "|---:|---|---|---|---|---:|---|---|---:|---:|---|---:|---:|",
+            "| # | Pair | Dir | Setup | Bias | EMA50 | D1 Struct | H4 Struct | ADX H4 | ADX H1 | B→R→C | H1 Zone | Entry | SL | TP | RR | Quality |",
+            "|---:|---|---|---|---|---:|---|---|---:|---:|---|---:|---:|---:|---:|---:|---:|",
         ]
         for i, r in enumerate(top, start=1):
             lines.append(
                 f"| {i} | **{r.pair}** | {r.direction} | **{r.setup_grade}** | {r.bias} | "
                 f"{r.ema_passes}/3 | {r.d1_structure} | {r.h4_structure} | "
                 f"{fmt_num(r.adx_h4)} | {fmt_num(r.adx_h1)} | **{r.brc_status}** | "
-                f"{fmt_zone(r.zone)} | **{r.quality_score:.1f}/100** |"
+                f"{fmt_zone(r.zone)} | {fmt_price(r.pair, r.entry)} | "
+                f"{fmt_price(r.pair, r.stop_loss)} | {fmt_price(r.pair, r.take_profit)} | "
+                f"**{fmt_rr(r.rr, r.rr_pass)}** | **{r.quality_score:.1f}/100** |"
             )
     else:
         lines.append("Δεν βρέθηκε αυτή τη στιγμή D1 + H4 + H1 alignment.")
@@ -655,14 +796,15 @@ def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") 
         "",
         "## Όλα τα 28 pairs",
         "",
-        "| Pair | D1 | H4 | H1 | Dir | EMA | D1 Struct | H4 Struct | BRC | Quality |",
-        "|---|---|---|---|---|---:|---|---|---|---:|",
+        "| Pair | D1 | H4 | H1 | Dir | EMA | D1 Struct | H4 Struct | BRC | RR | Quality |",
+        "|---|---|---|---|---|---:|---|---|---|---:|---:|",
     ]
     for r in sorted(results, key=lambda x: x.pair):
         lines.append(
             f"| {r.pair} | {rating_text(r.d1_rating)} | {rating_text(r.h4_rating)} | "
             f"{rating_text(r.h1_rating)} | {r.direction} | {r.ema_passes}/3 | "
-            f"{r.d1_structure} | {r.h4_structure} | {r.brc_status} | {r.quality_score:.1f} |"
+            f"{r.d1_structure} | {r.h4_structure} | {r.brc_status} | "
+            f"{fmt_rr(r.rr, r.rr_pass)} | {r.quality_score:.1f} |"
         )
 
     lines += [
@@ -674,7 +816,9 @@ def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") 
         "- **D1/H4 Struct:** BULL ή BEAR από ολοκληρωμένα swing highs/lows.",
         "- **ADX:** πάνω από ~20 δείχνει ισχυρότερη τάση· δεν είναι μόνο του σήμα εισόδου.",
         "- **BRC WAIT/BREAK/RETEST/READY:** πρόοδος του H1 Break → Retest → Confirmation.",
-        "- **A+ READY:** το αυστηρότερο φίλτρο. Πριν από trade χρειάζεται τελικός οπτικός έλεγχος του chart και RR.",
+        "- **Entry/SL/TP:** εμφανίζονται μόνο όταν το BRC είναι READY. Entry = τελευταίο κλεισμένο H1, SL = H1 zone ± 0.35×ATR, TP = κοντινότερο ολοκληρωμένο H4 swing target.",
+        f"- **RR:** ✅ όταν RR ≥ {MIN_RR:.1f}, ❌ όταν είναι χαμηλότερο. Το A+ READY απαιτεί RR pass.",
+        "- **A+ READY:** το αυστηρότερο φίλτρο. Πριν από trade χρειάζεται τελικός οπτικός έλεγχος chart, spread/news και sizing.",
         "",
     ]
 
@@ -688,7 +832,7 @@ def print_results(results: list[PairScan]) -> None:
     print("=" * 130)
     print(
         f"{'#':<3} {'PAIR':<8} {'DIR':<6} {'SETUP':<10} {'EMA':<5} "
-        f"{'D1':<6} {'H4':<6} {'ADX4':>6} {'ADX1':>6} {'BRC':<7} {'QUALITY':>8}"
+        f"{'D1':<6} {'H4':<6} {'ADX4':>6} {'ADX1':>6} {'BRC':<7} {'RR':>6} {'QUALITY':>8}"
     )
     print("-" * 130)
 
@@ -697,7 +841,7 @@ def print_results(results: list[PairScan]) -> None:
             f"{i:<3} {r.pair:<8} {r.direction:<6} {r.setup_grade:<10} "
             f"{r.ema_passes}/3  {r.d1_structure:<6} {r.h4_structure:<6} "
             f"{fmt_num(r.adx_h4):>6} {fmt_num(r.adx_h1):>6} "
-            f"{r.brc_status:<7} {r.quality_score:>7.1f}"
+            f"{r.brc_status:<7} {fmt_num(r.rr, 2):>6} {r.quality_score:>7.1f}"
         )
 
     ready = sum(1 for r in top if r.setup_grade == "A+ READY")
