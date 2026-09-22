@@ -49,7 +49,7 @@ ADX_MIN = 20.0
 MIN_RR = 1.2
 SL_ATR_BUFFER = 0.35
 MAX_READY_DISTANCE_ATR = 0.75
-MAX_BREAK_TO_RETEST_BARS = 3
+MAX_BREAK_TO_RETEST_BARS = 8
 MAX_RETEST_TO_CONFIRM_BARS = 2
 H1_SWING_LEFT = 15
 H1_SWING_RIGHT = 15
@@ -550,15 +550,11 @@ def detect_brc(direction: str, h1: pd.DataFrame):
     if break_i is None:
         return "WAIT FOR BREAK", level
 
-    # Break happened, but we only care about a recent actionable sequence.
-    if latest_i - break_i > (
-        MAX_BREAK_TO_RETEST_BARS + MAX_RETEST_TO_CONFIRM_BARS + 2
-    ):
-        return "WAIT NEW RETEST", level
-
+    # Keep the broken zone active for up to 8 subsequent closed H1 candles.
+    # The retest candle may be the latest candle; confirmation must come after it.
     max_retest_i = min(
         break_i + MAX_BREAK_TO_RETEST_BARS,
-        latest_i - 1,
+        latest_i,
     )
 
     retest_i = None
@@ -577,6 +573,9 @@ def detect_brc(direction: str, h1: pd.DataFrame):
             break
 
     if retest_i is None:
+        # Once the 8-candle retest window closes, discard this broken zone.
+        if latest_i - break_i >= MAX_BREAK_TO_RETEST_BARS:
+            return "WAIT NEW RETEST", level
         return "BREAK", level
 
     max_confirm_i = min(
@@ -928,7 +927,7 @@ def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") 
         "- **EMA50 3/3:** τιμή και κλίση EMA50 συμφωνούν με την κατεύθυνση και στα 3 TF.",
         "- **D1/H4 Struct:** BULL ή BEAR από ολοκληρωμένα swing highs/lows.",
         "- **ADX:** πάνω από ~20 δείχνει ισχυρότερη τάση· δεν είναι μόνο του σήμα εισόδου.",
-        "- **BRC WAIT FOR BREAK/BREAK/RETEST/READY:** το break γίνεται μόνο σε **επιβεβαιωμένο H1 swing resistance/support (15 κεριά αριστερά + 15 δεξιά)**, όχι σε μικρό 3-candle high/low. **WAIT NEW RETEST** σημαίνει ότι το παλιό setup έχει ξεπεραστεί ή η τιμή απομακρύνθηκε από τη zone.",
+        "- **BRC WAIT FOR BREAK/BREAK/RETEST/READY:** το break γίνεται μόνο σε **επιβεβαιωμένο H1 swing resistance/support (15 κεριά αριστερά + 15 δεξιά)**, όχι σε μικρό 3-candle high/low. Μετά το break, η broken zone μένει ενεργή για έως **8 επόμενα κλεισμένα H1 κεριά** ώστε να προλάβει retest. **WAIT NEW RETEST** σημαίνει ότι το παλιό setup έχει λήξει ή η τιμή απομακρύνθηκε από τη zone.",
         "- **Entry/SL/TP:** εμφανίζονται μόνο όταν το BRC είναι READY. Entry = τελευταίο κλεισμένο H1, SL = H1 zone ± 0.35×ATR, TP = κοντινότερο ολοκληρωμένο H4 swing target.",
         f"- **RR:** ✅ όταν RR ≥ {MIN_RR:.1f}, ❌ όταν είναι χαμηλότερο. Το A+ READY απαιτεί RR pass.",
         "- **A+ READY:** το αυστηρότερο φίλτρο. Πριν από trade χρειάζεται τελικός οπτικός έλεγχος chart, spread/news και sizing.",
