@@ -974,4 +974,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-# Manual scan trigger
+# Manual scan trigger 2026-09-22 12:01 Europe/Athens
