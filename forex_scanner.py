@@ -68,6 +68,9 @@ REVERSAL_H4_TOUCH_BARS = 18
 REVERSAL_ZONE_TOUCH_ATR = 0.55
 REVERSAL_INVALIDATION_ATR = 0.20
 REVERSAL_SL_BUFFER_ATR = 0.20
+# Pre-break reversal contexts are ARMED only when price is genuinely close
+# to the required H1 break. ATR keeps the rule consistent across all pairs.
+REVERSAL_MAX_ARMED_BREAK_DISTANCE_ATR = 1.50
 REVERSAL_MIN_ACTIVE_SCORE = 75.0
 
 _CANDLE_HISTORY_CACHE = {}
@@ -846,7 +849,12 @@ def analyze_htf_reversal(
 
     d1_atr = current_atr(d1)
     h4_atr = current_atr(h4)
-    if d1_atr is None or d1_atr <= 0 or h4_atr is None or h4_atr <= 0:
+    h1_atr = current_atr(h1)
+    if (
+        d1_atr is None or d1_atr <= 0
+        or h4_atr is None or h4_atr <= 0
+        or h1_atr is None or h1_atr <= 0
+    ):
         return result
 
     swing_highs, swing_lows = confirmed_daily_levels(d1)
@@ -927,6 +935,11 @@ def analyze_htf_reversal(
             stale_move = away > 2.75 * d1_atr
             brc_status, h1_zone = detect_brc(direction, h1)
 
+            break_distance_atr = None
+            if brc_status == "WAIT FOR BREAK" and h1_zone is not None:
+                h1_close = float(h1["Close"].iloc[-1])
+                break_distance_atr = abs(h1_close - float(h1_zone)) / h1_atr
+
             score = 25.0
             score += max(0.0, 10.0 * (1.0 - touch_distance / REVERSAL_ZONE_TOUCH_ATR))
             score += 15.0 if sweep else 0.0
@@ -956,9 +969,32 @@ def analyze_htf_reversal(
             elif brc_status == "RETEST":
                 status = "ARMED"
                 note = "H1 retest — περιμένει confirmation"
-            elif evidence_count >= 2 and moved_away:
+            elif (
+                evidence_count >= 2
+                and moved_away
+                and brc_status == "WAIT FOR BREAK"
+                and break_distance_atr is not None
+                and break_distance_atr <= REVERSAL_MAX_ARMED_BREAK_DISTANCE_ATR
+            ):
                 status = "ARMED"
-                note = "HTF αντίδραση — περιμένει H1 break"
+                note = (
+                    "HTF αντίδραση — H1 break κοντά "
+                    f"({break_distance_atr:.1f} ATR)"
+                )
+            elif (
+                evidence_count >= 2
+                and moved_away
+                and brc_status == "WAIT FOR BREAK"
+                and break_distance_atr is not None
+            ):
+                status = "WATCH"
+                note = (
+                    "HTF αντίδραση — H1 break μακριά "
+                    f"({break_distance_atr:.1f} ATR)"
+                )
+            elif evidence_count >= 2 and moved_away:
+                status = "WATCH"
+                note = "HTF αντίδραση — δεν υπάρχει ακόμη έγκυρο κοντινό H1 break"
             else:
                 status = "WATCH"
                 note = "D1 zone υπό παρακολούθηση"
@@ -1361,7 +1397,7 @@ def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") 
         "",
         "## HTF Reversal — ξεχωριστό mode",
         "",
-        f"> Δεν αναμειγνύεται με το A+ Trend. Ψάχνει D1 support/resistance → H4 sweep/rejection/displacement → H1 break/retest/confirmation. Το shortlist κρατά μόνο ενεργά contexts με **score ≥ {REVERSAL_MIN_ACTIVE_SCORE:.0f}**. Το **READY** απαιτεί φυσικό D1 target με **RR ≥ 3.0**.",
+        f"> Δεν αναμειγνύεται με το A+ Trend. Ψάχνει D1 support/resistance → H4 sweep/rejection/displacement → H1 break/retest/confirmation. Πριν από το break, ένα setup γίνεται **ARMED** μόνο όταν το H1 break απέχει έως **{REVERSAL_MAX_ARMED_BREAK_DISTANCE_ATR:.1f}× H1 ATR**. Το shortlist κρατά μόνο ενεργά contexts με **score ≥ {REVERSAL_MIN_ACTIVE_SCORE:.0f}**. Το **READY** απαιτεί φυσικό D1 target με **RR ≥ 3.0**.",
         "",
     ]
 
@@ -1405,7 +1441,7 @@ def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") 
         "### Καταστάσεις HTF Reversal",
         "",
         "- **WATCH:** η τιμή αντέδρασε σε επιβεβαιωμένη D1 zone, αλλά δεν υπάρχει ακόμη αρκετή H4 επιβεβαίωση.",
-        f"- **ARMED:** υπάρχουν τουλάχιστον δύο στοιχεία H4 ή έχει γίνει H1 retest· μπαίνει στο shortlist μόνο με score ≥ {REVERSAL_MIN_ACTIVE_SCORE:.0f} και περιμένει το επόμενο βήμα επιβεβαίωσης.",
+        f"- **ARMED:** H1 retest ή ισχυρό HTF context με το απαιτούμενο H1 break έως {REVERSAL_MAX_ARMED_BREAK_DISTANCE_ATR:.1f}× H1 ATR μακριά· μπαίνει στο shortlist μόνο με score ≥ {REVERSAL_MIN_ACTIVE_SCORE:.0f}.",
         "- **WAIT RETEST:** έγινε H1 break και περιμένει επιστροφή στη broken zone.",
         "- **READY:** fresh confirmation στο τελευταίο κλεισμένο H1 και RR ≥ 3.0 προς την επόμενη D1 zone.",
         "- **INVALID:** παραβίαση D1 zone, ληγμένο H1 setup, υπερβολική απομάκρυνση ή RR < 3.0.",
