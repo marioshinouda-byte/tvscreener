@@ -68,6 +68,7 @@ REVERSAL_H4_TOUCH_BARS = 18
 REVERSAL_ZONE_TOUCH_ATR = 0.55
 REVERSAL_INVALIDATION_ATR = 0.20
 REVERSAL_SL_BUFFER_ATR = 0.20
+REVERSAL_MIN_ACTIVE_SCORE = 75.0
 
 _CANDLE_HISTORY_CACHE = {}
 
@@ -1245,8 +1246,8 @@ def reversal_candidates(results: list[PairScan]) -> list[PairScan]:
         r for r in results
         if r.reversal is not None
         and r.reversal.direction in {"LONG", "SHORT"}
-        and r.reversal.status != "NO SETUP"
-        and r.reversal.score >= 35.0
+        and r.reversal.status in {"READY", "WAIT RETEST", "ARMED"}
+        and r.reversal.score >= REVERSAL_MIN_ACTIVE_SCORE
     ]
     priority = {
         "READY": 0,
@@ -1360,7 +1361,7 @@ def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") 
         "",
         "## HTF Reversal — ξεχωριστό mode",
         "",
-        "> Δεν αναμειγνύεται με το A+ Trend. Ψάχνει D1 support/resistance → H4 sweep/rejection/displacement → H1 break/retest/confirmation. Το **READY** απαιτεί φυσικό D1 target με **RR ≥ 3.0**.",
+        f"> Δεν αναμειγνύεται με το A+ Trend. Ψάχνει D1 support/resistance → H4 sweep/rejection/displacement → H1 break/retest/confirmation. Το shortlist κρατά μόνο ενεργά contexts με **score ≥ {REVERSAL_MIN_ACTIVE_SCORE:.0f}**. Το **READY** απαιτεί φυσικό D1 target με **RR ≥ 3.0**.",
         "",
     ]
 
@@ -1384,14 +1385,27 @@ def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") 
                 f"{fmt_rr(rev.rr, rev.rr_pass)} | **{rev.score:.1f}/100** | {rev.note} |"
             )
     else:
-        lines.append("Δεν υπάρχει πρόσφατο HTF reversal context που να περνά το ελάχιστο φίλτρο.")
+        lines.append("Δεν υπάρχει ενεργό HTF reversal context που να περνά το αυστηρό shortlist.")
+
+    watch_count = sum(
+        1 for r in results
+        if r.reversal is not None and r.reversal.status == "WATCH"
+    )
+    invalid_count = sum(
+        1 for r in results
+        if r.reversal is not None and r.reversal.status == "INVALID"
+    )
+    lines += [
+        "",
+        f"_Εκτός shortlist: WATCH {watch_count} | INVALID {invalid_count}. Δεν θεωρούνται ενεργά candidates._",
+    ]
 
     lines += [
         "",
         "### Καταστάσεις HTF Reversal",
         "",
         "- **WATCH:** η τιμή αντέδρασε σε επιβεβαιωμένη D1 zone, αλλά δεν υπάρχει ακόμη αρκετή H4 επιβεβαίωση.",
-        "- **ARMED:** υπάρχουν τουλάχιστον δύο στοιχεία H4 ή έχει γίνει H1 retest· περιμένει το επόμενο βήμα επιβεβαίωσης.",
+        f"- **ARMED:** υπάρχουν τουλάχιστον δύο στοιχεία H4 ή έχει γίνει H1 retest· μπαίνει στο shortlist μόνο με score ≥ {REVERSAL_MIN_ACTIVE_SCORE:.0f} και περιμένει το επόμενο βήμα επιβεβαίωσης.",
         "- **WAIT RETEST:** έγινε H1 break και περιμένει επιστροφή στη broken zone.",
         "- **READY:** fresh confirmation στο τελευταίο κλεισμένο H1 και RR ≥ 3.0 προς την επόμενη D1 zone.",
         "- **INVALID:** παραβίαση D1 zone, ληγμένο H1 setup, υπερβολική απομάκρυνση ή RR < 3.0.",

@@ -92,3 +92,46 @@ def test_h4_close_through_d1_zone_invalidates_context():
     assert reversal.direction == "SHORT"
     assert reversal.status == "INVALID"
     assert "πέρα από" in reversal.note
+
+
+def pair_with_reversal(pair, reversal):
+    return scanner.PairScan(
+        pair=pair,
+        symbol="",
+        provider="",
+        direction="—",
+        bias="MIXED",
+        d1_rating=None,
+        h4_rating=None,
+        h1_rating=None,
+        price=None,
+        ema_passes=0,
+        ema_total=3,
+        adx_h4=None,
+        adx_h1=None,
+        d1_structure="N/A",
+        h4_structure="N/A",
+        brc_status="WAIT",
+        zone=None,
+        quality_score=0.0,
+        setup_grade="—",
+        candles="YF",
+        entry=None,
+        stop_loss=None,
+        take_profit=None,
+        rr=None,
+        rr_pass=False,
+        reversal=reversal,
+    )
+
+
+def test_shortlist_keeps_only_strong_active_contexts():
+    results = [
+        pair_with_reversal("GBPNZD", scanner.ReversalScan("SHORT", "ARMED", 82.8)),
+        pair_with_reversal("EURUSD", scanner.ReversalScan("SHORT", "ARMED", 74.9)),
+        pair_with_reversal("GBPUSD", scanner.ReversalScan("SHORT", "INVALID", 95.0)),
+    ]
+
+    shortlist = scanner.reversal_candidates(results)
+
+    assert [item.pair for item in shortlist] == ["GBPNZD"]
