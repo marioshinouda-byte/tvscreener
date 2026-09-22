@@ -16,6 +16,7 @@ Important:
 from __future__ import annotations
 
 import math
+import os
 import time
 from dataclasses import dataclass
 from datetime import datetime
@@ -56,6 +57,20 @@ H1_SWING_RIGHT = 15
 H1_SWING_PROMINENCE_ATR = 0.50
 BREAK_CLOSE_BUFFER_ATR = 0.05
 
+# Independent, reversible mode for higher-timeframe reversal setups. Set
+# ENABLE_HTF_REVERSAL=false to disable it without touching the A+ trend model.
+ENABLE_HTF_REVERSAL = os.getenv("ENABLE_HTF_REVERSAL", "true").strip().lower() not in {
+    "0", "false", "no", "off",
+}
+REVERSAL_MIN_RR = 3.0
+REVERSAL_D1_LOOKBACK = 55
+REVERSAL_H4_TOUCH_BARS = 18
+REVERSAL_ZONE_TOUCH_ATR = 0.55
+REVERSAL_INVALIDATION_ATR = 0.20
+REVERSAL_SL_BUFFER_ATR = 0.20
+
+_CANDLE_HISTORY_CACHE = {}
+
 
 @dataclass(frozen=True)
 class QueryField:
@@ -67,6 +82,27 @@ class QueryField:
 
     def has_recommendation(self) -> bool:
         return False
+
+
+@dataclass
+class ReversalScan:
+    direction: str = "—"
+    status: str = "NO SETUP"
+    score: float = 0.0
+    htf_zone: Optional[float] = None
+    zone_kind: str = "—"
+    sweep: bool = False
+    rejection: bool = False
+    displacement: bool = False
+    h4_structure: str = "N/A"
+    brc_status: str = "WAIT"
+    h1_zone: Optional[float] = None
+    entry: Optional[float] = None
+    stop_loss: Optional[float] = None
+    take_profit: Optional[float] = None
+    rr: Optional[float] = None
+    rr_pass: bool = False
+    note: str = ""
 
 
 @dataclass
@@ -96,6 +132,7 @@ class PairScan:
     take_profit: Optional[float]
     rr: Optional[float]
     rr_pass: bool
+    reversal: Optional[ReversalScan] = None
 
 
 def q(field_name: str, label: str) -> QueryField:
@@ -206,32 +243,10 @@ def ema_frame_ok(direction: str, price, ema, ema_prev) -> bool:
     return False
 
 
-def fetch_candle_history(pair: str):
-    """
-    Yahoo Finance H1 data. H4 and D1 are derived from H1 so structure and BRC
-    use one consistent candle source.
-    """
-    ticker = f"{pair}=X"
-    df = yf.download(
-        ticker,
-        period="60d",
-        interval="1h",
-        auto_adjust=False,
-        progress=False,
-        threads=False,
-    )
-
+def prepare_candle_history(df: pd.DataFrame):
+    """Normalize Yahoo H1 data and derive completed H4/D1 candles."""
     if df is None or df.empty:
         return None
-
-    if isinstance(df.columns, pd.MultiIndex):
-        if ticker in df.columns.get_level_values(-1):
-            try:
-                df = df.xs(ticker, axis=1, level=-1)
-            except Exception:
-                df.columns = df.columns.get_level_values(0)
-        else:
-            df.columns = df.columns.get_level_values(0)
 
     wanted = ["Open", "High", "Low", "Close"]
     if not all(col in df.columns for col in wanted):
@@ -258,6 +273,81 @@ def fetch_candle_history(pair: str):
         return None
 
     return h1, h4, d1
+
+
+def extract_ticker_frame(df: pd.DataFrame, ticker: str):
+    """Extract one ticker regardless of yfinance MultiIndex orientation."""
+    if df is None or df.empty:
+        return None
+    if not isinstance(df.columns, pd.MultiIndex):
+        return df
+
+    for level in range(df.columns.nlevels):
+        if ticker in df.columns.get_level_values(level):
+            try:
+                return df.xs(ticker, axis=1, level=level)
+            except (KeyError, ValueError):
+                continue
+    return None
+
+
+def prefetch_candle_histories(pairs: list[str]) -> None:
+    """
+    Fetch all H1 histories in one Yahoo request for the optional reversal mode.
+
+    This materially lowers the chance of HTTP 429 compared with 28 individual
+    downloads. Missing tickers are cached as unavailable for this scan.
+    """
+    missing = [pair for pair in pairs if pair not in _CANDLE_HISTORY_CACHE]
+    if not missing:
+        return
+
+    tickers = [f"{pair}=X" for pair in missing]
+    try:
+        batch = yf.download(
+            tickers=tickers,
+            period="60d",
+            interval="1h",
+            auto_adjust=False,
+            group_by="ticker",
+            progress=False,
+            threads=True,
+        )
+    except Exception as exc:
+        print(f"[WARN] Yahoo batch candles: {exc}")
+        batch = None
+
+    for pair, ticker in zip(missing, tickers):
+        frame = extract_ticker_frame(batch, ticker) if batch is not None else None
+        _CANDLE_HISTORY_CACHE[pair] = prepare_candle_history(frame)
+
+
+def fetch_candle_history(pair: str):
+    """
+    Yahoo Finance H1 data. H4 and D1 are derived from H1 so structure and BRC
+    use one consistent candle source.
+    """
+    if pair in _CANDLE_HISTORY_CACHE:
+        return _CANDLE_HISTORY_CACHE[pair]
+
+    ticker = f"{pair}=X"
+    try:
+        df = yf.download(
+            ticker,
+            period="60d",
+            interval="1h",
+            auto_adjust=False,
+            progress=False,
+            threads=False,
+        )
+    except Exception as exc:
+        print(f"[WARN] {pair} Yahoo candles: {exc}")
+        df = None
+
+    frame = extract_ticker_frame(df, ticker) if df is not None else None
+    history = prepare_candle_history(frame)
+    _CANDLE_HISTORY_CACHE[pair] = history
+    return history
 
 
 def detect_structure(frame: pd.DataFrame, lookback: int = 30) -> str:
@@ -617,6 +707,310 @@ def detect_brc(direction: str, h1: pd.DataFrame):
     return "WAIT NEW RETEST", level
 
 
+def confirmed_daily_levels(frame: pd.DataFrame):
+    """Return older, confirmed D1 swing zones for reversal context."""
+    if frame is None or len(frame) < 12:
+        return [], []
+
+    data = frame.tail(REVERSAL_D1_LOOKBACK).copy()
+    # Keep the latest two D1 candles out of the reference set. They are the
+    # reaction leg; the zone must already have existed before the reaction.
+    reference = data.iloc[:-2]
+    if len(reference) < 8:
+        return [], []
+
+    highs = reference["High"].astype(float).tolist()
+    lows = reference["Low"].astype(float).tolist()
+    swing_highs = []
+    swing_lows = []
+
+    for i in range(2, len(reference) - 2):
+        if highs[i] >= max(highs[i - 2:i + 3]):
+            swing_highs.append(highs[i])
+        if lows[i] <= min(lows[i - 2:i + 3]):
+            swing_lows.append(lows[i])
+
+    # Range extremes are valid HTF zones even when the local-pivot test did
+    # not produce one near the edge of the downloaded window.
+    swing_highs.append(float(reference["High"].max()))
+    swing_lows.append(float(reference["Low"].min()))
+
+    return sorted(set(swing_highs)), sorted(set(swing_lows))
+
+
+def directional_rejection(direction: str, candle: pd.Series, atr: float) -> bool:
+    """Wick rejection that closes back away from the tested HTF zone."""
+    open_ = float(candle["Open"])
+    high = float(candle["High"])
+    low = float(candle["Low"])
+    close = float(candle["Close"])
+    candle_range = high - low
+    if candle_range <= 0:
+        return False
+
+    body = abs(close - open_)
+    if direction == "SHORT":
+        wick = high - max(open_, close)
+        closes_away = close <= high - 0.55 * candle_range
+    else:
+        wick = min(open_, close) - low
+        closes_away = close >= low + 0.55 * candle_range
+
+    return closes_away and wick >= max(0.25 * candle_range, 0.75 * body, 0.12 * atr)
+
+
+def directional_displacement(direction: str, candle: pd.Series, atr: float) -> bool:
+    """Strong H4 body closing near its directional extreme."""
+    open_ = float(candle["Open"])
+    high = float(candle["High"])
+    low = float(candle["Low"])
+    close = float(candle["Close"])
+    candle_range = high - low
+    body = abs(close - open_)
+    if candle_range <= 0 or body < 0.55 * atr:
+        return False
+
+    if direction == "SHORT":
+        return close < open_ and close <= low + 0.35 * candle_range
+    return close > open_ and close >= high - 0.35 * candle_range
+
+
+def calculate_reversal_trade_plan(
+    direction: str,
+    brc_status: str,
+    h1: pd.DataFrame,
+    h4: pd.DataFrame,
+    d1: pd.DataFrame,
+    htf_zone: float,
+):
+    """
+    Reversal plan created only after a fresh H1 confirmation.
+
+    SL sits beyond the recent H4 structural extreme. TP is the nearest
+    completed D1 swing zone in the trade direction. A reversal is READY only
+    when that natural target offers RR >= REVERSAL_MIN_RR.
+    """
+    if brc_status != "READY" or direction not in {"LONG", "SHORT"}:
+        return None, None, None, None, False
+
+    entry = safe_float(h1["Close"].iloc[-1])
+    h4_atr = current_atr(h4)
+    if entry is None or h4_atr is None or h4_atr <= 0:
+        return None, None, None, None, False
+
+    buffer = REVERSAL_SL_BUFFER_ATR * h4_atr
+    swing_highs, swing_lows = local_swing_levels(d1, REVERSAL_D1_LOOKBACK)
+
+    if direction == "SHORT":
+        recent_extreme = safe_float(h4["High"].tail(REVERSAL_H4_TOUCH_BARS).max())
+        if recent_extreme is None:
+            return entry, None, None, None, False
+        stop = max(float(htf_zone), recent_extreme) + buffer
+        targets = sorted((level for level in swing_lows if level < entry), reverse=True)
+        target = targets[0] if targets else safe_float(d1["Low"].tail(REVERSAL_D1_LOOKBACK).min())
+        risk = stop - entry
+        reward = entry - target if target is not None else 0.0
+    else:
+        recent_extreme = safe_float(h4["Low"].tail(REVERSAL_H4_TOUCH_BARS).min())
+        if recent_extreme is None:
+            return entry, None, None, None, False
+        stop = min(float(htf_zone), recent_extreme) - buffer
+        targets = sorted(level for level in swing_highs if level > entry)
+        target = targets[0] if targets else safe_float(d1["High"].tail(REVERSAL_D1_LOOKBACK).max())
+        risk = entry - stop
+        reward = target - entry if target is not None else 0.0
+
+    if target is None or risk <= 0 or reward <= 0:
+        return entry, stop, target, None, False
+
+    rr = round(reward / risk, 2)
+    return entry, stop, target, rr, rr >= REVERSAL_MIN_RR
+
+
+def analyze_htf_reversal(
+    h1: pd.DataFrame,
+    h4: pd.DataFrame,
+    d1: pd.DataFrame,
+) -> ReversalScan:
+    """
+    Independent D1 -> H4 -> H1 reversal model.
+
+    D1 supplies an already-confirmed support/resistance zone. A recent H4
+    test must then show rejection, liquidity sweep and/or displacement. H1
+    BRC controls timing. No rating/EMA input from the trend model is used.
+    """
+    result = ReversalScan()
+    if h1 is None or h4 is None or d1 is None or h4.empty or d1.empty:
+        return result
+
+    d1_atr = current_atr(d1)
+    h4_atr = current_atr(h4)
+    if d1_atr is None or d1_atr <= 0 or h4_atr is None or h4_atr <= 0:
+        return result
+
+    swing_highs, swing_lows = confirmed_daily_levels(d1)
+    if not swing_highs and not swing_lows:
+        return result
+
+    h4_data = h4.tail(max(50, REVERSAL_H4_TOUCH_BARS + 10)).copy()
+    recent_start = max(0, len(h4_data) - REVERSAL_H4_TOUCH_BARS)
+    latest_close = float(h4_data["Close"].iloc[-1])
+    h4_structure = detect_structure(h4_data)
+    evaluations = []
+
+    for direction, levels, price_column, zone_kind in (
+        ("SHORT", swing_highs, "High", "D1 RESISTANCE"),
+        ("LONG", swing_lows, "Low", "D1 SUPPORT"),
+    ):
+        for zone in levels:
+            recent_prices = h4_data[price_column].iloc[recent_start:].astype(float)
+            distances = (recent_prices - float(zone)).abs()
+            if distances.empty:
+                continue
+
+            touch_label = distances.idxmin()
+            touch_distance = float(distances.loc[touch_label]) / d1_atr
+            if touch_distance > REVERSAL_ZONE_TOUCH_ATR:
+                continue
+
+            # Use a positional index because duplicate/resampled timestamps can
+            # otherwise make label lookup ambiguous.
+            touch_offset = int(distances.reset_index(drop=True).idxmin())
+            touch_pos = recent_start + touch_offset
+            touch_candle = h4_data.iloc[touch_pos]
+            evidence_window = h4_data.iloc[touch_pos:min(touch_pos + 4, len(h4_data))]
+            follow_through = h4_data.iloc[touch_pos:]
+            prior = h4_data.iloc[max(0, touch_pos - 8):touch_pos]
+
+            rejection = any(
+                directional_rejection(direction, candle, h4_atr)
+                for _, candle in evidence_window.iterrows()
+            )
+            displacement = any(
+                directional_displacement(direction, candle, h4_atr)
+                for _, candle in follow_through.iterrows()
+            )
+
+            sweep = False
+            if not prior.empty:
+                if direction == "SHORT":
+                    prior_level = float(prior["High"].max())
+                    sweep = (
+                        float(touch_candle["High"]) > prior_level + 0.03 * h4_atr
+                        and float(touch_candle["Close"]) < prior_level
+                    )
+                else:
+                    prior_level = float(prior["Low"].min())
+                    sweep = (
+                        float(touch_candle["Low"]) < prior_level - 0.03 * h4_atr
+                        and float(touch_candle["Close"]) > prior_level
+                    )
+
+            # Also count a direct sweep of the pre-existing D1 zone.
+            if direction == "SHORT":
+                sweep = sweep or (
+                    float(touch_candle["High"]) > zone
+                    and float(touch_candle["Close"]) < zone
+                )
+                away = float(zone) - latest_close
+                invalidated = latest_close > float(zone) + REVERSAL_INVALIDATION_ATR * d1_atr
+            else:
+                sweep = sweep or (
+                    float(touch_candle["Low"]) < zone
+                    and float(touch_candle["Close"]) > zone
+                )
+                away = latest_close - float(zone)
+                invalidated = latest_close < float(zone) - REVERSAL_INVALIDATION_ATR * d1_atr
+
+            moved_away = away >= 0.45 * h4_atr
+            stale_move = away > 2.75 * d1_atr
+            brc_status, h1_zone = detect_brc(direction, h1)
+
+            score = 25.0
+            score += max(0.0, 10.0 * (1.0 - touch_distance / REVERSAL_ZONE_TOUCH_ATR))
+            score += 15.0 if sweep else 0.0
+            score += 15.0 if rejection else 0.0
+            score += 15.0 if displacement else 0.0
+            score += 5.0 if moved_away else 0.0
+            score += 5.0 if structure_matches(direction, h4_structure) else 0.0
+            score += {
+                "BREAK": 8.0,
+                "RETEST": 12.0,
+                "READY": 15.0,
+            }.get(brc_status, 0.0)
+
+            evidence_count = sum((sweep, rejection, displacement))
+            if invalidated:
+                status = "INVALID"
+                note = "H4 close πέρα από τη D1 zone"
+            elif stale_move:
+                status = "INVALID"
+                note = "Η κίνηση έχει απομακρυνθεί πολύ από τη zone"
+            elif brc_status == "WAIT NEW RETEST":
+                status = "INVALID"
+                note = "Το H1 break/retest έληξε"
+            elif brc_status == "BREAK":
+                status = "WAIT RETEST"
+                note = "H1 break — περιμένει retest"
+            elif brc_status == "RETEST":
+                status = "ARMED"
+                note = "H1 retest — περιμένει confirmation"
+            elif evidence_count >= 2 and moved_away:
+                status = "ARMED"
+                note = "HTF αντίδραση — περιμένει H1 break"
+            else:
+                status = "WATCH"
+                note = "D1 zone υπό παρακολούθηση"
+
+            entry, stop, target, rr, rr_pass = calculate_reversal_trade_plan(
+                direction, brc_status, h1, h4, d1, float(zone)
+            )
+            if brc_status == "READY":
+                if rr_pass:
+                    status = "READY"
+                    note = f"Fresh H1 confirmation και RR ≥ {REVERSAL_MIN_RR:.1f}"
+                else:
+                    status = "INVALID"
+                    note = f"H1 confirmation αλλά RR < {REVERSAL_MIN_RR:.1f}"
+
+            evaluations.append(
+                ReversalScan(
+                    direction=direction,
+                    status=status,
+                    score=round(min(score, 100.0), 1),
+                    htf_zone=float(zone),
+                    zone_kind=zone_kind,
+                    sweep=sweep,
+                    rejection=rejection,
+                    displacement=displacement,
+                    h4_structure=h4_structure,
+                    brc_status=brc_status,
+                    h1_zone=h1_zone,
+                    entry=entry,
+                    stop_loss=stop,
+                    take_profit=target,
+                    rr=rr,
+                    rr_pass=rr_pass,
+                    note=note,
+                )
+            )
+
+    if not evaluations:
+        return result
+
+    status_priority = {
+        "READY": 5,
+        "WAIT RETEST": 4,
+        "ARMED": 3,
+        "WATCH": 2,
+        "INVALID": 1,
+    }
+    return max(
+        evaluations,
+        key=lambda item: (status_priority.get(item.status, 0), item.score),
+    )
+
+
 def calc_quality(
     direction: str,
     ratings: tuple[Optional[float], Optional[float], Optional[float]],
@@ -734,17 +1128,30 @@ def scan_pair(pair: str) -> PairScan:
         take_profit = None
         rr = None
         rr_pass = False
+        reversal = None
 
-        if direction in {"LONG", "SHORT"}:
+        if direction in {"LONG", "SHORT"} or ENABLE_HTF_REVERSAL:
             candle_history = fetch_candle_history(pair)
             if candle_history is not None:
                 h1_candles, h4_candles, d1_candles = candle_history
-                d1_structure = detect_structure(d1_candles)
-                h4_structure = detect_structure(h4_candles)
-                brc_status, zone = detect_brc(direction, h1_candles)
-                entry, stop_loss, take_profit, rr, rr_pass = calculate_trade_plan(
-                    direction, brc_status, zone, h1_candles, h4_candles
-                )
+                if direction in {"LONG", "SHORT"}:
+                    d1_structure = detect_structure(d1_candles)
+                    h4_structure = detect_structure(h4_candles)
+                    brc_status, zone = detect_brc(direction, h1_candles)
+                    entry, stop_loss, take_profit, rr, rr_pass = calculate_trade_plan(
+                        direction, brc_status, zone, h1_candles, h4_candles
+                    )
+
+                if ENABLE_HTF_REVERSAL:
+                    try:
+                        reversal = analyze_htf_reversal(
+                            h1_candles, h4_candles, d1_candles
+                        )
+                    except Exception as exc:
+                        # The optional model must never change or break an
+                        # existing A+ trend result.
+                        print(f"[WARN] {pair} reversal: {exc}")
+                        reversal = ReversalScan(note="Reversal analysis error")
                 candle_status = "YF"
             else:
                 candle_status = "N/A"
@@ -798,6 +1205,7 @@ def scan_pair(pair: str) -> PairScan:
             take_profit=take_profit,
             rr=rr,
             rr_pass=rr_pass,
+            reversal=reversal,
         )
 
     except Exception as exc:
@@ -810,6 +1218,10 @@ def scan_pair(pair: str) -> PairScan:
 
 
 def scan_all_pairs() -> list[PairScan]:
+    if ENABLE_HTF_REVERSAL:
+        print("Προφόρτωση H1 candles για το HTF Reversal mode...")
+        prefetch_candle_histories(PAIRS)
+
     results = []
     for index, pair in enumerate(PAIRS, start=1):
         print(f"[{index:02d}/{len(PAIRS)}] Scan {pair}...")
@@ -822,6 +1234,34 @@ def candidates(results: list[PairScan]) -> list[PairScan]:
     selected = [r for r in results if r.direction in {"LONG", "SHORT"}]
     priority = {"A+ READY": 0, "A": 1, "WATCH": 2, "—": 3}
     selected.sort(key=lambda r: (priority.get(r.setup_grade, 9), -r.quality_score, r.pair))
+    return selected
+
+
+def reversal_candidates(results: list[PairScan]) -> list[PairScan]:
+    if not ENABLE_HTF_REVERSAL:
+        return []
+
+    selected = [
+        r for r in results
+        if r.reversal is not None
+        and r.reversal.direction in {"LONG", "SHORT"}
+        and r.reversal.status != "NO SETUP"
+        and r.reversal.score >= 35.0
+    ]
+    priority = {
+        "READY": 0,
+        "WAIT RETEST": 1,
+        "ARMED": 2,
+        "WATCH": 3,
+        "INVALID": 4,
+    }
+    selected.sort(
+        key=lambda r: (
+            priority.get(r.reversal.status, 9),
+            -r.reversal.score,
+            r.pair,
+        )
+    )
     return selected
 
 
@@ -852,10 +1292,19 @@ def fmt_rr(value: Optional[float], passed: bool) -> str:
     return f"{value:.2f} {mark}"
 
 
+def fmt_check(value: bool) -> str:
+    return "✅" if value else "—"
+
+
 def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") -> None:
     now = datetime.now(ZoneInfo("Europe/Athens"))
     top = candidates(results)
     ready = [r for r in top if r.setup_grade == "A+ READY"]
+    reversals = reversal_candidates(results)
+    reversal_ready = [
+        r for r in reversals
+        if r.reversal is not None and r.reversal.status == "READY"
+    ]
 
     lines = [
         "# Latest Forex Scan",
@@ -863,6 +1312,9 @@ def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") 
         f"**Τελευταία ενημέρωση:** {now:%d/%m/%Y %H:%M} (Europe/Athens)",
         "",
         f"**Pairs:** {len(results)}  |  **Aligned:** {len(top)}  |  **A+ READY:** {len(ready)}",
+        "",
+        f"**HTF Reversal mode:** {'ON' if ENABLE_HTF_REVERSAL else 'OFF'}"
+        f"  |  **Candidates:** {len(reversals)}  |  **READY:** {len(reversal_ready)}",
         "",
         "> Το Quality Score είναι βαθμός συμφωνίας φίλτρων, **όχι πιθανότητα κέρδους**.",
         "",
@@ -903,6 +1355,48 @@ def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") 
             f"| {r.pair} | {rating_text(r.d1_rating)} | {rating_text(r.h4_rating)} | "
             f"{rating_text(r.h1_rating)} | {r.direction} |"
         )
+
+    lines += [
+        "",
+        "## HTF Reversal — ξεχωριστό mode",
+        "",
+        "> Δεν αναμειγνύεται με το A+ Trend. Ψάχνει D1 support/resistance → H4 sweep/rejection/displacement → H1 break/retest/confirmation. Το **READY** απαιτεί φυσικό D1 target με **RR ≥ 3.0**.",
+        "",
+    ]
+
+    if not ENABLE_HTF_REVERSAL:
+        lines.append("Το mode είναι απενεργοποιημένο (`ENABLE_HTF_REVERSAL=false`).")
+    elif reversals:
+        lines += [
+            "| # | Pair | Dir | State | D1 Zone | H4 Struct | Sweep | Reject | Displ. | H1 BRC | H1 Zone | Entry | SL | TP | RR | Score | Σημείωση |",
+            "|---:|---|---|---|---:|---|---:|---:|---:|---|---:|---:|---:|---:|---:|---:|---|",
+        ]
+        for i, pair_scan in enumerate(reversals, start=1):
+            rev = pair_scan.reversal
+            lines.append(
+                f"| {i} | **{pair_scan.pair}** | {rev.direction} | **{rev.status}** | "
+                f"{fmt_zone(rev.htf_zone)} | {rev.h4_structure} | {fmt_check(rev.sweep)} | "
+                f"{fmt_check(rev.rejection)} | {fmt_check(rev.displacement)} | "
+                f"{rev.brc_status} | {fmt_zone(rev.h1_zone)} | "
+                f"{fmt_price(pair_scan.pair, rev.entry)} | "
+                f"{fmt_price(pair_scan.pair, rev.stop_loss)} | "
+                f"{fmt_price(pair_scan.pair, rev.take_profit)} | "
+                f"{fmt_rr(rev.rr, rev.rr_pass)} | **{rev.score:.1f}/100** | {rev.note} |"
+            )
+    else:
+        lines.append("Δεν υπάρχει πρόσφατο HTF reversal context που να περνά το ελάχιστο φίλτρο.")
+
+    lines += [
+        "",
+        "### Καταστάσεις HTF Reversal",
+        "",
+        "- **WATCH:** η τιμή αντέδρασε σε επιβεβαιωμένη D1 zone, αλλά δεν υπάρχει ακόμη αρκετή H4 επιβεβαίωση.",
+        "- **ARMED:** υπάρχουν τουλάχιστον δύο στοιχεία H4 ή έχει γίνει H1 retest· περιμένει το επόμενο βήμα επιβεβαίωσης.",
+        "- **WAIT RETEST:** έγινε H1 break και περιμένει επιστροφή στη broken zone.",
+        "- **READY:** fresh confirmation στο τελευταίο κλεισμένο H1 και RR ≥ 3.0 προς την επόμενη D1 zone.",
+        "- **INVALID:** παραβίαση D1 zone, ληγμένο H1 setup, υπερβολική απομάκρυνση ή RR < 3.0.",
+        "- Απενεργοποίηση χωρίς αφαίρεση κώδικα: `ENABLE_HTF_REVERSAL=false python forex_scanner.py`.",
+    ]
 
     lines += [
         "",
@@ -960,6 +1454,30 @@ def print_results(results: list[PairScan]) -> None:
     print("-" * 130)
     print(f"Checked: {len(results)} | Aligned: {len(top)} | A+ READY: {ready}")
     print("Quality Score = confluence score, NOT win probability.")
+
+    if ENABLE_HTF_REVERSAL:
+        reversals = reversal_candidates(results)
+        print("\n" + "=" * 100)
+        print("HTF REVERSAL — INDEPENDENT MODE")
+        print("=" * 100)
+        print(
+            f"{'#':<3} {'PAIR':<8} {'DIR':<6} {'STATE':<12} {'HTF ZONE':>10} "
+            f"{'SWP':>4} {'REJ':>4} {'DSP':>4} {'H1 BRC':<15} {'RR':>6} {'SCORE':>7}"
+        )
+        print("-" * 100)
+        for i, pair_scan in enumerate(reversals, start=1):
+            rev = pair_scan.reversal
+            print(
+                f"{i:<3} {pair_scan.pair:<8} {rev.direction:<6} {rev.status:<12} "
+                f"{fmt_zone(rev.htf_zone):>10} {fmt_check(rev.sweep):>4} "
+                f"{fmt_check(rev.rejection):>4} {fmt_check(rev.displacement):>4} "
+                f"{rev.brc_status:<15} {fmt_num(rev.rr, 2):>6} {rev.score:>6.1f}"
+            )
+        print("-" * 100)
+        reversal_ready = sum(
+            1 for r in reversals if r.reversal.status == "READY"
+        )
+        print(f"Candidates: {len(reversals)} | READY: {reversal_ready}")
 
 
 def main():

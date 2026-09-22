@@ -14,6 +14,9 @@ permissions:
 jobs:
   scan:
     runs-on: ubuntu-latest
+    env:
+      # Repository variable: set to "false" to hide/disable the optional mode.
+      ENABLE_HTF_REVERSAL: ${{ vars.ENABLE_HTF_REVERSAL || 'true' }}
 
     steps:
       - name: Checkout repository
