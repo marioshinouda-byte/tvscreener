@@ -2,6 +2,9 @@ name: Run Forex Scanner
 
 on:
   workflow_dispatch:
+  schedule:
+    # Five minutes after each hourly candle closes (GitHub cron uses UTC).
+    - cron: "5 * * * *"
   push:
     branches: [main]
     paths:
