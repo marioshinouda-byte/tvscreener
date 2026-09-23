@@ -1360,7 +1360,7 @@ def trend_state(r: PairScan) -> str:
         return "🟢 ENTRY READY"
     if r.direction not in {"LONG", "SHORT"} or r.candles in {"N/A", "ERROR"}:
         return "🔴 INVALID"
-    if r.brc_status == "RETEST" or r.setup_grade == "A":
+    if r.brc_status in {"RETEST", "READY"} or r.setup_grade == "A":
         return "🟡 WATCH"
     return "⚪ WAIT"
 
