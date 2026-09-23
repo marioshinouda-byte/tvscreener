@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from forex_scanner import PairScan, trend_state, weekly_trend_watchlist, write_markdown
+from forex_scanner import PairScan, ReversalScan, trend_state, weekly_trend_watchlist, write_markdown
 
 
 def pair(name, score, *, grade="WATCH", brc="WAIT FOR BREAK", direction="LONG"):
@@ -23,13 +23,22 @@ class WeeklyForexWatchlistTest(unittest.TestCase):
     def test_report_prioritizes_ready_and_keeps_reversal_separate(self):
         with tempfile.TemporaryDirectory() as directory:
             report = Path(directory) / "LATEST_FOREX_SCAN.md"
-            write_markdown([pair("EURUSD", 90, grade="A+ READY", brc="READY")], str(report))
+            result = pair("EURUSD", 90, grade="A+ READY", brc="READY")
+            result.reversal = ReversalScan(
+                direction="SHORT", status="ARMED", score=100.0,
+                brc_status="RETEST", note="H1 retest — περιμένει confirmation",
+            )
+            write_markdown([result], str(report))
             text = report.read_text(encoding="utf-8")
             self.assertLess(text.index("🟢 ENTRY READY — Trend"), text.index("Weekly Top 5"))
             self.assertLess(text.index("Weekly Top 5"), text.index("🔥 HOT NEW — Trend"))
             self.assertLess(text.index("🔥 HOT NEW — Trend"), text.index("HTF Reversal — ξεχωριστό mode"))
             self.assertIn("Setup Score 90.0%", text)
             self.assertIn("όχι ποσοστό πιθανότητας επιτυχίας", text)
+            self.assertIn("HTF Reversal Score μετρά τη συμφωνία", text)
+            self.assertIn("Context score", text)
+            self.assertIn("H1 retest — περιμένει confirmation", text)
+            self.assertIn("| RETEST | — | — | — | — | — | **100.0/100** |", text)
 
     def test_confirmed_brc_without_a_plus_filters_is_watch_not_wait(self):
         result = pair("EURUSD", 80, grade="WATCH", brc="READY")
