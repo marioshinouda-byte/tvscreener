@@ -16,6 +16,7 @@ Important:
 from __future__ import annotations
 
 import math
+import json
 import os
 import time
 from dataclasses import dataclass
@@ -53,6 +54,8 @@ MAX_READY_DISTANCE_ATR = 0.75
 MAX_BREAK_TO_RETEST_BARS = 8
 MAX_RETEST_TO_CONFIRM_BARS = 2
 MAX_CONFIRMED_SETUP_AGE_BARS = 8
+WEEKLY_TOP5_PATH = "WEEKLY_FOREX_TOP5.json"
+HOT_NEW_MIN_SCORE = 70.0
 H1_SWING_LEFT = 15
 H1_SWING_RIGHT = 15
 H1_SWING_PROMINENCE_ATR = 0.50
@@ -1292,6 +1295,63 @@ def candidates(results: list[PairScan]) -> list[PairScan]:
     return selected
 
 
+def weekly_trend_watchlist(
+    results: list[PairScan], now: datetime, state_path: str = WEEKLY_TOP5_PATH
+) -> tuple[list[PairScan], list[PairScan], str]:
+    """Persist the Trend watchlist across scans, resetting on Monday in Athens."""
+    week = f"{now.isocalendar().year}-W{now.isocalendar().week:02d}"
+    ranked = candidates(results)
+    by_pair = {r.pair: r for r in results}
+    state_file = Path(state_path)
+    saved_state = json.loads(state_file.read_text(encoding="utf-8")) if state_file.exists() else {}
+    state = saved_state
+    if state.get("week") != week:
+        state = {"week": week, "top5": [r.pair for r in ranked[:5]], "hot_new": []}
+
+    top_pairs = [p for p in state["top5"] if p in by_pair]
+    for r in ranked:
+        if len(top_pairs) >= 5:
+            break
+        if r.pair not in top_pairs:
+            top_pairs.append(r.pair)
+    # Only a confirmed, tradable new setup may displace a weekly pick.
+    for r in ranked:
+        if r.pair in top_pairs or r.brc_status != "READY" or r.setup_grade not in {"A+ READY", "A"}:
+            continue
+        if len(top_pairs) < 5:
+            top_pairs.append(r.pair)
+        else:
+            replaceable = [p for p in top_pairs if by_pair[p].setup_grade != "A+ READY"]
+            if replaceable:
+                weakest = min(replaceable, key=lambda p: by_pair[p].quality_score)
+                top_pairs[top_pairs.index(weakest)] = r.pair
+
+    hot_pairs = [p for p in state["hot_new"] if p in by_pair and p not in top_pairs]
+    for r in ranked:
+        if r.pair in top_pairs or r.pair in hot_pairs:
+            continue
+        strong_context = (r.quality_score >= HOT_NEW_MIN_SCORE and r.ema_passes >= 2
+                          and structure_matches(r.direction, r.d1_structure)
+                          and structure_matches(r.direction, r.h4_structure))
+        if strong_context or r.setup_grade in {"A+ READY", "A"}:
+            hot_pairs.append(r.pair)
+
+    next_state = {"week": week, "top5": top_pairs, "hot_new": hot_pairs}
+    if saved_state != next_state:
+        state_file.write_text(json.dumps(next_state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return [by_pair[p] for p in top_pairs], [by_pair[p] for p in hot_pairs], week
+
+
+def trend_state(r: PairScan) -> str:
+    if r.setup_grade == "A+ READY":
+        return "🟢 ENTRY READY"
+    if r.direction not in {"LONG", "SHORT"} or r.candles in {"N/A", "ERROR"}:
+        return "🔴 INVALID"
+    if r.brc_status == "RETEST" or r.setup_grade == "A":
+        return "🟡 WATCH"
+    return "⚪ WAIT"
+
+
 def reversal_candidates(results: list[PairScan]) -> list[PairScan]:
     if not ENABLE_HTF_REVERSAL:
         return []
@@ -1354,6 +1414,9 @@ def fmt_check(value: bool) -> str:
 def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") -> None:
     now = datetime.now(ZoneInfo("Europe/Athens"))
     top = candidates(results)
+    weekly, hot_new, week = weekly_trend_watchlist(
+        results, now, str(Path(path).with_name(WEEKLY_TOP5_PATH))
+    )
     ready = [r for r in top if r.setup_grade == "A+ READY"]
     reversals = reversal_candidates(results)
     reversal_ready = [
@@ -1375,9 +1438,72 @@ def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") 
         "",
         "> Ratings / EMA50 / ADX: TradingView Screener. Structure / BRC: Yahoo Finance H1 candles (H4/D1 derived). Μπορεί να υπάρχουν μικρές διαφορές candle boundaries από TradingView.",
         "",
-        "> **A+ READY** απαιτεί: D1/H4/H1 alignment + EMA50 3/3 + D1/H4 structure + ADX + **confirmation στο τελευταίο κλεισμένο H1**, χωρίς υπερβολική απόσταση από τη zone + **RR ≥ 1.2**.",
+        "> **A+ READY** απαιτεί: D1/H4/H1 alignment + EMA50 3/3 + D1/H4 structure + ADX + **confirmation έως 8 κλεισμένα H1 κεριά πίσω**, χωρίς ακύρωση ή υπερβολική απόσταση από τη zone + **RR ≥ 1.2**.",
         "",
-        "## Top candidates",
+        "## 🟢 ENTRY READY — Trend",
+        "",
+    ]
+    if ready:
+        for r in ready:
+            lines.append(
+                f"**{r.pair} {r.direction} · Setup Score {r.quality_score:.1f}% · "
+                f"H1 zone {fmt_zone(r.zone)} · Entry {fmt_price(r.pair, r.entry)} · "
+                f"SL {fmt_price(r.pair, r.stop_loss)} · TP {fmt_price(r.pair, r.take_profit)} · "
+                f"RR {fmt_rr(r.rr, r.rr_pass)}**"
+            )
+    else:
+        lines.append("Κανένα A+ READY στο τρέχον scan.")
+
+    lines += [
+        "",
+        "> Η ένδειξη απαιτεί έλεγχο στο τρέχον chart, spread, ειδήσεων και μεγέθους θέσης πριν από οποιαδήποτε είσοδο.",
+        "",
+        f"## Weekly Top 5 — {week} (Europe/Athens)",
+        "",
+        "Η πεντάδα διατηρείται όλη την εβδομάδα· ανανεώνονται score και κατάσταση σε κάθε scan. "
+        "Μόνο νέο επιβεβαιωμένο setup με RR ≥ 1.2 μπορεί να αντικαταστήσει θέση. "
+        "Νέα επιλογή γίνεται τη Δευτέρα (ώρα Ελλάδας).",
+        "",
+        "| # | Pair | Dir | Setup Score | Κατάσταση | B→R→C | H1 Zone | RR |",
+        "|---:|---|---|---:|---|---|---:|---:|",
+    ]
+    for i, r in enumerate(weekly, start=1):
+        lines.append(
+            f"| {i} | **{r.pair}** | {r.direction} | **{r.quality_score:.1f}%** | "
+            f"**{trend_state(r)}** | {r.brc_status} | {fmt_zone(r.zone)} | "
+            f"{fmt_rr(r.rr, r.rr_pass)} |"
+        )
+    if not weekly:
+        lines.append("| — | Δεν υπάρχουν επαρκή δεδομένα για εβδομαδιαία επιλογή | — | — | — | — | — | — |")
+
+    lines += [
+        "",
+        "## 🔥 HOT NEW — Trend",
+        "",
+        f"Νέα ζευγάρια εκτός πεντάδας με ισχυρή συμφωνία φίλτρων (score ≥ {HOT_NEW_MIN_SCORE:.0f}% "
+        "και D1/H4 structure + EMA50) ή setup A/Α+. Παραμένουν ορατά στην εβδομάδα· "
+        "ελέγχουμε την τρέχουσα κατάστασή τους σε κάθε scan.",
+        "",
+    ]
+    if hot_new:
+        lines += [
+            "| Pair | Dir | Setup Score | Κατάσταση | B→R→C | H1 Zone |",
+            "|---|---|---:|---|---|---:|",
+        ]
+        for r in hot_new:
+            lines.append(
+                f"| **{r.pair}** | {r.direction} | **{r.quality_score:.1f}%** | "
+                f"**{trend_state(r)}** | {r.brc_status} | {fmt_zone(r.zone)} |"
+            )
+    else:
+        lines.append("Κανένα νέο ζευγάρι που να περνά τα κριτήρια.")
+
+    lines += [
+        "",
+        "> **Setup Score % = βαθμός συμφωνίας φίλτρων, όχι ποσοστό πιθανότητας επιτυχίας.** "
+        "🔴 INVALID σημαίνει ότι χάθηκε το alignment ή δεν υπάρχουν αξιόπιστα δεδομένα στο τρέχον scan.",
+        "",
+        "## Όλοι οι τρέχοντες Trend candidates",
         "",
     ]
 

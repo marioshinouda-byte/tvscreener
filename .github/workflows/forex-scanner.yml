@@ -14,6 +14,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: forex-scanner-main
+  cancel-in-progress: false
+
 jobs:
   scan:
     runs-on: ubuntu-latest
@@ -43,12 +47,13 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add LATEST_FOREX_SCAN.md
+          git add LATEST_FOREX_SCAN.md WEEKLY_FOREX_TOP5.json
           if git diff --cached --quiet; then
             echo "No result changes to commit."
           else
             git commit -m "Update latest Forex scan"
-            git push
+            git pull --rebase origin main
+            git push origin HEAD:main
           fi
 
       - name: Save scanner output artifact
@@ -59,3 +64,4 @@ jobs:
           path: |
             scan_output.txt
             LATEST_FOREX_SCAN.md
+            WEEKLY_FOREX_TOP5.json
