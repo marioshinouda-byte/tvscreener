@@ -1106,7 +1106,20 @@ def calc_quality(
         "WAIT NEW RETEST": 0,
     }.get(brc_status, 0)
 
-    return round(min(rating_score + ema_score + adx_score + structure_score + brc_score, 100), 1)
+    raw_score = min(rating_score + ema_score + adx_score + structure_score + brc_score, 100)
+
+    # Stage-aware readiness cap: strong HTF/context must not make an incomplete
+    # Break -> Retest -> Confirmation setup look trade-ready.
+    stage_cap = {
+        "WAIT": 55.0,
+        "WAIT FOR BREAK": 55.0,
+        "BREAK": 65.0,
+        "RETEST": 85.0,
+        "READY": 100.0,
+        "WAIT NEW RETEST": 55.0,
+    }.get(brc_status, 55.0)
+
+    return round(min(raw_score, stage_cap), 1)
 
 
 def setup_grade(
