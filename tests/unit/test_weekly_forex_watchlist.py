@@ -31,6 +31,10 @@ class WeeklyForexWatchlistTest(unittest.TestCase):
             self.assertIn("Setup Score 90.0%", text)
             self.assertIn("όχι ποσοστό πιθανότητας επιτυχίας", text)
 
+    def test_confirmed_brc_without_a_plus_filters_is_watch_not_wait(self):
+        result = pair("EURUSD", 80, grade="WATCH", brc="READY")
+        self.assertEqual(trend_state(result), "🟡 WATCH")
+
     def test_weekly_continuity_hot_new_promotion_and_rollover(self):
         athens = ZoneInfo("Europe/Athens")
         monday = datetime(2026, 9, 21, 8, tzinfo=athens)
