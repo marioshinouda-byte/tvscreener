@@ -1,6 +1,6 @@
 # Latest Forex Scan
 
-**Τελευταία ενημέρωση:** 26/09/2026 01:12 (Europe/Athens)
+**Τελευταία ενημέρωση:** 26/09/2026 04:26 (Europe/Athens)
 
 **Pairs:** 28  |  **Aligned:** 14  |  **A+ READY:** 0
 
