@@ -28,7 +28,7 @@ from zoneinfo import ZoneInfo
 import pandas as pd
 import yfinance as yf
 
-from tvscreener import ForexField, ForexScreener
+from tvscreener import CryptoField, CryptoScreener, ForexField, ForexScreener
 
 
 PAIRS = [
@@ -39,6 +39,9 @@ PAIRS = [
     "NZDJPY", "NZDCHF", "NZDCAD",
     "CADJPY", "CADCHF", "CHFJPY",
 ]
+
+CRYPTO_ASSETS = ["BTC", "ETH", "SOL"]
+CRYPTO_PROVIDER_PRIORITY = ["COINBASE", "KRAKEN", "BITSTAMP", "BINANCE", "BYBIT"]
 
 PROVIDER_PRIORITY = [
     "OANDA", "FOREXCOM", "FX_IDC", "SAXO", "FXCM",
@@ -141,6 +144,22 @@ class PairScan:
     rr: Optional[float]
     rr_pass: bool
     reversal: Optional[ReversalScan] = None
+    # Weekly rating is context only; it does not change the D1/H4/H1 A+ rules.
+    w1_rating: Optional[float] = None
+
+
+@dataclass
+class CryptoScan:
+    asset: str
+    symbol: str
+    provider: str
+    price: Optional[float]
+    w1_rating: Optional[float]
+    d1_rating: Optional[float]
+    h4_rating: Optional[float]
+    h1_rating: Optional[float]
+    direction: str
+    bias: str
 
 
 def q(field_name: str, label: str) -> QueryField:
@@ -188,6 +207,7 @@ def exact_pair_from_symbol(symbol: str) -> str:
 
 QUERY_FIELDS = [
     ForexField.NAME,
+    ForexField.RECOMMEND_ALL_1W,   # W1 context only
     ForexField.TECHNICAL_RATING,   # D1
     ForexField.RECOMMEND_ALL_240,  # H4
     ForexField.RECOMMEND_ALL_60,   # H1
@@ -201,6 +221,48 @@ QUERY_FIELDS = [
     q("ADX|240", "ADX H4"),
     q("ADX|60", "ADX H1"),
 ]
+
+CRYPTO_QUERY_FIELDS = [
+    CryptoField.NAME,
+    CryptoField.RECOMMEND_ALL_1W,
+    CryptoField.TECHNICAL_RATING,
+    CryptoField.RECOMMEND_ALL_240,
+    CryptoField.RECOMMEND_ALL_60,
+    CryptoField.PRICE,
+]
+
+
+def crypto_provider_rank(symbol: str) -> int:
+    provider = symbol.split(":", 1)[0] if ":" in symbol else ""
+    try:
+        return CRYPTO_PROVIDER_PRIORITY.index(provider)
+    except ValueError:
+        return len(CRYPTO_PROVIDER_PRIORITY)
+
+
+def fetch_crypto(asset: str):
+    """Fetch a liquid spot USD/USDT market for BTC, ETH or SOL."""
+    candidates = []
+    for quote_rank, market in enumerate((f"{asset}USD", f"{asset}USDT")):
+        screener = CryptoScreener()
+        screener.select(*CRYPTO_QUERY_FIELDS)
+        screener.search(market)
+        screener.set_range(0, 50)
+        data = screener.get()
+        if data.empty:
+            continue
+
+        for _, row in data.iterrows():
+            symbol = str(row.get("Symbol", ""))
+            raw = symbol.split(":", 1)[-1].upper()
+            if raw == market:
+                candidates.append((quote_rank, crypto_provider_rank(symbol), row))
+
+    if not candidates:
+        return None
+
+    candidates.sort(key=lambda item: (item[0], item[1]))
+    return candidates[0][2]
 
 
 def fetch_pair(pair: str):
@@ -1167,6 +1229,7 @@ def scan_pair(pair: str) -> PairScan:
         symbol = str(row.get("Symbol", ""))
         provider = symbol.split(":", 1)[0] if ":" in symbol else ""
 
+        w1 = safe_float(row.get("Recommend All|1W"))
         d1 = safe_float(row.get("Technical Rating"))
         h4 = safe_float(row.get("Recommend All|240"))
         h1 = safe_float(row.get("Recommend All|60"))
@@ -1277,6 +1340,7 @@ def scan_pair(pair: str) -> PairScan:
             rr=rr,
             rr_pass=rr_pass,
             reversal=reversal,
+            w1_rating=w1,
         )
 
     except Exception as exc:
@@ -1299,6 +1363,51 @@ def scan_all_pairs() -> list[PairScan]:
         results.append(scan_pair(pair))
         time.sleep(0.15)
     return results
+
+
+def scan_crypto_asset(asset: str) -> CryptoScan:
+    try:
+        row = fetch_crypto(asset)
+        if row is None:
+            return CryptoScan(asset, "", "", None, None, None, None, None, "—", "NO DATA")
+
+        symbol = str(row.get("Symbol", ""))
+        provider = symbol.split(":", 1)[0] if ":" in symbol else ""
+        w1 = safe_float(row.get("Recommend All|1W"))
+        d1 = safe_float(row.get("Technical Rating"))
+        h4 = safe_float(row.get("Recommend All|240"))
+        h1 = safe_float(row.get("Recommend All|60"))
+        price = safe_float(row.get("Price"))
+        direction, bias = classify_alignment(d1, h4, h1)
+        return CryptoScan(asset, symbol, provider, price, w1, d1, h4, h1, direction, bias)
+    except Exception as exc:
+        print(f"[WARN] {asset} crypto: {exc}")
+        return CryptoScan(asset, "", "", None, None, None, None, None, "—", "ERROR")
+
+
+def scan_all_crypto() -> list[CryptoScan]:
+    results = []
+    for asset in CRYPTO_ASSETS:
+        print(f"[CRYPTO] Scan {asset}...")
+        results.append(scan_crypto_asset(asset))
+        time.sleep(0.15)
+    return results
+
+
+def weekly_context(direction: str, w1: Optional[float]) -> str:
+    if w1 is None:
+        return "N/A"
+    if direction == "LONG":
+        if w1 > DIRECTION_LEVEL:
+            return "✅ SUPPORTS"
+        if w1 < -DIRECTION_LEVEL:
+            return "⚠️ OPPOSES"
+    elif direction == "SHORT":
+        if w1 < -DIRECTION_LEVEL:
+            return "✅ SUPPORTS"
+        if w1 > DIRECTION_LEVEL:
+            return "⚠️ OPPOSES"
+    return "NEUTRAL"
 
 
 def candidates(results: list[PairScan]) -> list[PairScan]:
@@ -1424,8 +1533,13 @@ def fmt_check(value: bool) -> str:
     return "✅" if value else "—"
 
 
-def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") -> None:
+def write_markdown(
+    results: list[PairScan],
+    crypto_results: Optional[list[CryptoScan]] = None,
+    path: str = "LATEST_FOREX_SCAN.md",
+) -> None:
     now = datetime.now(ZoneInfo("Europe/Athens"))
+    crypto_results = crypto_results or []
     top = candidates(results)
     weekly, hot_new, week = weekly_trend_watchlist(
         results, now, str(Path(path).with_name(WEEKLY_TOP5_PATH))
@@ -1451,7 +1565,7 @@ def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") 
         "",
         "> Ratings / EMA50 / ADX: TradingView Screener. Structure / BRC: Yahoo Finance H1 candles (H4/D1 derived). Μπορεί να υπάρχουν μικρές διαφορές candle boundaries από TradingView.",
         "",
-        "> **A+ READY** απαιτεί: D1/H4/H1 alignment + EMA50 3/3 + D1/H4 structure + ADX + **confirmation έως 8 κλεισμένα H1 κεριά πίσω**, χωρίς ακύρωση ή υπερβολική απόσταση από τη zone + **RR ≥ 1.2**.",
+        "> **W1 / Weekly:** χρησιμοποιείται ως ανώτερο context και εμφανίζεται στο scan. **Δεν αλλάζει** το A+ rule: D1/H4/H1 alignment + EMA50 3/3 + D1/H4 structure + ADX + **confirmation έως 8 κλεισμένα H1 κεριά πίσω**, χωρίς ακύρωση ή υπερβολική απόσταση από τη zone + **RR ≥ 1.2**.",
         "",
         "## 🟢 ENTRY READY — Trend",
         "",
@@ -1541,14 +1655,35 @@ def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") 
         "",
         "### Rating detail",
         "",
-        "| Pair | D1 | H4 | H1 | Direction |",
-        "|---|---|---|---|---|",
+        "| Pair | W1 | D1 | H4 | H1 | Direction |",
+        "|---|---|---|---|---|---|",
     ]
     for r in top:
         lines.append(
-            f"| {r.pair} | {rating_text(r.d1_rating)} | {rating_text(r.h4_rating)} | "
-            f"{rating_text(r.h1_rating)} | {r.direction} |"
+            f"| {r.pair} | {rating_text(r.w1_rating)} | {rating_text(r.d1_rating)} | "
+            f"{rating_text(r.h4_rating)} | {rating_text(r.h1_rating)} | {r.direction} |"
         )
+
+    lines += [
+        "",
+        "## Crypto Watch — BTC / ETH / SOL",
+        "",
+        "> Crypto δεδομένα από TradingView Crypto Screener. Το W1 είναι context· η κατεύθυνση εξακολουθεί να απαιτεί D1/H4/H1 alignment.",
+        "",
+        "| Asset | Market | Price | W1 | D1 | H4 | H1 | Direction | W1 Context |",
+        "|---|---|---:|---|---|---|---|---|---|",
+    ]
+    if crypto_results:
+        for c in crypto_results:
+            market = c.symbol or "—"
+            price_text = "—" if c.price is None else (f"{c.price:,.2f}" if c.price >= 100 else f"{c.price:,.4f}")
+            lines.append(
+                f"| **{c.asset}** | {market} | {price_text} | {rating_text(c.w1_rating)} | "
+                f"{rating_text(c.d1_rating)} | {rating_text(c.h4_rating)} | {rating_text(c.h1_rating)} | "
+                f"**{c.direction}** | {weekly_context(c.direction, c.w1_rating)} |"
+            )
+    else:
+        lines.append("| — | — | — | — | — | — | — | — | — |")
 
     lines += [
         "",
@@ -1608,15 +1743,15 @@ def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") 
 
     lines += [
         "",
-        "## Όλα τα 28 pairs",
+        "## Όλα τα 28 Forex pairs",
         "",
-        "| Pair | D1 | H4 | H1 | Dir | EMA | D1 Struct | H4 Struct | BRC | RR | Quality |",
-        "|---|---|---|---|---|---:|---|---|---|---:|---:|",
+        "| Pair | W1 | D1 | H4 | H1 | Dir | EMA | D1 Struct | H4 Struct | BRC | RR | Quality |",
+        "|---|---|---|---|---|---|---:|---|---|---|---|---:|---:|",
     ]
     for r in sorted(results, key=lambda x: x.pair):
         lines.append(
-            f"| {r.pair} | {rating_text(r.d1_rating)} | {rating_text(r.h4_rating)} | "
-            f"{rating_text(r.h1_rating)} | {r.direction} | {r.ema_passes}/3 | "
+            f"| {r.pair} | {rating_text(r.w1_rating)} | {rating_text(r.d1_rating)} | "
+            f"{rating_text(r.h4_rating)} | {rating_text(r.h1_rating)} | {r.direction} | {r.ema_passes}/3 | "
             f"{r.d1_structure} | {r.h4_structure} | {r.brc_status} | "
             f"{fmt_rr(r.rr, r.rr_pass)} | {r.quality_score:.1f} |"
         )
@@ -1625,6 +1760,7 @@ def write_markdown(results: list[PairScan], path: str = "LATEST_FOREX_SCAN.md") 
         "",
         "## Πώς διαβάζεται",
         "",
+        "- **W1 / Weekly:** ανώτερο context. SUPPORTS όταν συμφωνεί με το D1/H4/H1 direction, OPPOSES όταν είναι αντίθετο. Δεν μπλοκάρει μόνο του ένα A+ setup.",
         "- **Bias STRONG/ALIGNED:** συμφωνία Technical Rating σε D1/H4/H1.",
         "- **EMA50 3/3:** τιμή και κλίση EMA50 συμφωνούν με την κατεύθυνση και στα 3 TF.",
         "- **D1/H4 Struct:** BULL ή BEAR από ολοκληρωμένα swing highs/lows.",
@@ -1689,10 +1825,11 @@ def print_results(results: list[PairScan]) -> None:
 
 
 def main():
-    print("Ξεκινά advanced scan 28 Forex pairs...")
+    print("Ξεκινά advanced scan 28 Forex pairs + BTC/ETH/SOL...")
     results = scan_all_pairs()
+    crypto_results = scan_all_crypto()
     print_results(results)
-    write_markdown(results)
+    write_markdown(results, crypto_results)
     print("\nΑποθηκεύτηκε: LATEST_FOREX_SCAN.md")
 
 

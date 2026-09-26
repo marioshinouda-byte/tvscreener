@@ -3,8 +3,9 @@ name: Run Forex Scanner
 on:
   workflow_dispatch:
   schedule:
-    # Five minutes after each hourly candle closes (GitHub cron uses UTC).
-    - cron: "5 * * * *"
+    # Run hourly away from the top-of-hour GitHub Actions load peak.
+    # GitHub schedule is best-effort; :17 materially reduces delay/drop risk vs :05.
+    - cron: "17 * * * *"
   push:
     branches: [main]
     paths:
