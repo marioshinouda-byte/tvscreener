@@ -1746,7 +1746,7 @@ def write_markdown(
         "## Όλα τα 28 Forex pairs",
         "",
         "| Pair | W1 | D1 | H4 | H1 | Dir | EMA | D1 Struct | H4 Struct | BRC | RR | Quality |",
-        "|---|---|---|---|---|---|---:|---|---|---|---|---:|---:|",
+        "|---|---|---|---|---|---|---:|---|---|---|---:|---:|",
     ]
     for r in sorted(results, key=lambda x: x.pair):
         lines.append(
