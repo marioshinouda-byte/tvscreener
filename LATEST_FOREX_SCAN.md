@@ -1,6 +1,6 @@
 # Latest Forex Scan
 
-**Τελευταία ενημέρωση:** 04/10/2026 16:13 (Europe/Athens)
+**Τελευταία ενημέρωση:** 04/10/2026 20:37 (Europe/Athens)
 
 **Pairs:** 28  |  **Aligned:** 11  |  **A+ READY:** 0
 
@@ -83,9 +83,9 @@
 
 | Asset | Market | Price | W1 | D1 | H4 | H1 | Direction | W1 Context |
 |---|---|---:|---|---|---|---|---|---|
-| **BTC** | COINBASE:BTCUSD | 85,145.48 | BUY | STRONG BUY | BUY | STRONG BUY | **LONG** | ✅ SUPPORTS |
-| **ETH** | COINBASE:ETHUSD | 2,697.12 | BUY | STRONG BUY | BUY | BUY | **LONG** | ✅ SUPPORTS |
-| **SOL** | COINBASE:SOLUSD | 121.40 | BUY | BUY | BUY | STRONG BUY | **LONG** | ✅ SUPPORTS |
+| **BTC** | COINBASE:BTCUSD | 85,359.78 | BUY | STRONG BUY | BUY | STRONG BUY | **LONG** | ✅ SUPPORTS |
+| **ETH** | COINBASE:ETHUSD | 2,702.22 | BUY | STRONG BUY | BUY | STRONG BUY | **LONG** | ✅ SUPPORTS |
+| **SOL** | COINBASE:SOLUSD | 121.64 | BUY | STRONG BUY | BUY | BUY | **LONG** | ✅ SUPPORTS |
 
 ## HTF Reversal — ξεχωριστό mode
 
