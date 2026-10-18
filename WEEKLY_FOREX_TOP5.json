@@ -1,16 +1,11 @@
 {
-  "week": "2026-W42",
+  "week": "2026-W43",
   "top5": [
-    "EURCHF",
-    "AUDNZD",
     "EURCAD",
-    "AUDCAD",
-    "EURGBP"
+    "EURAUD",
+    "EURCHF",
+    "EURGBP",
+    "EURNZD"
   ],
-  "hot_new": [
-    "GBPNZD",
-    "USDJPY",
-    "EURUSD",
-    "NZDCAD"
-  ]
+  "hot_new": []
 }
