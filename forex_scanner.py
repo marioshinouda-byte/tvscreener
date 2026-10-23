@@ -146,6 +146,8 @@ class PairScan:
     reversal: Optional[ReversalScan] = None
     # Weekly rating is context only; it does not change the D1/H4/H1 A+ rules.
     w1_rating: Optional[float] = None
+    # Timestamp of the last closed H1 candle used by BRC and structure checks.
+    h1_closed_at: Optional[object] = None
 
 
 @dataclass
@@ -1263,11 +1265,14 @@ def scan_pair(pair: str) -> PairScan:
         rr = None
         rr_pass = False
         reversal = None
+        h1_closed_at = None
 
         if direction in {"LONG", "SHORT"} or ENABLE_HTF_REVERSAL:
             candle_history = fetch_candle_history(pair)
             if candle_history is not None:
                 h1_candles, h4_candles, d1_candles = candle_history
+                if not h1_candles.empty:
+                    h1_closed_at = h1_candles.index[-1]
                 if direction in {"LONG", "SHORT"}:
                     d1_structure = detect_structure(d1_candles)
                     h4_structure = detect_structure(h4_candles)
@@ -1341,6 +1346,7 @@ def scan_pair(pair: str) -> PairScan:
             rr_pass=rr_pass,
             reversal=reversal,
             w1_rating=w1,
+            h1_closed_at=h1_closed_at,
         )
 
     except Exception as exc:
@@ -1522,6 +1528,34 @@ def fmt_price(pair: str, value: Optional[float]) -> str:
     return f"{value:.3f}" if "JPY" in pair else f"{value:.5f}"
 
 
+def fmt_zone_distance(pair: str, price: Optional[float], zone: Optional[float]) -> str:
+    """Signed distance from the H1 BRC zone using the TradingView price."""
+    if price is None or zone is None:
+        return "—"
+    pip_size = 0.01 if pair.endswith("JPY") else 0.0001
+    distance = (price - zone) / pip_size
+    return f"{distance:+.1f} pips"
+
+
+def fmt_h1_closed_at(value) -> str:
+    """Format the source timestamp of the last completed H1 candle in Athens time."""
+    if value is None:
+        return "—"
+    timestamp = pd.Timestamp(value)
+    if timestamp.tzinfo is None:
+        timestamp = timestamp.tz_localize("UTC")
+    return timestamp.tz_convert("Europe/Athens").strftime("%d/%m %H:%M")
+
+
+def reversal_display_state(rev: ReversalScan) -> str:
+    """Explain what the internal ARMED state is waiting for."""
+    if rev.status == "ARMED" and rev.brc_status == "RETEST":
+        return "ΑΝΑΜΟΝΗ H1 ΕΠΙΒΕΒΑΙΩΣΗΣ"
+    if rev.status == "ARMED" and rev.brc_status == "WAIT FOR BREAK":
+        return "ARMED · ΑΝΑΜΟΝΗ BREAK"
+    return rev.status
+
+
 def fmt_rr(value: Optional[float], passed: bool) -> str:
     if value is None:
         return "—"
@@ -1561,9 +1595,10 @@ def write_markdown(
         f"**HTF Reversal mode:** {'ON' if ENABLE_HTF_REVERSAL else 'OFF'}"
         f"  |  **Candidates:** {len(reversals)}  |  **READY:** {len(reversal_ready)}",
         "",
-        "> Το Quality Score είναι βαθμός συμφωνίας φίλτρων, **όχι πιθανότητα κέρδους**.",
+        "> Το score δείχνει συμφωνία των φίλτρων (/100), **όχι πιθανότητα κέρδους ή επιτυχίας**. Η απόσταση τιμής–zone είναι ενδεικτική: τιμή TradingView, zone από Yahoo Finance.",
         "",
         "> Ratings / EMA50 / ADX: TradingView Screener. Structure / BRC: Yahoo Finance H1 candles (H4/D1 derived). Μπορεί να υπάρχουν μικρές διαφορές candle boundaries από TradingView.",
+        "> Στους πίνακες, Δ zone = τρέχουσα τιμή μείον H1 zone σε pips (+ πάνω από τη zone, − κάτω από τη zone). Ώρα τελευταίου κλεισμένου H1 σε Athens time.",
         "",
         "> **W1 / Weekly:** χρησιμοποιείται ως ανώτερο context και εμφανίζεται στο scan. **Δεν αλλάζει** το A+ rule: D1/H4/H1 alignment + EMA50 3/3 + D1/H4 structure + ADX + **confirmation έως 8 κλεισμένα H1 κεριά πίσω**, χωρίς ακύρωση ή υπερβολική απόσταση από τη zone + **RR ≥ 1.2**.",
         "",
@@ -1573,7 +1608,7 @@ def write_markdown(
     if ready:
         for r in ready:
             lines.append(
-                f"**{r.pair} {r.direction} · Setup Score {r.quality_score:.1f}% · "
+                f"**{r.pair} {r.direction} · Agreement score {r.quality_score:.1f}/100 · "
                 f"H1 zone {fmt_zone(r.zone)} · Entry {fmt_price(r.pair, r.entry)} · "
                 f"SL {fmt_price(r.pair, r.stop_loss)} · TP {fmt_price(r.pair, r.take_profit)} · "
                 f"RR {fmt_rr(r.rr, r.rr_pass)}**"
@@ -1591,43 +1626,46 @@ def write_markdown(
         "Μόνο νέο επιβεβαιωμένο setup με RR ≥ 1.2 μπορεί να αντικαταστήσει θέση. "
         "Νέα επιλογή γίνεται τη Δευτέρα (ώρα Ελλάδας).",
         "",
-        "| # | Pair | Dir | Setup Score | Κατάσταση | B→R→C | H1 Zone | RR |",
-        "|---:|---|---|---:|---|---|---:|---:|",
+        "| # | Pair | Dir | Agreement /100 | Κατάσταση | B→R→C | H1 Zone | Τιμή | Απόσταση zone | Last closed H1 (Athens) | RR |",
+        "|---:|---|---|---:|---|---|---:|---:|---:|---|---:|",
     ]
     for i, r in enumerate(weekly, start=1):
         lines.append(
-            f"| {i} | **{r.pair}** | {r.direction} | **{r.quality_score:.1f}%** | "
+            f"| {i} | **{r.pair}** | {r.direction} | **{r.quality_score:.1f}/100** | "
             f"**{trend_state(r)}** | {r.brc_status} | {fmt_zone(r.zone)} | "
-            f"{fmt_rr(r.rr, r.rr_pass)} |"
+            f"{fmt_price(r.pair, r.price)} | {fmt_zone_distance(r.pair, r.price, r.zone)} | "
+            f"{fmt_h1_closed_at(r.h1_closed_at)} | {fmt_rr(r.rr, r.rr_pass)} |"
         )
     if not weekly:
-        lines.append("| — | Δεν υπάρχουν επαρκή δεδομένα για εβδομαδιαία επιλογή | — | — | — | — | — | — |")
+        lines.append("| — | Δεν υπάρχουν επαρκή δεδομένα για εβδομαδιαία επιλογή | — | — | — | — | — | — | — | — | — |")
 
     lines += [
         "",
-        "## 🔥 HOT NEW — Trend",
+        "## Νέοι υποψήφιοι για παρακολούθηση — Trend",
         "",
-        f"Νέα ζευγάρια εκτός πεντάδας με ισχυρή συμφωνία φίλτρων (score ≥ {HOT_NEW_MIN_SCORE:.0f}% "
-        "και D1/H4 structure + EMA50) ή setup A/Α+. Παραμένουν ορατά στην εβδομάδα· "
-        "ελέγχουμε την τρέχουσα κατάστασή τους σε κάθε scan.",
+        f"Νέα ζευγάρια εκτός πεντάδας με agreement score ≥ {HOT_NEW_MIN_SCORE:.0f}/100 "
+        "και D1/H4 structure + EMA50 ή setup A/A+. Είναι υποψήφια για παρακολούθηση, "
+        "όχι σήματα εισόδου· είσοδος εξετάζεται μόνο σε ENTRY READY.", 
         "",
     ]
     if hot_new:
         lines += [
-            "| Pair | Dir | Setup Score | Κατάσταση | B→R→C | H1 Zone |",
-            "|---|---|---:|---|---|---:|",
+            "| Pair | Dir | Agreement /100 | Κατάσταση | B→R→C | H1 Zone | Τιμή | Απόσταση zone | Last closed H1 (Athens) |",
+            "|---|---|---:|---|---|---:|---:|---:|---|",
         ]
         for r in hot_new:
             lines.append(
-                f"| **{r.pair}** | {r.direction} | **{r.quality_score:.1f}%** | "
-                f"**{trend_state(r)}** | {r.brc_status} | {fmt_zone(r.zone)} |"
+                f"| **{r.pair}** | {r.direction} | **{r.quality_score:.1f}/100** | "
+                f"**{trend_state(r)}** | {r.brc_status} | {fmt_zone(r.zone)} | "
+                f"{fmt_price(r.pair, r.price)} | {fmt_zone_distance(r.pair, r.price, r.zone)} | "
+                f"{fmt_h1_closed_at(r.h1_closed_at)} |"
             )
     else:
         lines.append("Κανένα νέο ζευγάρι που να περνά τα κριτήρια.")
 
     lines += [
         "",
-        "> **Setup Score % = βαθμός συμφωνίας φίλτρων, όχι ποσοστό πιθανότητας επιτυχίας.** "
+        "> **Agreement score /100 = βαθμός συμφωνίας φίλτρων, όχι πιθανότητα επιτυχίας.** "
         "🔴 INVALID σημαίνει ότι χάθηκε το alignment ή δεν υπάρχουν αξιόπιστα δεδομένα στο τρέχον scan.",
         "",
         "## Όλοι οι τρέχοντες Trend candidates",
@@ -1636,17 +1674,19 @@ def write_markdown(
 
     if top:
         lines += [
-            "| # | Pair | Dir | Setup | Bias | EMA50 | D1 Struct | H4 Struct | ADX H4 | ADX H1 | B→R→C | H1 Zone | Entry | SL | TP | RR | Quality |",
-            "|---:|---|---|---|---|---:|---|---|---:|---:|---|---:|---:|---:|---:|---:|---:|",
+            "| # | Pair | Dir | Setup | Bias | EMA50 | D1 Struct | H4 Struct | ADX H4 | ADX H1 | B→R→C | H1 Zone | Τιμή | Δ zone | Last closed H1 (Athens) | Entry | SL | TP | RR | Agreement /100 |",
+            "|---:|---|---|---|---|---:|---|---|---:|---:|---|---:|---:|---:|---|---:|---:|---:|---:|---:|",
         ]
         for i, r in enumerate(top, start=1):
             lines.append(
                 f"| {i} | **{r.pair}** | {r.direction} | **{r.setup_grade}** | {r.bias} | "
                 f"{r.ema_passes}/3 | {r.d1_structure} | {r.h4_structure} | "
                 f"{fmt_num(r.adx_h4)} | {fmt_num(r.adx_h1)} | **{r.brc_status}** | "
-                f"{fmt_zone(r.zone)} | {fmt_price(r.pair, r.entry)} | "
-                f"{fmt_price(r.pair, r.stop_loss)} | {fmt_price(r.pair, r.take_profit)} | "
-                f"**{fmt_rr(r.rr, r.rr_pass)}** | **{r.quality_score:.1f}/100** |"
+                f"{fmt_zone(r.zone)} | {fmt_price(r.pair, r.price)} | "
+                f"{fmt_zone_distance(r.pair, r.price, r.zone)} | {fmt_h1_closed_at(r.h1_closed_at)} | "
+                f"{fmt_price(r.pair, r.entry)} | {fmt_price(r.pair, r.stop_loss)} | "
+                f"{fmt_price(r.pair, r.take_profit)} | **{fmt_rr(r.rr, r.rr_pass)}** | "
+                f"**{r.quality_score:.1f}/100** |"
             )
     else:
         lines.append("Δεν βρέθηκε αυτή τη στιγμή D1 + H4 + H1 alignment.")
@@ -1690,7 +1730,7 @@ def write_markdown(
         "## HTF Reversal — ξεχωριστό mode",
         "",
         f"> Δεν αναμειγνύεται με το A+ Trend. Ψάχνει D1 support/resistance → H4 sweep/rejection/displacement → H1 break/retest/confirmation. Πριν από το break, ένα setup γίνεται **ARMED** μόνο όταν το H1 break απέχει έως **{REVERSAL_MAX_ARMED_BREAK_DISTANCE_ATR:.1f}× H1 ATR**. Το shortlist κρατά μόνο ενεργά contexts με **score ≥ {REVERSAL_MIN_ACTIVE_SCORE:.0f}**. Το **READY** απαιτεί φυσικό D1 target με **RR ≥ 3.0**.",
-        "> **Το HTF Reversal Score μετρά τη συμφωνία του context (D1/H4 και H1 BRC), όχι πιθανότητα κέρδους ή ετοιμότητα εισόδου. Σε ARMED ή WAIT RETEST περιμένουμε H1 confirmation· Entry/SL/TP εμφανίζονται μόνο σε READY, με RR ≥ 3.0.**",
+        "> **Το HTF Reversal Score μετρά συμφωνία context (/100), όχι πιθανότητα κέρδους. ΑΝΑΜΟΝΗ H1 ΕΠΙΒΕΒΑΙΩΣΗΣ / WAIT RETEST / ARMED δεν είναι είσοδος. Entry/SL/TP εμφανίζονται μόνο σε READY, με RR ≥ 3.0.**",
         "",
     ]
 
@@ -1704,7 +1744,7 @@ def write_markdown(
         for i, pair_scan in enumerate(reversals, start=1):
             rev = pair_scan.reversal
             lines.append(
-                f"| {i} | **{pair_scan.pair}** | {rev.direction} | **{rev.status}** | "
+                f"| {i} | **{pair_scan.pair}** | {rev.direction} | **{reversal_display_state(rev)}** | "
                 f"{fmt_zone(rev.htf_zone)} | {rev.h4_structure} | {fmt_check(rev.sweep)} | "
                 f"{fmt_check(rev.rejection)} | {fmt_check(rev.displacement)} | "
                 f"{rev.brc_status} | {fmt_zone(rev.h1_zone)} | "
@@ -1734,7 +1774,8 @@ def write_markdown(
         "### Καταστάσεις HTF Reversal",
         "",
         "- **WATCH:** η τιμή αντέδρασε σε επιβεβαιωμένη D1 zone, αλλά δεν υπάρχει ακόμη αρκετή H4 επιβεβαίωση.",
-        f"- **ARMED:** H1 retest ή ισχυρό HTF context με το απαιτούμενο H1 break έως {REVERSAL_MAX_ARMED_BREAK_DISTANCE_ATR:.1f}× H1 ATR μακριά· μπαίνει στο shortlist μόνο με score ≥ {REVERSAL_MIN_ACTIVE_SCORE:.0f}.",
+        f"- **ΑΝΑΜΟΝΗ H1 ΕΠΙΒΕΒΑΙΩΣΗΣ:** έγινε H1 retest και περιμένει νέο κλεισμένο H1 candle να επιβεβαιώσει· δεν είναι είσοδος.",
+        f"- **ARMED · ΑΝΑΜΟΝΗ BREAK:** ισχυρό HTF context με το απαιτούμενο H1 break έως {REVERSAL_MAX_ARMED_BREAK_DISTANCE_ATR:.1f}× H1 ATR· μπαίνει στο shortlist μόνο με score ≥ {REVERSAL_MIN_ACTIVE_SCORE:.0f}. Δεν είναι είσοδος.",
         "- **WAIT RETEST:** έγινε H1 break και περιμένει επιστροφή στη broken zone.",
         "- **READY:** fresh confirmation στο τελευταίο κλεισμένο H1 και RR ≥ 3.0 προς την επόμενη D1 zone.",
         "- **INVALID:** παραβίαση D1 zone, ληγμένο H1 setup, υπερβολική απομάκρυνση ή RR < 3.0.",
