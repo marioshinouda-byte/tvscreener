@@ -1544,7 +1544,10 @@ def fmt_h1_closed_at(value) -> str:
     timestamp = pd.Timestamp(value)
     if timestamp.tzinfo is None:
         timestamp = timestamp.tz_localize("UTC")
-    return timestamp.tz_convert("Europe/Athens").strftime("%d/%m %H:%M")
+    start = timestamp.tz_convert("Europe/Athens")
+    end = (timestamp + pd.Timedelta(hours=1)).tz_convert("Europe/Athens")
+    end_label = end.strftime("%d/%m %H:%M") if end.date() != start.date() else end.strftime("%H:%M")
+    return f"{start:%d/%m %H:%M}–{end_label}"
 
 
 def reversal_display_state(rev: ReversalScan) -> str:
@@ -1626,7 +1629,7 @@ def write_markdown(
         "Μόνο νέο επιβεβαιωμένο setup με RR ≥ 1.2 μπορεί να αντικαταστήσει θέση. "
         "Νέα επιλογή γίνεται τη Δευτέρα (ώρα Ελλάδας).",
         "",
-        "| # | Pair | Dir | Agreement /100 | Κατάσταση | B→R→C | H1 Zone | Τιμή | Απόσταση zone | Last closed H1 (Athens) | RR |",
+        "| # | Pair | Dir | Agreement /100 | Κατάσταση | B→R→C | H1 Zone | Τιμή | Απόσταση zone | Κλεισμένο H1 (ώρα Αθήνας) | RR |",
         "|---:|---|---|---:|---|---|---:|---:|---:|---|---:|",
     ]
     for i, r in enumerate(weekly, start=1):
@@ -1650,7 +1653,7 @@ def write_markdown(
     ]
     if hot_new:
         lines += [
-            "| Pair | Dir | Agreement /100 | Κατάσταση | B→R→C | H1 Zone | Τιμή | Απόσταση zone | Last closed H1 (Athens) |",
+            "| Pair | Dir | Agreement /100 | Κατάσταση | B→R→C | H1 Zone | Τιμή | Απόσταση zone | Κλεισμένο H1 (ώρα Αθήνας) |",
             "|---|---|---:|---|---|---:|---:|---:|---|",
         ]
         for r in hot_new:
@@ -1674,7 +1677,7 @@ def write_markdown(
 
     if top:
         lines += [
-            "| # | Pair | Dir | Setup | Bias | EMA50 | D1 Struct | H4 Struct | ADX H4 | ADX H1 | B→R→C | H1 Zone | Τιμή | Δ zone | Last closed H1 (Athens) | Entry | SL | TP | RR | Agreement /100 |",
+            "| # | Pair | Dir | Setup | Bias | EMA50 | D1 Struct | H4 Struct | ADX H4 | ADX H1 | B→R→C | H1 Zone | Τιμή | Δ zone | Κλεισμένο H1 (ώρα Αθήνας) | Entry | SL | TP | RR | Agreement /100 |",
             "|---:|---|---|---|---|---:|---|---|---:|---:|---|---:|---:|---:|---|---:|---:|---:|---:|---:|",
         ]
         for i, r in enumerate(top, start=1):
@@ -1738,7 +1741,7 @@ def write_markdown(
         lines.append("Το mode είναι απενεργοποιημένο (`ENABLE_HTF_REVERSAL=false`).")
     elif reversals:
         lines += [
-            "| # | Pair | Dir | State | D1 Zone | H4 Struct | Sweep | Reject | Displ. | H1 BRC | H1 Zone | Τιμή | Δ H1 zone | Last closed H1 (Athens) | Entry | SL | TP | RR | Context score /100 | Σημείωση |",
+            "| # | Pair | Dir | State | D1 Zone | H4 Struct | Sweep | Reject | Displ. | H1 BRC | H1 Zone | Τιμή | Δ H1 zone | Κλεισμένο H1 (ώρα Αθήνας) | Entry | SL | TP | RR | Context score /100 | Σημείωση |",
             "|---:|---|---|---|---:|---|---:|---:|---:|---|---:|---:|---:|---|---:|---:|---:|---:|---:|---|",
         ]
         for i, pair_scan in enumerate(reversals, start=1):
