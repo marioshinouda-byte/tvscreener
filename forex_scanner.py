@@ -1738,8 +1738,8 @@ def write_markdown(
         lines.append("Το mode είναι απενεργοποιημένο (`ENABLE_HTF_REVERSAL=false`).")
     elif reversals:
         lines += [
-            "| # | Pair | Dir | State | D1 Zone | H4 Struct | Sweep | Reject | Displ. | H1 BRC | H1 Zone | Entry | SL | TP | RR | Context score | Σημείωση |",
-            "|---:|---|---|---|---:|---|---:|---:|---:|---|---:|---:|---:|---:|---:|---:|---|",
+            "| # | Pair | Dir | State | D1 Zone | H4 Struct | Sweep | Reject | Displ. | H1 BRC | H1 Zone | Τιμή | Δ H1 zone | Last closed H1 (Athens) | Entry | SL | TP | RR | Context score /100 | Σημείωση |",
+            "|---:|---|---|---|---:|---|---:|---:|---:|---|---:|---:|---:|---|---:|---:|---:|---:|---:|---|",
         ]
         for i, pair_scan in enumerate(reversals, start=1):
             rev = pair_scan.reversal
@@ -1748,6 +1748,9 @@ def write_markdown(
                 f"{fmt_zone(rev.htf_zone)} | {rev.h4_structure} | {fmt_check(rev.sweep)} | "
                 f"{fmt_check(rev.rejection)} | {fmt_check(rev.displacement)} | "
                 f"{rev.brc_status} | {fmt_zone(rev.h1_zone)} | "
+                f"{fmt_price(pair_scan.pair, pair_scan.price)} | "
+                f"{fmt_zone_distance(pair_scan.pair, pair_scan.price, rev.h1_zone)} | "
+                f"{fmt_h1_closed_at(pair_scan.h1_closed_at)} | "
                 f"{fmt_price(pair_scan.pair, rev.entry)} | "
                 f"{fmt_price(pair_scan.pair, rev.stop_loss)} | "
                 f"{fmt_price(pair_scan.pair, rev.take_profit)} | "
