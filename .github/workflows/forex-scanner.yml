@@ -3,9 +3,9 @@ name: Run Forex Scanner
 on:
   workflow_dispatch:
   schedule:
-    # Run hourly away from the top-of-hour GitHub Actions load peak.
-    # GitHub schedule is best-effort; :17 materially reduces delay/drop risk vs :05.
-    - cron: "17 * * * *"
+    # Run every 30 minutes away from the top-of-hour and half-hour peaks.
+    # GitHub schedule is best-effort; :17 and :47 reduce delay/drop risk.
+    - cron: "17,47 * * * *"
   push:
     branches: [main]
     paths:
