@@ -1,10 +1,10 @@
 # Latest Forex Scan
 
-**Τελευταία ενημέρωση:** 27/10/2026 08:52 (Europe/Athens)
+**Τελευταία ενημέρωση:** 27/10/2026 10:30 (Europe/Athens)
 
 **Pairs:** 28  |  **Aligned:** 20  |  **A+ READY:** 0
 
-**HTF Reversal mode:** ON  |  **Candidates:** 3  |  **READY:** 0
+**HTF Reversal mode:** ON  |  **Candidates:** 2  |  **READY:** 0
 
 > Το score δείχνει συμφωνία των φίλτρων (/100), **όχι πιθανότητα κέρδους ή επιτυχίας**. Η απόσταση τιμής–zone είναι ενδεικτική: τιμή TradingView, zone από Yahoo Finance.
 
@@ -25,19 +25,17 @@
 
 | # | Pair | Dir | Agreement /100 | Κατάσταση | B→R→C | H1 Zone | Τιμή | Απόσταση zone | Κλεισμένο H1 (ώρα Αθήνας) | RR |
 |---:|---|---|---:|---|---|---:|---:|---:|---|---:|
-| 1 | **EURNZD** | SHORT | **73.0/100** | **🟡 WATCH** | READY | 1.96256 | 1.96064 | -19.2 pips | 27/10 07:00–08:00 | 0.81 ❌ |
-| 2 | **CADCHF** | LONG | **71.8/100** | **🟡 WATCH** | READY | 0.59007 | 0.59068 | +6.1 pips | 27/10 07:00–08:00 | 0.27 ❌ |
-| 3 | **GBPCAD** | SHORT | **55.0/100** | **⚪ WAIT** | WAIT FOR BREAK | 1.86790 | 1.86858 | +6.8 pips | 27/10 07:00–08:00 | — |
-| 4 | **CADJPY** | LONG | **53.6/100** | **⚪ WAIT** | WAIT NEW RETEST | 112.258 | 112.548 | +29.0 pips | 27/10 07:00–08:00 | — |
-| 5 | **GBPNZD** | SHORT | **63.0/100** | **🟡 WATCH** | READY | 2.34259 | 2.34125 | -13.4 pips | 27/10 07:00–08:00 | 0.58 ❌ |
+| 1 | **EURNZD** | SHORT | **71.5/100** | **🟡 WATCH** | READY | 1.96256 | 1.96220 | -3.6 pips | 27/10 09:00–10:00 | 1.58 ✅ |
+| 2 | **CADCHF** | LONG | **53.5/100** | **⚪ WAIT** | WAIT NEW RETEST | 0.59007 | 0.59078 | +7.1 pips | 27/10 09:00–10:00 | — |
+| 3 | **GBPCAD** | SHORT | **55.0/100** | **⚪ WAIT** | WAIT FOR BREAK | 1.86790 | 1.86838 | +4.8 pips | 27/10 09:00–10:00 | — |
+| 4 | **NZDCHF** | LONG | **68.5/100** | **🟡 WATCH** | READY | 0.47053 | 0.47100 | +4.7 pips | 27/10 09:00–10:00 | 1.36 ✅ |
+| 5 | **GBPNZD** | SHORT | **61.2/100** | **🟡 WATCH** | READY | 2.34259 | 2.34358 | +9.9 pips | 27/10 09:00–10:00 | 1.79 ✅ |
 
 ## Νέοι υποψήφιοι για παρακολούθηση — Trend
 
 Νέα ζευγάρια εκτός πεντάδας με agreement score ≥ 70/100 και D1/H4 structure + EMA50 ή setup A/A+. Είναι υποψήφια για παρακολούθηση, όχι σήματα εισόδου· είσοδος εξετάζεται μόνο σε ENTRY READY.
 
-| Pair | Dir | Agreement /100 | Κατάσταση | B→R→C | H1 Zone | Τιμή | Απόσταση zone | Κλεισμένο H1 (ώρα Αθήνας) |
-|---|---|---:|---|---|---:|---:|---:|---|
-| **NZDCHF** | LONG | **72.7/100** | **🟡 WATCH** | READY | 0.47053 | 0.47144 | +9.1 pips | 27/10 07:00–08:00 |
+Κανένα νέο ζευγάρι που να περνά τα κριτήρια.
 
 > **Agreement score /100 = βαθμός συμφωνίας φίλτρων, όχι πιθανότητα επιτυχίας.** 🔴 INVALID σημαίνει ότι χάθηκε το alignment ή δεν υπάρχουν αξιόπιστα δεδομένα στο τρέχον scan.
 
@@ -45,51 +43,51 @@
 
 | # | Pair | Dir | Setup | Bias | EMA50 | D1 Struct | H4 Struct | ADX H4 | ADX H1 | B→R→C | H1 Zone | Τιμή | Δ zone | Κλεισμένο H1 (ώρα Αθήνας) | Entry | SL | TP | RR | Agreement /100 |
 |---:|---|---|---|---|---:|---|---|---:|---:|---|---:|---:|---:|---|---:|---:|---:|---:|---:|
-| 1 | **EURNZD** | SHORT | **WATCH** | ALIGNED | 3/3 | BEAR | BULL | 32.5 | 24.3 | **READY** | 1.96256 | 1.96064 | -19.2 pips | 27/10 07:00–08:00 | 1.96118 | 1.96340 | 1.95939 | **0.81 ❌** | **73.0/100** |
-| 2 | **NZDCHF** | LONG | **WATCH** | ALIGNED | 3/3 | BULL | BULL | 16.7 | 17.1 | **READY** | 0.47053 | 0.47144 | +9.1 pips | 27/10 07:00–08:00 | 0.47132 | 0.47013 | 0.47183 | **0.43 ❌** | **72.7/100** |
-| 3 | **CADCHF** | LONG | **WATCH** | ALIGNED | 3/3 | BULL | BULL | 17.2 | 21.3 | **READY** | 0.59007 | 0.59068 | +6.1 pips | 27/10 07:00–08:00 | 0.59057 | 0.58969 | 0.59081 | **0.27 ❌** | **71.8/100** |
-| 4 | **GBPNZD** | SHORT | **WATCH** | ALIGNED | 2/3 | BEAR | BULL | 27.5 | 29.2 | **READY** | 2.34259 | 2.34125 | -13.4 pips | 27/10 07:00–08:00 | 2.34149 | 2.34372 | 2.34019 | **0.58 ❌** | **63.0/100** |
-| 5 | **NZDJPY** | LONG | **WATCH** | ALIGNED | 2/3 | BULL | BULL | 18.7 | 17.5 | **RETEST** | 89.618 | 89.834 | +21.6 pips | 27/10 07:00–08:00 | — | — | — | **—** | **57.3/100** |
-| 6 | **EURAUD** | SHORT | **WATCH** | ALIGNED | 3/3 | BEAR | BEAR | 23.0 | 19.4 | **WAIT NEW RETEST** | 1.58994 | 1.59026 | +3.2 pips | 27/10 07:00–08:00 | — | — | — | **—** | **55.0/100** |
-| 7 | **EURCAD** | SHORT | **WATCH** | ALIGNED | 3/3 | BEAR | BEAR | 36.8 | 22.6 | **WAIT FOR BREAK** | 1.56425 | 1.56489 | +6.4 pips | 27/10 07:00–08:00 | — | — | — | **—** | **55.0/100** |
-| 8 | **GBPCAD** | SHORT | **WATCH** | ALIGNED | 3/3 | BEAR | BEAR | 23.7 | 17.7 | **WAIT FOR BREAK** | 1.86790 | 1.86858 | +6.8 pips | 27/10 07:00–08:00 | — | — | — | **—** | **55.0/100** |
-| 9 | **CADJPY** | LONG | **WATCH** | ALIGNED | 3/3 | BULL | BULL | 22.5 | 20.7 | **WAIT NEW RETEST** | 112.258 | 112.548 | +29.0 pips | 27/10 07:00–08:00 | — | — | — | **—** | **53.6/100** |
-| 10 | **GBPUSD** | SHORT | **WATCH** | ALIGNED | 3/3 | BULL | BEAR | 27.4 | 35.8 | **WAIT FOR BREAK** | 1.33296 | 1.33280 | -1.6 pips | 27/10 07:00–08:00 | — | — | — | **—** | **51.8/100** |
-| 11 | **EURUSD** | SHORT | **WATCH** | ALIGNED | 3/3 | BULL | BEAR | 20.8 | 32.6 | **WAIT NEW RETEST** | 1.11894 | 1.11616 | -27.8 pips | 27/10 07:00–08:00 | — | — | — | **—** | **51.4/100** |
-| 12 | **EURGBP** | SHORT | **WATCH** | ALIGNED | 3/3 | BEAR | BULL | 34.3 | 13.0 | **WAIT FOR BREAK** | 0.83612 | 0.83746 | +13.4 pips | 27/10 07:00–08:00 | — | — | — | **—** | **47.8/100** |
-| 13 | **GBPCHF** | LONG | **WATCH** | ALIGNED | 3/3 | BULL | BULL | 13.7 | 14.1 | **WAIT NEW RETEST** | 1.10396 | 1.10375 | -2.1 pips | 27/10 07:00–08:00 | — | — | — | **—** | **46.8/100** |
-| 14 | **GBPAUD** | SHORT | **WATCH** | ALIGNED | 3/3 | BULL | BEAR | 17.9 | 15.0 | **WAIT FOR BREAK** | 1.89571 | 1.89885 | +31.4 pips | 27/10 07:00–08:00 | — | — | — | **—** | **41.7/100** |
-| 15 | **USDCHF** | LONG | **WATCH** | ALIGNED | 3/3 | BEAR | BULL | 21.5 | 15.3 | **WAIT NEW RETEST** | 0.82635 | 0.82814 | +17.9 pips | 27/10 07:00–08:00 | — | — | — | **—** | **40.7/100** |
-| 16 | **AUDCHF** | LONG | **WATCH** | ALIGNED | 3/3 | BEAR | BULL | 14.7 | 12.6 | **WAIT NEW RETEST** | 0.58151 | 0.58126 | -2.5 pips | 27/10 07:00–08:00 | — | — | — | **—** | **39.8/100** |
-| 17 | **AUDCAD** | SHORT | **WATCH** | ALIGNED | 3/3 | BEAR | BULL | 17.5 | 9.4 | **WAIT FOR BREAK** | 0.98052 | 0.98404 | +35.2 pips | 27/10 07:00–08:00 | — | — | — | **—** | **37.8/100** |
-| 18 | **EURCHF** | SHORT | **WATCH** | ALIGNED | 2/3 | BEAR | BULL | 29.2 | 12.3 | **WAIT FOR BREAK** | 0.92293 | 0.92432 | +13.9 pips | 27/10 07:00–08:00 | — | — | — | **—** | **36.7/100** |
-| 19 | **AUDNZD** | SHORT | **WATCH** | ALIGNED | 2/3 | BEAR | BULL | 12.0 | 20.0 | **WAIT FOR BREAK** | 1.23181 | 1.23292 | +11.1 pips | 27/10 07:00–08:00 | — | — | — | **—** | **34.3/100** |
-| 20 | **AUDJPY** | LONG | **WATCH** | ALIGNED | 2/3 | N/A | N/A | 18.4 | 10.3 | **WAIT** | — | 110.750 | — | — | — | — | — | **—** | **24.4/100** |
+| 1 | **EURNZD** | SHORT | **A** | ALIGNED | 3/3 | BEAR | BULL | 32.5 | 26.5 | **READY** | 1.96256 | 1.96220 | -3.6 pips | 27/10 09:00–10:00 | 1.96135 | 1.96342 | 1.95808 | **1.58 ✅** | **71.5/100** |
+| 2 | **NZDCHF** | LONG | **A** | ALIGNED | 3/3 | BULL | BULL | 16.6 | 16.4 | **READY** | 0.47053 | 0.47100 | +4.7 pips | 27/10 09:00–10:00 | 0.47092 | 0.47013 | 0.47200 | **1.36 ✅** | **68.5/100** |
+| 3 | **GBPUSD** | SHORT | **WATCH** | ALIGNED | 3/3 | BULL | BEAR | 27.7 | 38.7 | **RETEST** | 1.33296 | 1.33246 | -5.0 pips | 27/10 09:00–10:00 | — | — | — | **—** | **62.6/100** |
+| 4 | **GBPNZD** | SHORT | **WATCH** | ALIGNED | 2/3 | BEAR | BULL | 27.5 | 30.9 | **READY** | 2.34259 | 2.34358 | +9.9 pips | 27/10 09:00–10:00 | 2.34190 | 2.34367 | 2.33873 | **1.79 ✅** | **61.2/100** |
+| 5 | **EURAUD** | SHORT | **WATCH** | STRONG | 3/3 | BEAR | BEAR | 23.0 | 20.2 | **WAIT NEW RETEST** | 1.58994 | 1.58906 | -8.8 pips | 27/10 09:00–10:00 | — | — | — | **—** | **55.0/100** |
+| 6 | **EURCAD** | SHORT | **WATCH** | STRONG | 3/3 | BEAR | BEAR | 37.0 | 24.0 | **WAIT FOR BREAK** | 1.56425 | 1.56432 | +0.7 pips | 27/10 09:00–10:00 | — | — | — | **—** | **55.0/100** |
+| 7 | **GBPCAD** | SHORT | **WATCH** | ALIGNED | 3/3 | BEAR | BEAR | 24.0 | 20.6 | **WAIT FOR BREAK** | 1.86790 | 1.86838 | +4.8 pips | 27/10 09:00–10:00 | — | — | — | **—** | **55.0/100** |
+| 8 | **EURUSD** | SHORT | **WATCH** | ALIGNED | 3/3 | BULL | BEAR | 21.1 | 36.5 | **WAIT NEW RETEST** | 1.11894 | 1.11564 | -33.0 pips | 27/10 09:00–10:00 | — | — | — | **—** | **53.7/100** |
+| 9 | **CADCHF** | LONG | **WATCH** | ALIGNED | 3/3 | BULL | BULL | 17.0 | 21.5 | **WAIT NEW RETEST** | 0.59007 | 0.59078 | +7.1 pips | 27/10 09:00–10:00 | — | — | — | **—** | **53.5/100** |
+| 10 | **CADJPY** | LONG | **WATCH** | ALIGNED | 3/3 | BULL | BULL | 22.5 | 20.4 | **WAIT NEW RETEST** | 112.258 | 112.507 | +24.9 pips | 27/10 09:00–10:00 | — | — | — | **—** | **52.4/100** |
+| 11 | **NZDCAD** | SHORT | **WATCH** | ALIGNED | 3/3 | BEAR | BEAR | 9.5 | 15.3 | **WAIT FOR BREAK** | 0.79437 | 0.79722 | +28.5 pips | 27/10 09:00–10:00 | — | — | — | **—** | **50.9/100** |
+| 12 | **EURGBP** | SHORT | **WATCH** | ALIGNED | 3/3 | BEAR | BULL | 34.3 | 11.6 | **WAIT FOR BREAK** | 0.83612 | 0.83726 | +11.4 pips | 27/10 09:00–10:00 | — | — | — | **—** | **49.7/100** |
+| 13 | **GBPCHF** | LONG | **WATCH** | ALIGNED | 3/3 | BULL | BULL | 14.1 | 13.3 | **WAIT FOR BREAK** | 1.10482 | 1.10374 | -10.8 pips | 27/10 09:00–10:00 | — | — | — | **—** | **48.0/100** |
+| 14 | **EURJPY** | SHORT | **WATCH** | ALIGNED | 3/3 | BEAR | BULL | 25.4 | 9.7 | **WAIT FOR BREAK** | 175.090 | 175.992 | +90.2 pips | 27/10 09:00–10:00 | — | — | — | **—** | **44.7/100** |
+| 15 | **EURCHF** | SHORT | **WATCH** | ALIGNED | 3/3 | BEAR | BULL | 29.6 | 13.5 | **WAIT FOR BREAK** | 0.92293 | 0.92410 | +11.7 pips | 27/10 09:00–10:00 | — | — | — | **—** | **44.6/100** |
+| 16 | **AUDJPY** | LONG | **WATCH** | ALIGNED | 2/3 | BULL | BULL | 18.4 | 9.6 | **WAIT NEW RETEST** | 110.759 | 110.756 | -0.3 pips | 27/10 09:00–10:00 | — | — | — | **—** | **44.4/100** |
+| 17 | **GBPAUD** | SHORT | **WATCH** | ALIGNED | 3/3 | BULL | BEAR | 17.9 | 15.5 | **WAIT FOR BREAK** | 1.89571 | 1.89783 | +21.2 pips | 27/10 09:00–10:00 | — | — | — | **—** | **43.2/100** |
+| 18 | **AUDCHF** | LONG | **WATCH** | ALIGNED | 3/3 | BEAR | BULL | 14.7 | 12.0 | **WAIT NEW RETEST** | 0.58151 | 0.58158 | +0.7 pips | 27/10 09:00–10:00 | — | — | — | **—** | **42.4/100** |
+| 19 | **USDCHF** | LONG | **WATCH** | ALIGNED | 3/3 | BEAR | BULL | 21.7 | 17.3 | **WAIT NEW RETEST** | 0.82635 | 0.82840 | +20.5 pips | 27/10 09:00–10:00 | — | — | — | **—** | **42.4/100** |
+| 20 | **CHFJPY** | SHORT | **WATCH** | ALIGNED | 3/3 | BULL | BEAR | 19.2 | 12.1 | **WAIT FOR BREAK** | 189.941 | 190.438 | +49.7 pips | 27/10 09:00–10:00 | — | — | — | **—** | **38.0/100** |
 
 ### Rating detail
 
 | Pair | W1 | D1 | H4 | H1 | Direction |
 |---|---|---|---|---|---|
-| EURNZD | SELL | STRONG SELL | SELL | SELL | SHORT |
-| NZDCHF | BUY | STRONG BUY | BUY | BUY | LONG |
-| CADCHF | BUY | BUY | BUY | BUY | LONG |
-| GBPNZD | BUY | SELL | SELL | STRONG SELL | SHORT |
-| NZDJPY | SELL | BUY | STRONG BUY | BUY | LONG |
-| EURAUD | SELL | STRONG SELL | SELL | SELL | SHORT |
-| EURCAD | SELL | SELL | SELL | SELL | SHORT |
+| EURNZD | SELL | SELL | SELL | SELL | SHORT |
+| NZDCHF | BUY | BUY | BUY | BUY | LONG |
+| GBPUSD | SELL | SELL | SELL | SELL | SHORT |
+| GBPNZD | BUY | SELL | SELL | SELL | SHORT |
+| EURAUD | STRONG SELL | STRONG SELL | STRONG SELL | STRONG SELL | SHORT |
+| EURCAD | SELL | STRONG SELL | STRONG SELL | STRONG SELL | SHORT |
 | GBPCAD | SELL | SELL | STRONG SELL | SELL | SHORT |
+| EURUSD | SELL | SELL | STRONG SELL | STRONG SELL | SHORT |
+| CADCHF | BUY | BUY | BUY | STRONG BUY | LONG |
 | CADJPY | SELL | BUY | BUY | BUY | LONG |
-| GBPUSD | SELL | SELL | SELL | STRONG SELL | SHORT |
-| EURUSD | SELL | SELL | SELL | STRONG SELL | SHORT |
-| EURGBP | STRONG SELL | STRONG SELL | SELL | SELL | SHORT |
+| NZDCAD | SELL | SELL | SELL | STRONG SELL | SHORT |
+| EURGBP | STRONG SELL | SELL | SELL | STRONG SELL | SHORT |
 | GBPCHF | STRONG BUY | BUY | BUY | BUY | LONG |
-| GBPAUD | SELL | SELL | SELL | SELL | SHORT |
-| USDCHF | BUY | BUY | BUY | BUY | LONG |
-| AUDCHF | BUY | BUY | BUY | BUY | LONG |
-| AUDCAD | NEUTRAL | SELL | SELL | SELL | SHORT |
+| EURJPY | SELL | SELL | SELL | SELL | SHORT |
 | EURCHF | SELL | SELL | SELL | SELL | SHORT |
-| AUDNZD | BUY | SELL | SELL | STRONG SELL | SHORT |
 | AUDJPY | NEUTRAL | BUY | BUY | BUY | LONG |
+| GBPAUD | SELL | SELL | SELL | STRONG SELL | SHORT |
+| AUDCHF | BUY | STRONG BUY | BUY | BUY | LONG |
+| USDCHF | BUY | BUY | BUY | STRONG BUY | LONG |
+| CHFJPY | SELL | SELL | SELL | SELL | SHORT |
 
 ## Crypto Watch — BTC / ETH / SOL
 
@@ -97,9 +95,9 @@
 
 | Asset | Market | Price | W1 | D1 | H4 | H1 | Direction | W1 Context |
 |---|---|---:|---|---|---|---|---|---|
-| **BTC** | COINBASE:BTCUSD | 79,456.89 | BUY | SELL | STRONG SELL | STRONG SELL | **SHORT** | ⚠️ OPPOSES |
-| **ETH** | COINBASE:ETHUSD | 2,299.74 | SELL | SELL | STRONG SELL | STRONG SELL | **SHORT** | ✅ SUPPORTS |
-| **SOL** | COINBASE:SOLUSD | 99.4500 | SELL | SELL | STRONG SELL | STRONG SELL | **SHORT** | ✅ SUPPORTS |
+| **BTC** | COINBASE:BTCUSD | 79,704.93 | BUY | SELL | SELL | SELL | **SHORT** | ⚠️ OPPOSES |
+| **ETH** | COINBASE:ETHUSD | 2,311.11 | SELL | SELL | SELL | SELL | **SHORT** | ✅ SUPPORTS |
+| **SOL** | COINBASE:SOLUSD | 99.7900 | SELL | SELL | STRONG SELL | STRONG SELL | **SHORT** | ✅ SUPPORTS |
 
 ## HTF Reversal — ξεχωριστό mode
 
@@ -108,11 +106,10 @@
 
 | # | Pair | Dir | State | D1 Zone | H4 Struct | Sweep | Reject | Displ. | H1 BRC | H1 Zone | Τιμή | Δ H1 zone | Κλεισμένο H1 (ώρα Αθήνας) | Entry | SL | TP | RR | Context score /100 | Σημείωση |
 |---:|---|---|---|---:|---|---:|---:|---:|---|---:|---:|---:|---|---:|---:|---:|---:|---:|---|
-| 1 | **NZDCAD** | LONG | **WAIT RETEST** | 0.79558 | BEAR | ✅ | ✅ | ✅ | BREAK | 0.79885 | 0.79814 | -7.1 pips | 27/10 07:00–08:00 | — | — | — | — | **93.0/100** | H1 break — περιμένει retest |
-| 2 | **NZDJPY** | LONG | **ΑΝΑΜΟΝΗ H1 ΕΠΙΒΕΒΑΙΩΣΗΣ** | 88.720 | BULL | ✅ | ✅ | ✅ | RETEST | 89.618 | 89.834 | +21.6 pips | 27/10 07:00–08:00 | — | — | — | — | **100.0/100** | H1 retest — περιμένει confirmation |
-| 3 | **AUDCAD** | LONG | **ARMED · ΑΝΑΜΟΝΗ BREAK** | 0.98104 | BULL | ✅ | ✅ | ✅ | WAIT FOR BREAK | 0.98654 | 0.98404 | -25.0 pips | 27/10 07:00–08:00 | — | — | — | — | **89.8/100** | HTF αντίδραση — H1 break κοντά (1.1 ATR) |
+| 1 | **NZDCAD** | LONG | **WAIT RETEST** | 0.79558 | BEAR | ✅ | ✅ | ✅ | BREAK | 0.79885 | 0.79722 | -16.3 pips | 27/10 09:00–10:00 | — | — | — | — | **93.0/100** | H1 break — περιμένει retest |
+| 2 | **AUDCAD** | LONG | **ARMED · ΑΝΑΜΟΝΗ BREAK** | 0.98104 | BULL | ✅ | ✅ | ✅ | WAIT FOR BREAK | 0.98654 | 0.98450 | -20.4 pips | 27/10 09:00–10:00 | — | — | — | — | **89.8/100** | HTF αντίδραση — H1 break κοντά (1.4 ATR) |
 
-_Εκτός shortlist: WATCH 17 | INVALID 4. Δεν θεωρούνται ενεργά candidates._
+_Εκτός shortlist: WATCH 19 | INVALID 6. Δεν θεωρούνται ενεργά candidates._
 
 ### Καταστάσεις HTF Reversal
 
@@ -128,34 +125,34 @@ _Εκτός shortlist: WATCH 17 | INVALID 4. Δεν θεωρούνται ενε�
 
 | Pair | W1 | D1 | H4 | H1 | Dir | EMA | D1 Struct | H4 Struct | BRC | RR | Quality |
 |---|---|---|---|---|---|---:|---|---|---|---:|---:|
-| AUDCAD | NEUTRAL | SELL | SELL | SELL | SHORT | 3/3 | BEAR | BULL | WAIT FOR BREAK | — | 37.8 |
-| AUDCHF | BUY | BUY | BUY | BUY | LONG | 3/3 | BEAR | BULL | WAIT NEW RETEST | — | 39.8 |
-| AUDJPY | NEUTRAL | BUY | BUY | BUY | LONG | 2/3 | N/A | N/A | WAIT | — | 24.4 |
-| AUDNZD | BUY | SELL | SELL | STRONG SELL | SHORT | 2/3 | BEAR | BULL | WAIT FOR BREAK | — | 34.3 |
-| AUDUSD | NEUTRAL | NEUTRAL | SELL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| CADCHF | BUY | BUY | BUY | BUY | LONG | 3/3 | BULL | BULL | READY | 0.27 ❌ | 71.8 |
-| CADJPY | SELL | BUY | BUY | BUY | LONG | 3/3 | BULL | BULL | WAIT NEW RETEST | — | 53.6 |
-| CHFJPY | SELL | SELL | SELL | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| EURAUD | SELL | STRONG SELL | SELL | SELL | SHORT | 3/3 | BEAR | BEAR | WAIT NEW RETEST | — | 55.0 |
-| EURCAD | SELL | SELL | SELL | SELL | SHORT | 3/3 | BEAR | BEAR | WAIT FOR BREAK | — | 55.0 |
-| EURCHF | SELL | SELL | SELL | SELL | SHORT | 2/3 | BEAR | BULL | WAIT FOR BREAK | — | 36.7 |
-| EURGBP | STRONG SELL | STRONG SELL | SELL | SELL | SHORT | 3/3 | BEAR | BULL | WAIT FOR BREAK | — | 47.8 |
-| EURJPY | NEUTRAL | SELL | SELL | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| EURNZD | SELL | STRONG SELL | SELL | SELL | SHORT | 3/3 | BEAR | BULL | READY | 0.81 ❌ | 73.0 |
-| EURUSD | SELL | SELL | SELL | STRONG SELL | SHORT | 3/3 | BULL | BEAR | WAIT NEW RETEST | — | 51.4 |
-| GBPAUD | SELL | SELL | SELL | SELL | SHORT | 3/3 | BULL | BEAR | WAIT FOR BREAK | — | 41.7 |
+| AUDCAD | NEUTRAL | SELL | NEUTRAL | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| AUDCHF | BUY | STRONG BUY | BUY | BUY | LONG | 3/3 | BEAR | BULL | WAIT NEW RETEST | — | 42.4 |
+| AUDJPY | NEUTRAL | BUY | BUY | BUY | LONG | 2/3 | BULL | BULL | WAIT NEW RETEST | — | 44.4 |
+| AUDNZD | STRONG BUY | NEUTRAL | BUY | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| AUDUSD | NEUTRAL | NEUTRAL | NEUTRAL | NEUTRAL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| CADCHF | BUY | BUY | BUY | STRONG BUY | LONG | 3/3 | BULL | BULL | WAIT NEW RETEST | — | 53.5 |
+| CADJPY | SELL | BUY | BUY | BUY | LONG | 3/3 | BULL | BULL | WAIT NEW RETEST | — | 52.4 |
+| CHFJPY | SELL | SELL | SELL | SELL | SHORT | 3/3 | BULL | BEAR | WAIT FOR BREAK | — | 38.0 |
+| EURAUD | STRONG SELL | STRONG SELL | STRONG SELL | STRONG SELL | SHORT | 3/3 | BEAR | BEAR | WAIT NEW RETEST | — | 55.0 |
+| EURCAD | SELL | STRONG SELL | STRONG SELL | STRONG SELL | SHORT | 3/3 | BEAR | BEAR | WAIT FOR BREAK | — | 55.0 |
+| EURCHF | SELL | SELL | SELL | SELL | SHORT | 3/3 | BEAR | BULL | WAIT FOR BREAK | — | 44.6 |
+| EURGBP | STRONG SELL | SELL | SELL | STRONG SELL | SHORT | 3/3 | BEAR | BULL | WAIT FOR BREAK | — | 49.7 |
+| EURJPY | SELL | SELL | SELL | SELL | SHORT | 3/3 | BEAR | BULL | WAIT FOR BREAK | — | 44.7 |
+| EURNZD | SELL | SELL | SELL | SELL | SHORT | 3/3 | BEAR | BULL | READY | 1.58 ✅ | 71.5 |
+| EURUSD | SELL | SELL | STRONG SELL | STRONG SELL | SHORT | 3/3 | BULL | BEAR | WAIT NEW RETEST | — | 53.7 |
+| GBPAUD | SELL | SELL | SELL | STRONG SELL | SHORT | 3/3 | BULL | BEAR | WAIT FOR BREAK | — | 43.2 |
 | GBPCAD | SELL | SELL | STRONG SELL | SELL | SHORT | 3/3 | BEAR | BEAR | WAIT FOR BREAK | — | 55.0 |
-| GBPCHF | STRONG BUY | BUY | BUY | BUY | LONG | 3/3 | BULL | BULL | WAIT NEW RETEST | — | 46.8 |
-| GBPJPY | SELL | NEUTRAL | NEUTRAL | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| GBPNZD | BUY | SELL | SELL | STRONG SELL | SHORT | 2/3 | BEAR | BULL | READY | 0.58 ❌ | 63.0 |
-| GBPUSD | SELL | SELL | SELL | STRONG SELL | SHORT | 3/3 | BULL | BEAR | WAIT FOR BREAK | — | 51.8 |
-| NZDCAD | SELL | SELL | BUY | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| NZDCHF | BUY | STRONG BUY | BUY | BUY | LONG | 3/3 | BULL | BULL | READY | 0.43 ❌ | 72.7 |
-| NZDJPY | SELL | BUY | STRONG BUY | BUY | LONG | 2/3 | BULL | BULL | RETEST | — | 57.3 |
-| NZDUSD | SELL | SELL | BUY | STRONG BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| GBPCHF | STRONG BUY | BUY | BUY | BUY | LONG | 3/3 | BULL | BULL | WAIT FOR BREAK | — | 48.0 |
+| GBPJPY | SELL | SELL | NEUTRAL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| GBPNZD | BUY | SELL | SELL | SELL | SHORT | 2/3 | BEAR | BULL | READY | 1.79 ✅ | 61.2 |
+| GBPUSD | SELL | SELL | SELL | SELL | SHORT | 3/3 | BULL | BEAR | RETEST | — | 62.6 |
+| NZDCAD | SELL | SELL | SELL | STRONG SELL | SHORT | 3/3 | BEAR | BEAR | WAIT FOR BREAK | — | 50.9 |
+| NZDCHF | BUY | BUY | BUY | BUY | LONG | 3/3 | BULL | BULL | READY | 1.36 ✅ | 68.5 |
+| NZDJPY | SELL | NEUTRAL | BUY | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| NZDUSD | SELL | NEUTRAL | SELL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
 | USDCAD | BUY | NEUTRAL | SELL | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| USDCHF | BUY | BUY | BUY | BUY | LONG | 3/3 | BEAR | BULL | WAIT NEW RETEST | — | 40.7 |
-| USDJPY | NEUTRAL | NEUTRAL | BUY | STRONG BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| USDCHF | BUY | BUY | BUY | STRONG BUY | LONG | 3/3 | BEAR | BULL | WAIT NEW RETEST | — | 42.4 |
+| USDJPY | NEUTRAL | NEUTRAL | BUY | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
 
 ## Πώς διαβάζεται
 
