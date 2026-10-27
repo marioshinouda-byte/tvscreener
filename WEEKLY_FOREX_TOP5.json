@@ -5,7 +5,9 @@
     "CADCHF",
     "GBPCAD",
     "NZDCHF",
-    "GBPNZD"
+    "GBPUSD"
   ],
-  "hot_new": []
+  "hot_new": [
+    "EURCAD"
+  ]
 }
