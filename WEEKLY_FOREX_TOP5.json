@@ -3,14 +3,13 @@
   "top5": [
     "EURNZD",
     "EURCHF",
-    "GBPCAD",
+    "EURGBP",
     "NZDCHF",
     "GBPUSD"
   ],
   "hot_new": [
     "EURCAD",
     "CADCHF",
-    "AUDUSD",
-    "EURGBP"
+    "AUDUSD"
   ]
 }
