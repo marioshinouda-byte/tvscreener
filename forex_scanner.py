@@ -56,7 +56,7 @@ SL_ATR_BUFFER = 0.35
 MAX_READY_DISTANCE_ATR = 0.75
 MAX_BREAK_TO_RETEST_BARS = 8
 MAX_RETEST_TO_CONFIRM_BARS = 2
-MAX_CONFIRMED_SETUP_AGE_BARS = 8
+MAX_CONFIRMED_SETUP_AGE_BARS = 1
 WEEKLY_TOP5_PATH = "WEEKLY_FOREX_TOP5.json"
 HOT_NEW_MIN_SCORE = 70.0
 H1_SWING_LEFT = 15
@@ -315,8 +315,56 @@ def ema_frame_ok(direction: str, price, ema, ema_prev) -> bool:
     return False
 
 
+def ema_frame_signal(frame: pd.DataFrame, period: int = 50) -> Optional[str]:
+    """Return the EMA50 direction from a frame of fully closed candles."""
+    if frame is None or len(frame) < period + 2:
+        return None
+    close = frame["Close"].astype(float)
+    ema = close.ewm(span=period, adjust=False, min_periods=period).mean()
+    price, current_ema, previous_ema = (
+        safe_float(close.iloc[-1]),
+        safe_float(ema.iloc[-1]),
+        safe_float(ema.iloc[-2]),
+    )
+    if price is None or current_ema is None or previous_ema is None:
+        return None
+    if price > current_ema and current_ema > previous_ema:
+        return "LONG"
+    if price < current_ema and current_ema < previous_ema:
+        return "SHORT"
+    return None
+
+
+def calculate_adx(frame: pd.DataFrame, period: int = 14) -> Optional[float]:
+    """Calculate Wilder ADX from the same completed OHLC candles used by BRC."""
+    if frame is None or len(frame) < period * 2 + 2:
+        return None
+
+    high = frame["High"].astype(float)
+    low = frame["Low"].astype(float)
+    close = frame["Close"].astype(float)
+    up_move = high.diff()
+    down_move = -low.diff()
+    plus_dm = up_move.where((up_move > down_move) & (up_move > 0), 0.0)
+    minus_dm = down_move.where((down_move > up_move) & (down_move > 0), 0.0)
+    previous_close = close.shift(1)
+    true_range = pd.concat(
+        [(high - low), (high - previous_close).abs(), (low - previous_close).abs()],
+        axis=1,
+    ).max(axis=1)
+
+    alpha = 1.0 / period
+    atr = true_range.ewm(alpha=alpha, min_periods=period, adjust=False).mean()
+    plus_di = 100.0 * plus_dm.ewm(alpha=alpha, min_periods=period, adjust=False).mean() / atr
+    minus_di = 100.0 * minus_dm.ewm(alpha=alpha, min_periods=period, adjust=False).mean() / atr
+    denominator = plus_di + minus_di
+    dx = 100.0 * (plus_di - minus_di).abs() / denominator.where(denominator != 0)
+    adx = dx.ewm(alpha=alpha, min_periods=period, adjust=False).mean()
+    return safe_float(adx.iloc[-1])
+
+
 def prepare_candle_history(df: pd.DataFrame):
-    """Normalize Yahoo H1 data and derive completed H4/D1 candles."""
+    """Keep only fully closed H1 candles and derive fully closed H4/D1 bars."""
     if df is None or df.empty:
         return None
 
@@ -328,24 +376,32 @@ def prepare_candle_history(df: pd.DataFrame):
     if len(h1) < 80:
         return None
 
-    # Exclude newest H1 candle in case it is still forming.
-    h1 = h1.iloc[:-1]
+    index = pd.DatetimeIndex(h1.index)
+    if index.tz is None:
+        index = index.tz_localize("UTC")
+    else:
+        index = index.tz_convert("UTC")
+    h1.index = index
+
+    now = pd.Timestamp.now(tz="UTC")
+    # Yahoo labels intraday bars by their start time. Exclude only bars that
+    # have not closed yet; do not discard a completed bar unconditionally.
+    h1 = h1.loc[h1.index + pd.Timedelta(hours=1) <= now]
+    if len(h1) < 80:
+        return None
 
     agg = {"Open": "first", "High": "max", "Low": "min", "Close": "last"}
-    h4 = h1.resample("4h").agg(agg).dropna()
-    d1 = h1.resample("1D").agg(agg).dropna()
+    h4 = h1.resample("4h", origin="start_day", label="left", closed="left").agg(agg).dropna()
+    d1 = h1.resample("1D", origin="start_day", label="left", closed="left").agg(agg).dropna()
 
-    # Exclude potentially incomplete current H4/D1 aggregates.
-    if len(h4) > 1:
-        h4 = h4.iloc[:-1]
-    if len(d1) > 1:
-        d1 = d1.iloc[:-1]
+    # Keep the latest H4/D1 aggregate only after its full interval has closed.
+    h4 = h4.loc[h4.index + pd.Timedelta(hours=4) <= now]
+    d1 = d1.loc[d1.index + pd.Timedelta(days=1) <= now]
 
     if len(h1) < 30 or len(h4) < 20 or len(d1) < 15:
         return None
 
     return h1, h4, d1
-
 
 def extract_ticker_frame(df: pd.DataFrame, ticker: str):
     """Extract one ticker regardless of yfinance MultiIndex orientation."""
@@ -1146,7 +1202,9 @@ def calc_quality(
     if direction not in {"LONG", "SHORT"}:
         return 0.0
 
-    valid_ratings = [abs(v) for v in ratings if v is not None]
+    # TradingView ratings contribute only as directional corroboration.
+    sign = 1.0 if direction == "LONG" else -1.0
+    valid_ratings = [max(0.0, sign * v) for v in ratings if v is not None]
     rating_score = (sum(valid_ratings) / len(valid_ratings) * 25) if valid_ratings else 0.0
     ema_score = (ema_passes / 3) * 20
 
@@ -1231,34 +1289,24 @@ def scan_pair(pair: str) -> PairScan:
         symbol = str(row.get("Symbol", ""))
         provider = symbol.split(":", 1)[0] if ":" in symbol else ""
 
+        # TradingView ratings are retained as context only. Trend, EMA50, ADX,
+        # BRC, price and zones are evaluated from one completed Yahoo OHLC feed.
         w1 = safe_float(row.get("Recommend All|1W"))
         d1 = safe_float(row.get("Technical Rating"))
         h4 = safe_float(row.get("Recommend All|240"))
         h1 = safe_float(row.get("Recommend All|60"))
-        price = safe_float(row.get("Price"))
-        direction, bias = classify_alignment(d1, h4, h1)
-
-        ema_d1 = safe_float(row.get("EMA50 D1"))
-        ema_d1_prev = safe_float(row.get("EMA50 D1 Prev"))
-        ema_h4 = safe_float(row.get("EMA50 H4"))
-        ema_h4_prev = safe_float(row.get("EMA50 H4 Prev"))
-        ema_h1 = safe_float(row.get("EMA50 H1"))
-        ema_h1_prev = safe_float(row.get("EMA50 H1 Prev"))
-
-        ema_passes = sum([
-            ema_frame_ok(direction, price, ema_d1, ema_d1_prev),
-            ema_frame_ok(direction, price, ema_h4, ema_h4_prev),
-            ema_frame_ok(direction, price, ema_h1, ema_h1_prev),
-        ])
-
-        adx_h4 = safe_float(row.get("ADX H4"))
-        adx_h1 = safe_float(row.get("ADX H1"))
+        price = None
+        direction = "—"
+        bias = "NO DATA"
+        ema_passes = 0
+        adx_h4 = None
+        adx_h1 = None
 
         d1_structure = "N/A"
         h4_structure = "N/A"
         brc_status = "WAIT"
         zone = None
-        candle_status = "SKIPPED"
+        candle_status = "N/A"
         entry = None
         stop_loss = None
         take_profit = None
@@ -1267,33 +1315,49 @@ def scan_pair(pair: str) -> PairScan:
         reversal = None
         h1_closed_at = None
 
-        if direction in {"LONG", "SHORT"} or ENABLE_HTF_REVERSAL:
-            candle_history = fetch_candle_history(pair)
-            if candle_history is not None:
-                h1_candles, h4_candles, d1_candles = candle_history
-                if not h1_candles.empty:
-                    h1_closed_at = h1_candles.index[-1]
-                if direction in {"LONG", "SHORT"}:
-                    d1_structure = detect_structure(d1_candles)
-                    h4_structure = detect_structure(h4_candles)
-                    brc_status, zone = detect_brc(direction, h1_candles)
-                    entry, stop_loss, take_profit, rr, rr_pass = calculate_trade_plan(
-                        direction, brc_status, zone, h1_candles, h4_candles
-                    )
+        candle_history = fetch_candle_history(pair)
+        if candle_history is not None:
+            h1_candles, h4_candles, d1_candles = candle_history
+            if not h1_candles.empty:
+                h1_closed_at = h1_candles.index[-1]
+                price = safe_float(h1_candles["Close"].iloc[-1])
 
-                if ENABLE_HTF_REVERSAL:
-                    try:
-                        reversal = analyze_htf_reversal(
-                            h1_candles, h4_candles, d1_candles
-                        )
-                    except Exception as exc:
-                        # The optional model must never change or break an
-                        # existing A+ trend result.
-                        print(f"[WARN] {pair} reversal: {exc}")
-                        reversal = ReversalScan(note="Reversal analysis error")
-                candle_status = "YF"
+            signals = [
+                ema_frame_signal(d1_candles),
+                ema_frame_signal(h4_candles),
+                ema_frame_signal(h1_candles),
+            ]
+            # D1 establishes direction, H4 must agree, and H1 is the timing
+            # filter. A missing or mixed D1/H4 context cannot create a trend.
+            if signals[0] in {"LONG", "SHORT"} and signals[0] == signals[1]:
+                direction = signals[0]
+                ema_passes = sum(signal == direction for signal in signals)
+                bias = "ALIGNED" if ema_passes == 3 else "MIXED"
             else:
-                candle_status = "N/A"
+                direction = "—"
+                ema_passes = 0
+                bias = "MIXED" if all(signal is not None for signal in signals[:2]) else "NO DATA"
+
+            adx_h4 = calculate_adx(h4_candles)
+            adx_h1 = calculate_adx(h1_candles)
+
+            if direction in {"LONG", "SHORT"}:
+                d1_structure = detect_structure(d1_candles)
+                h4_structure = detect_structure(h4_candles)
+                brc_status, zone = detect_brc(direction, h1_candles)
+                entry, stop_loss, take_profit, rr, rr_pass = calculate_trade_plan(
+                    direction, brc_status, zone, h1_candles, h4_candles
+                )
+
+            if ENABLE_HTF_REVERSAL:
+                try:
+                    reversal = analyze_htf_reversal(
+                        h1_candles, h4_candles, d1_candles
+                    )
+                except Exception as exc:
+                    print(f"[WARN] {pair} reversal: {exc}")
+                    reversal = ReversalScan(note="Reversal analysis error")
+            candle_status = "YF"
 
         quality = calc_quality(
             direction,
@@ -1356,7 +1420,6 @@ def scan_pair(pair: str) -> PairScan:
             0, 3, None, None, "N/A", "N/A", "WAIT", None, 0.0, "—", "ERROR",
             None, None, None, None, False
         )
-
 
 def scan_all_pairs() -> list[PairScan]:
     if ENABLE_HTF_REVERSAL:
@@ -1598,10 +1661,10 @@ def write_markdown(
         f"**HTF Reversal mode:** {'ON' if ENABLE_HTF_REVERSAL else 'OFF'}"
         f"  |  **Candidates:** {len(reversals)}  |  **READY:** {len(reversal_ready)}",
         "",
-        "> Το score δείχνει συμφωνία των φίλτρων (/100), **όχι πιθανότητα κέρδους ή επιτυχίας**. Η απόσταση τιμής–zone είναι ενδεικτική: τιμή TradingView, zone από Yahoo Finance.",
+        "> Το score δείχνει συμφωνία των φίλτρων (/100), **όχι πιθανότητα κέρδους ή επιτυχίας**. Τιμή, EMA50, ADX, δομή, BRC και zones βασίζονται στα ίδια κλεισμένα κεριά Yahoo Finance.",
         "",
-        "> Ratings / EMA50 / ADX: TradingView Screener. Structure / BRC: Yahoo Finance H1 candles (H4/D1 derived). Μπορεί να υπάρχουν μικρές διαφορές candle boundaries από TradingView.",
-        "> Στους πίνακες, Δ zone = τρέχουσα τιμή μείον H1 zone σε pips (+ πάνω από τη zone, − κάτω από τη zone). Ώρα τελευταίου κλεισμένου H1 σε Athens time.",
+        "> Τα TradingView ratings είναι μόνο συμπληρωματικό context και δεν καθορίζουν READY. EMA50, ADX, structure, BRC, entry και zone υπολογίζονται από το ίδιο feed OHLC.",
+        "> Στους πίνακες, η τιμή είναι το close του τελευταίου κλεισμένου H1. Δ zone = close μείον H1 zone σε pips (+ πάνω από τη zone, − κάτω από τη zone).",
         "",
         "> **W1 / Weekly:** χρησιμοποιείται ως ανώτερο context και εμφανίζεται στο scan. **Δεν αλλάζει** το A+ rule: D1/H4/H1 alignment + EMA50 3/3 + D1/H4 structure + ADX + **confirmation έως 8 κλεισμένα H1 κεριά πίσω**, χωρίς ακύρωση ή υπερβολική απόσταση από τη zone + **RR ≥ 1.2**.",
         "",
@@ -1808,7 +1871,7 @@ def write_markdown(
         "## Πώς διαβάζεται",
         "",
         "- **W1 / Weekly:** ανώτερο context. SUPPORTS όταν συμφωνεί με το D1/H4/H1 direction, OPPOSES όταν είναι αντίθετο. Δεν μπλοκάρει μόνο του ένα A+ setup.",
-        "- **Bias STRONG/ALIGNED:** συμφωνία Technical Rating σε D1/H4/H1.",
+        "- **Κατεύθυνση:** EMA50 slope/close από κλεισμένα Yahoo candles· D1 και H4 ορίζουν την κατεύθυνση, H1 είναι το timing filter. Τα TradingView ratings είναι context.",
         "- **EMA50 3/3:** τιμή και κλίση EMA50 συμφωνούν με την κατεύθυνση και στα 3 TF.",
         "- **D1/H4 Struct:** BULL ή BEAR από ολοκληρωμένα swing highs/lows.",
         "- **ADX:** πάνω από ~20 δείχνει ισχυρότερη τάση· δεν είναι μόνο του σήμα εισόδου.",
