@@ -1,6 +1,6 @@
 # Latest Forex Scan
 
-**Τελευταία ενημέρωση:** 07/11/2026 18:25 (Europe/Athens)
+**Τελευταία ενημέρωση:** 07/11/2026 22:52 (Europe/Athens)
 
 **Pairs:** 28  |  **Aligned:** 0  |  **A+ READY:** 0
 
@@ -16,7 +16,7 @@
 ## 🟢 ENTRY READY — Trend
 
 
-> ⚠️ STALE DATA: 27 pair(s) have no closed H1 candle within 3 hours. Their trend and reversal signals are suppressed.
+> ⚠️ STALE DATA: 28 pair(s) have no closed H1 candle within 3 hours. Their trend and reversal signals are suppressed.
 
 Κανένα A+ READY στο τρέχον scan.
 
@@ -63,9 +63,9 @@
 
 | Asset | Market | Price | W1 | D1 | H4 | H1 | Direction | W1 Context |
 |---|---|---:|---|---|---|---|---|---|
-| **BTC** | COINBASE:BTCUSD | 75,680.56 | SELL | SELL | SELL | SELL | **SHORT** | ✅ SUPPORTS |
-| **ETH** | COINBASE:ETHUSD | 2,234.63 | SELL | SELL | SELL | SELL | **SHORT** | ✅ SUPPORTS |
-| **SOL** | COINBASE:SOLUSD | 89.5100 | SELL | SELL | STRONG SELL | SELL | **SHORT** | ✅ SUPPORTS |
+| **BTC** | COINBASE:BTCUSD | 75,529.87 | SELL | SELL | STRONG SELL | STRONG SELL | **SHORT** | ✅ SUPPORTS |
+| **ETH** | COINBASE:ETHUSD | 2,223.67 | SELL | SELL | STRONG SELL | STRONG SELL | **SHORT** | ✅ SUPPORTS |
+| **SOL** | COINBASE:SOLUSD | 89.0200 | SELL | SELL | STRONG SELL | STRONG SELL | **SHORT** | ✅ SUPPORTS |
 
 ## HTF Reversal — ξεχωριστό mode
 
@@ -74,7 +74,7 @@
 
 Δεν υπάρχει ενεργό HTF reversal context που να περνά το αυστηρό shortlist.
 
-_Εκτός shortlist: WATCH 0 | INVALID 27. Δεν θεωρούνται ενεργά candidates._
+_Εκτός shortlist: WATCH 0 | INVALID 28. Δεν θεωρούνται ενεργά candidates._
 
 ### Καταστάσεις HTF Reversal
 
