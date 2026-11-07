@@ -2,9 +2,9 @@
 Advanced Forex Scanner — 28 liquid pairs
 ==========================================
 
-Primary source: TradingView Screener (ratings, EMA50, ADX).
-Secondary candle source: Yahoo Finance via yfinance (H1 candles used to derive
-H4/D1 market structure and H1 Break -> Retest -> Confirmation).
+Primary OHLC source: Yahoo Finance via yfinance. EMA50, ADX, structure, price,
+and Break -> Retest -> Confirmation are calculated from fully closed candles
+from this single feed. TradingView Screener ratings are context only.
 
 Important:
 - Quality Score is a confluence score, NOT a win probability.
@@ -804,22 +804,25 @@ def detect_brc(direction: str, h1: pd.DataFrame):
     for confirm_i in range(retest_i + 1, max_confirm_i + 1):
         confirm = candles[confirm_i]
 
+        retest_candle = candles[retest_i]
         if direction == "LONG":
             confirmed = (
                 confirm["close"] > confirm["open"]
                 and confirm["close"] > level
+                and confirm["close"] > retest_candle["high"]
             )
         else:
             confirmed = (
                 confirm["close"] < confirm["open"]
                 and confirm["close"] < level
+                and confirm["close"] < retest_candle["low"]
             )
 
         if not confirmed:
             continue
 
-        # Keep a recently confirmed setup visible for up to 8 closed H1 candles
-        # instead of requiring confirmation on the exact latest candle.
+        # Permit only the latest confirmation or one immediately preceding
+        # completed H1 candle; older setups are not fresh enough to be READY.
         confirm_age = latest_i - confirm_i
         if confirm_age > MAX_CONFIRMED_SETUP_AGE_BARS:
             return "WAIT NEW RETEST", level
