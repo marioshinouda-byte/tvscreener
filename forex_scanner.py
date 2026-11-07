@@ -9,8 +9,8 @@ from this single feed. TradingView Screener ratings are context only.
 Important:
 - Quality Score is a confluence score, NOT a win probability.
 - A+ READY is a strict filter, NOT an automatic trade instruction.
-- H4/D1 candles derived from Yahoo H1 data can differ slightly from TradingView
-  candle boundaries/provider data.
+- A setup is suppressed when the latest closed H1 candle is more than
+  MAX_H1_DATA_AGE_HOURS hours old. Yahoo H1 timestamps are shown in the report.
 """
 
 from __future__ import annotations
@@ -57,6 +57,7 @@ MAX_READY_DISTANCE_ATR = 0.75
 MAX_BREAK_TO_RETEST_BARS = 8
 MAX_RETEST_TO_CONFIRM_BARS = 2
 MAX_CONFIRMED_SETUP_AGE_BARS = 1
+MAX_H1_DATA_AGE_HOURS = 3
 WEEKLY_TOP5_PATH = "WEEKLY_FOREX_TOP5.json"
 HOT_NEW_MIN_SCORE = 70.0
 H1_SWING_LEFT = 15
@@ -1323,44 +1324,60 @@ def scan_pair(pair: str) -> PairScan:
             h1_candles, h4_candles, d1_candles = candle_history
             if not h1_candles.empty:
                 h1_closed_at = h1_candles.index[-1]
-                price = safe_float(h1_candles["Close"].iloc[-1])
+                last_close_time = pd.Timestamp(h1_closed_at)
+                if last_close_time.tzinfo is None:
+                    last_close_time = last_close_time.tz_localize("UTC")
+                else:
+                    last_close_time = last_close_time.tz_convert("UTC")
+                last_close_time += pd.Timedelta(hours=1)
+                data_age = pd.Timestamp.now(tz="UTC") - last_close_time
 
-            signals = [
-                ema_frame_signal(d1_candles),
-                ema_frame_signal(h4_candles),
-                ema_frame_signal(h1_candles),
-            ]
-            # D1 establishes direction, H4 must agree, and H1 is the timing
-            # filter. A missing or mixed D1/H4 context cannot create a trend.
-            if signals[0] in {"LONG", "SHORT"} and signals[0] == signals[1]:
-                direction = signals[0]
-                ema_passes = sum(signal == direction for signal in signals)
-                bias = "ALIGNED" if ema_passes == 3 else "MIXED"
-            else:
-                direction = "—"
-                ema_passes = 0
-                bias = "MIXED" if all(signal is not None for signal in signals[:2]) else "NO DATA"
+                if data_age < pd.Timedelta(0) or data_age > pd.Timedelta(hours=MAX_H1_DATA_AGE_HOURS):
+                    candle_status = "STALE"
+                    bias = "STALE DATA"
+                    if ENABLE_HTF_REVERSAL:
+                        reversal = ReversalScan(
+                            status="INVALID",
+                            note=f"Stale H1 data ({data_age.total_seconds() / 3600:.1f}h old)",
+                        )
+                else:
+                    price = safe_float(h1_candles["Close"].iloc[-1])
+                    signals = [
+                        ema_frame_signal(d1_candles),
+                        ema_frame_signal(h4_candles),
+                        ema_frame_signal(h1_candles),
+                    ]
+                    # D1 establishes direction, H4 must agree, and H1 is the timing
+                    # filter. A missing or mixed D1/H4 context cannot create a trend.
+                    if signals[0] in {"LONG", "SHORT"} and signals[0] == signals[1]:
+                        direction = signals[0]
+                        ema_passes = sum(signal == direction for signal in signals)
+                        bias = "ALIGNED" if ema_passes == 3 else "MIXED"
+                    else:
+                        direction = "—"
+                        ema_passes = 0
+                        bias = "MIXED" if all(signal is not None for signal in signals[:2]) else "NO DATA"
 
-            adx_h4 = calculate_adx(h4_candles)
-            adx_h1 = calculate_adx(h1_candles)
+                    adx_h4 = calculate_adx(h4_candles)
+                    adx_h1 = calculate_adx(h1_candles)
 
-            if direction in {"LONG", "SHORT"}:
-                d1_structure = detect_structure(d1_candles)
-                h4_structure = detect_structure(h4_candles)
-                brc_status, zone = detect_brc(direction, h1_candles)
-                entry, stop_loss, take_profit, rr, rr_pass = calculate_trade_plan(
-                    direction, brc_status, zone, h1_candles, h4_candles
-                )
+                    if direction in {"LONG", "SHORT"}:
+                        d1_structure = detect_structure(d1_candles)
+                        h4_structure = detect_structure(h4_candles)
+                        brc_status, zone = detect_brc(direction, h1_candles)
+                        entry, stop_loss, take_profit, rr, rr_pass = calculate_trade_plan(
+                            direction, brc_status, zone, h1_candles, h4_candles
+                        )
 
-            if ENABLE_HTF_REVERSAL:
-                try:
-                    reversal = analyze_htf_reversal(
-                        h1_candles, h4_candles, d1_candles
-                    )
-                except Exception as exc:
-                    print(f"[WARN] {pair} reversal: {exc}")
-                    reversal = ReversalScan(note="Reversal analysis error")
-            candle_status = "YF"
+                    if ENABLE_HTF_REVERSAL:
+                        try:
+                            reversal = analyze_htf_reversal(
+                                h1_candles, h4_candles, d1_candles
+                            )
+                        except Exception as exc:
+                            print(f"[WARN] {pair} reversal: {exc}")
+                            reversal = ReversalScan(note="Reversal analysis error")
+                    candle_status = "YF"
 
         quality = calc_quality(
             direction,
@@ -1669,11 +1686,19 @@ def write_markdown(
         "> Τα TradingView ratings είναι μόνο συμπληρωματικό context και δεν καθορίζουν READY. EMA50, ADX, structure, BRC, entry και zone υπολογίζονται από το ίδιο feed OHLC.",
         "> Στους πίνακες, η τιμή είναι το close του τελευταίου κλεισμένου H1. Δ zone = close μείον H1 zone σε pips (+ πάνω από τη zone, − κάτω από τη zone).",
         "",
-        "> **W1 / Weekly:** χρησιμοποιείται ως ανώτερο context και εμφανίζεται στο scan. **Δεν αλλάζει** το A+ rule: D1/H4/H1 alignment + EMA50 3/3 + D1/H4 structure + ADX + **confirmation έως 8 κλεισμένα H1 κεριά πίσω**, χωρίς ακύρωση ή υπερβολική απόσταση από τη zone + **RR ≥ 1.2**.",
+        "> **W1 / Weekly:** χρησιμοποιείται ως ανώτερο context και εμφανίζεται στο scan. **Δεν αλλάζει** το A+ rule: D1/H4/H1 alignment + EMA50 3/3 + D1/H4 structure + ADX + **confirmation στο τελευταίο ή αμέσως προηγούμενο κλεισμένο H1**, χωρίς ακύρωση ή υπερβολική απόσταση από τη zone + **RR ≥ 1.2**.",
         "",
         "## 🟢 ENTRY READY — Trend",
         "",
     ]
+    stale_pairs = [r.pair for r in results if r.candles == "STALE"]
+    if stale_pairs:
+        lines += [
+            "",
+            f"> ⚠️ STALE DATA: {len(stale_pairs)} pair(s) have no closed H1 candle within {MAX_H1_DATA_AGE_HOURS} hours. Their trend and reversal signals are suppressed.",
+            "",
+        ]
+
     if ready:
         for r in ready:
             lines.append(
@@ -1878,7 +1903,7 @@ def write_markdown(
         "- **EMA50 3/3:** τιμή και κλίση EMA50 συμφωνούν με την κατεύθυνση και στα 3 TF.",
         "- **D1/H4 Struct:** BULL ή BEAR από ολοκληρωμένα swing highs/lows.",
         "- **ADX:** πάνω από ~20 δείχνει ισχυρότερη τάση· δεν είναι μόνο του σήμα εισόδου.",
-        "- **BRC WAIT FOR BREAK/BREAK/RETEST/READY:** το break γίνεται μόνο σε **επιβεβαιωμένο H1 swing resistance/support (15 κεριά αριστερά + 15 δεξιά)**, όχι σε μικρό 3-candle high/low. Μετά το break, η broken zone μένει ενεργή για έως **8 επόμενα κλεισμένα H1 κεριά** ώστε να προλάβει retest. Μετά από confirmation, ένα έγκυρο setup μπορεί επίσης να παραμένει ορατό για έως **8 κλεισμένα H1 κεριά**, αρκεί να μην έχει ακυρωθεί και η τιμή να μην έχει απομακρυνθεί υπερβολικά από τη zone. **WAIT NEW RETEST** σημαίνει ότι το παλιό setup έχει λήξει, ακυρώθηκε ή η τιμή απομακρύνθηκε από τη zone.",
+        "- **BRC:** break σε επιβεβαιωμένο H1 swing, retest στη ζώνη και confirmation με κλείσιμο πέρα από το high/low του retest candle. READY ισχύει μόνο για confirmation στο τελευταίο ή αμέσως προηγούμενο κλεισμένο H1. Ανοιχτά κεριά αποκλείονται.",
         "- **Entry/SL/TP:** εμφανίζονται μόνο όταν το BRC είναι READY. Entry = τελευταίο κλεισμένο H1, SL = H1 zone ± 0.35×ATR, TP = κοντινότερο ολοκληρωμένο H4 swing target.",
         f"- **RR:** ✅ όταν RR ≥ {MIN_RR:.1f}, ❌ όταν είναι χαμηλότερο. Το A+ READY απαιτεί RR pass.",
         "- **A+ READY:** το αυστηρότερο φίλτρο. Πριν από trade χρειάζεται τελικός οπτικός έλεγχος chart, spread/news και sizing.",
