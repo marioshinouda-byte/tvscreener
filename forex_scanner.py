@@ -128,6 +128,8 @@ class OandaPreScreen:
     ema_checked: int
     adx_h4: Optional[float]
     adx_h1: Optional[float]
+    oanda_prev_h1_open: Optional[float] = None
+    oanda_h1_update: Optional[float] = None
 
 
 @dataclass
@@ -1313,8 +1315,9 @@ def setup_grade(
 
 def oanda_prescreen_from_row(row) -> Optional[OandaPreScreen]:
     """
-    First-stage SHORTLIST only. This is an OANDA TradingView Screener snapshot,
-    with NO source-candle timestamp and NO Break/Retest/Confirmation validation.
+    First-stage SHORTLIST only. This is an OANDA TradingView Screener snapshot.
+    H1 timestamp is displayed as context, but there is NO full OHLC
+    or Break/Retest/Confirmation validation in this first-stage ranking.
     Never infer a trading entry from this function.
     """
     symbol = str(row.get("Symbol", ""))
@@ -1377,6 +1380,8 @@ def oanda_prescreen_from_row(row) -> Optional[OandaPreScreen]:
         ema_checked=ema_checked,
         adx_h4=adx_h4,
         adx_h1=adx_h1,
+        oanda_prev_h1_open=safe_float(row.get("OANDA Previous H1 Open")),
+        oanda_h1_update=safe_float(row.get("Last Bar Update Time|60")),
     )
 
 
@@ -1393,6 +1398,29 @@ def oanda_shortlist(results: list[PairScan], limit: int = 5) -> list[PairScan]:
     return eligible[:limit]
 
 
+def oanda_timestamp_label(value: Optional[float]) -> str:
+    if value is None:
+        return "—"
+    try:
+        return pd.to_datetime(value, unit="s", utc=True).tz_convert(
+            "Europe/Athens"
+        ).strftime("%d/%m %H:%M")
+    except (ValueError, TypeError, OverflowError):
+        return "—"
+
+
+def oanda_ref_status(value: Optional[float]) -> str:
+    if value is None:
+        return "NO TIME"
+    try:
+        age = pd.Timestamp.now(tz="UTC") - pd.to_datetime(value, unit="s", utc=True)
+        if age < -pd.Timedelta(minutes=2) or age > pd.Timedelta(hours=4):
+            return "STALE"
+        return "RECENT"
+    except (ValueError, TypeError, OverflowError):
+        return "NO TIME"
+
+
 def write_oanda_shortlist(results: list[PairScan], path: str = "OANDA_SHORTLIST.md") -> None:
     now = datetime.now(ZoneInfo("Europe/Athens"))
     top = oanda_shortlist(results)
@@ -1405,13 +1433,14 @@ def write_oanda_shortlist(results: list[PairScan], path: str = "OANDA_SHORTLIST.
         "",
         "> **ΜΟΝΟ ΑΡΧΙΚΟ ΦΙΛΤΡΟ — ΟΧΙ ΣΗΜΑ ΕΙΣΟΔΟΥ.**",
         "> Πηγή: TradingView Forex Screener, αποκλειστικά σύμβολα OANDA. "
-        "Οι ενδείξεις δεν έχουν επαληθευμένη ώρα τελευταίου κεριού. "
+        "Εμφανίζεται η ώρα του προηγούμενου OANDA H1 και ο έλεγχος "
+        "παλαιότητας του feed. Αυτό δεν επαληθεύει όλο το OHLC ιστορικό. "
         "EMA50/ADX εμφανίζονται μόνο αν επιστράφηκαν από το screener.",
         "> Ο δείκτης κατάταξης (/100) δεν είναι πιθανότητα επιτυχίας, "
         "BRC confirmation ή READY.",
         "",
-        "| # | Ζευγάρι | Κατεύθυνση ελέγχου | Ranking /100 | W1 | D1 | H4 | H1 | EMA50 TV | ADX H4 | ADX H1 |",
-        "|---:|---|---|---:|---|---|---|---|---|---:|---:|",
+        "| # | Ζευγάρι | Κατεύθυνση ελέγχου | Ranking /100 | W1 | D1 | H4 | H1 | EMA50 TV | ADX H4 | ADX H1 | Προηγούμενο H1 OANDA (Αθήνα) | OANDA update |",
+        "|---:|---|---|---:|---|---|---|---|---|---:|---:|---|---|",
     ]
     for i, r in enumerate(top, 1):
         preview = r.oanda_prescreen
@@ -1420,10 +1449,12 @@ def write_oanda_shortlist(results: list[PairScan], path: str = "OANDA_SHORTLIST.
             f"{preview.score:.1f} | {rating_text(r.w1_rating)} | "
             f"{rating_text(r.d1_rating)} | {rating_text(r.h4_rating)} | "
             f"{rating_text(r.h1_rating)} | {preview.ema_passes}/{preview.ema_checked} verified fields | "
-            f"{fmt_num(preview.adx_h4)} | {fmt_num(preview.adx_h1)} |"
+            f"{fmt_num(preview.adx_h4)} | {fmt_num(preview.adx_h1)} | "
+            f"{oanda_timestamp_label(preview.oanda_prev_h1_open)} | "
+            f"{oanda_ref_status(preview.oanda_h1_update)} |"
         )
     if not top:
-        lines.append("| — | Καμία επαρκώς συμφωνημένη ένδειξη OANDA ή μη διαθέσιμα δεδομένα | — | — | — | — | — | — | — | — | — |")
+        lines.append("| — | Καμία επαρκώς συμφωνημένη ένδειξη OANDA ή μη διαθέσιμα δεδομένα | — | — | — | — | — | — | — | — | — | — | — |")
     lines += [
         "",
         "Η λίστα είναι υποψήφια για χειροκίνητο τελικό έλεγχο μόνο αυτών των γραφημάτων. "
@@ -1911,7 +1942,7 @@ def write_markdown(
     ]
     verified_pairs = [r.pair for r in results if r.candles == "YF+OANDA-H1"]
     rejected_pairs = [(r.pair, r.candles) for r in results
-                      if r.candles not in {"YF+OANDA-H1", "N/A"}]
+                      if r.candles != "YF+OANDA-H1"]
     lines += [
         "",
         f"> **Πηγές δεδομένων:** Yahoo OHLC + OANDA H1 διασταύρωση. "
@@ -1956,7 +1987,7 @@ def write_markdown(
         f"**{len(oanda_shortlist(results))} ζευγάρια προς έλεγχο** — "
         "δες το [OANDA_SHORTLIST.md](OANDA_SHORTLIST.md). "
         "Μόνο ενδείξεις TradingView OANDA, χωρίς BRC/READY. "
-        "Η ώρα του τελευταίου κεριού TradingView δεν επαληθεύεται από το screener.",
+        "Το report εμφανίζει H1 OANDA timestamps, αλλά δεν έχει επιβεβαιωμένο πλήρες OHLC ιστορικό.",
         "",
         f"## Weekly Top 5 — {week} (Europe/Athens)",
         "",
