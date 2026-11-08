@@ -28,17 +28,20 @@ class WeeklyForexWatchlistTest(unittest.TestCase):
                 direction="SHORT", status="ARMED", score=100.0,
                 brc_status="RETEST", note="H1 retest — περιμένει confirmation",
             )
-            write_markdown([result], str(report))
+            write_markdown([result], path=str(report))
             text = report.read_text(encoding="utf-8")
             self.assertLess(text.index("🟢 ENTRY READY — Trend"), text.index("Weekly Top 5"))
-            self.assertLess(text.index("Weekly Top 5"), text.index("🔥 HOT NEW — Trend"))
-            self.assertLess(text.index("🔥 HOT NEW — Trend"), text.index("HTF Reversal — ξεχωριστό mode"))
-            self.assertIn("Setup Score 90.0%", text)
-            self.assertIn("όχι ποσοστό πιθανότητας επιτυχίας", text)
-            self.assertIn("HTF Reversal Score μετρά τη συμφωνία", text)
+            self.assertLess(text.index("Weekly Top 5"), text.index("Νέοι υποψήφιοι για παρακολούθηση — Trend"))
+            self.assertLess(text.index("Νέοι υποψήφιοι για παρακολούθηση — Trend"), text.index("HTF Reversal — ξεχωριστό mode"))
+            self.assertIn("Agreement score 90.0/100", text)
+            self.assertIn("όχι πιθανότητα κέρδους ή επιτυχίας", text)
+            self.assertIn("HTF Reversal Score μετρά συμφωνία", text)
             self.assertIn("Context score", text)
             self.assertIn("H1 retest — περιμένει confirmation", text)
-            self.assertIn("| RETEST | — | — | — | — | — | **100.0/100** |", text)
+            self.assertRegex(
+                text,
+                r"\| RETEST \| .* \| — \| — \| — \| — \| \*\*100\.0/100\*\* \|",
+            )
 
     def test_confirmed_brc_without_a_plus_filters_is_watch_not_wait(self):
         result = pair("EURUSD", 80, grade="WATCH", brc="READY")

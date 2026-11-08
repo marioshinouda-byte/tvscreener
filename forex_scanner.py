@@ -9,8 +9,8 @@ from this single feed. TradingView Screener ratings are context only.
 Important:
 - Quality Score is a confluence score, NOT a win probability.
 - A+ READY is a strict filter, NOT an automatic trade instruction.
-- A setup is suppressed when the latest closed H1 candle is more than
-  MAX_H1_DATA_AGE_HOURS hours old. Yahoo H1 timestamps are shown in the report.
+- Yahoo H1 candles older than MAX_H1_DATA_AGE_HOURS are marked YF-STALE.
+  Analysis continues with a warning. Yahoo H1 timestamps are shown in the report.
 """
 
 from __future__ import annotations
@@ -420,6 +420,16 @@ def extract_ticker_frame(df: pd.DataFrame, ticker: str):
     return None
 
 
+def log_candle_history(pair: str, df: Optional[pd.DataFrame]) -> None:
+    """Show the per-pair Yahoo rows received before candle preparation."""
+    if df is None:
+        df = pd.DataFrame()
+    print(
+        f"[INFO] {pair} | candles={len(df)} "
+        f"| last={df.index[-1] if len(df) else 'NONE'}"
+    )
+
+
 def prefetch_candle_histories(pairs: list[str]) -> None:
     """
     Fetch all H1 histories in one Yahoo request for the optional reversal mode.
@@ -448,6 +458,7 @@ def prefetch_candle_histories(pairs: list[str]) -> None:
 
     for pair, ticker in zip(missing, tickers):
         frame = extract_ticker_frame(batch, ticker) if batch is not None else None
+        log_candle_history(pair, frame)
         _CANDLE_HISTORY_CACHE[pair] = prepare_candle_history(frame)
 
 
@@ -474,6 +485,7 @@ def fetch_candle_history(pair: str):
         df = None
 
     frame = extract_ticker_frame(df, ticker) if df is not None else None
+    log_candle_history(pair, frame)
     history = prepare_candle_history(frame)
     _CANDLE_HISTORY_CACHE[pair] = history
     return history
@@ -1332,52 +1344,50 @@ def scan_pair(pair: str) -> PairScan:
                 last_close_time += pd.Timedelta(hours=1)
                 data_age = pd.Timestamp.now(tz="UTC") - last_close_time
 
-                if data_age < pd.Timedelta(0) or data_age > pd.Timedelta(hours=MAX_H1_DATA_AGE_HOURS):
-                    candle_status = "STALE"
-                    bias = "STALE DATA"
-                    if ENABLE_HTF_REVERSAL:
-                        reversal = ReversalScan(
-                            status="INVALID",
-                            note=f"Stale H1 data ({data_age.total_seconds() / 3600:.1f}h old)",
-                        )
+                candle_status = "YF"
+                if data_age > pd.Timedelta(hours=MAX_H1_DATA_AGE_HOURS):
+                    print(
+                        f"[WARNING] {pair}: stale Yahoo candle "
+                        f"({data_age.total_seconds()/3600:.1f}h old)"
+                    )
+                    candle_status = "YF-STALE"
+
+                price = safe_float(h1_candles["Close"].iloc[-1])
+                signals = [
+                    ema_frame_signal(d1_candles),
+                    ema_frame_signal(h4_candles),
+                    ema_frame_signal(h1_candles),
+                ]
+                # D1 establishes direction, H4 must agree, and H1 is the timing
+                # filter. A missing or mixed D1/H4 context cannot create a trend.
+                if signals[0] in {"LONG", "SHORT"} and signals[0] == signals[1]:
+                    direction = signals[0]
+                    ema_passes = sum(signal == direction for signal in signals)
+                    bias = "ALIGNED" if ema_passes == 3 else "MIXED"
                 else:
-                    price = safe_float(h1_candles["Close"].iloc[-1])
-                    signals = [
-                        ema_frame_signal(d1_candles),
-                        ema_frame_signal(h4_candles),
-                        ema_frame_signal(h1_candles),
-                    ]
-                    # D1 establishes direction, H4 must agree, and H1 is the timing
-                    # filter. A missing or mixed D1/H4 context cannot create a trend.
-                    if signals[0] in {"LONG", "SHORT"} and signals[0] == signals[1]:
-                        direction = signals[0]
-                        ema_passes = sum(signal == direction for signal in signals)
-                        bias = "ALIGNED" if ema_passes == 3 else "MIXED"
-                    else:
-                        direction = "—"
-                        ema_passes = 0
-                        bias = "MIXED" if all(signal is not None for signal in signals[:2]) else "NO DATA"
+                    direction = "—"
+                    ema_passes = 0
+                    bias = "MIXED" if all(signal is not None for signal in signals[:2]) else "NO DATA"
 
-                    adx_h4 = calculate_adx(h4_candles)
-                    adx_h1 = calculate_adx(h1_candles)
+                adx_h4 = calculate_adx(h4_candles)
+                adx_h1 = calculate_adx(h1_candles)
 
-                    if direction in {"LONG", "SHORT"}:
-                        d1_structure = detect_structure(d1_candles)
-                        h4_structure = detect_structure(h4_candles)
-                        brc_status, zone = detect_brc(direction, h1_candles)
-                        entry, stop_loss, take_profit, rr, rr_pass = calculate_trade_plan(
-                            direction, brc_status, zone, h1_candles, h4_candles
+                if direction in {"LONG", "SHORT"}:
+                    d1_structure = detect_structure(d1_candles)
+                    h4_structure = detect_structure(h4_candles)
+                    brc_status, zone = detect_brc(direction, h1_candles)
+                    entry, stop_loss, take_profit, rr, rr_pass = calculate_trade_plan(
+                        direction, brc_status, zone, h1_candles, h4_candles
+                    )
+
+                if ENABLE_HTF_REVERSAL:
+                    try:
+                        reversal = analyze_htf_reversal(
+                            h1_candles, h4_candles, d1_candles
                         )
-
-                    if ENABLE_HTF_REVERSAL:
-                        try:
-                            reversal = analyze_htf_reversal(
-                                h1_candles, h4_candles, d1_candles
-                            )
-                        except Exception as exc:
-                            print(f"[WARN] {pair} reversal: {exc}")
-                            reversal = ReversalScan(note="Reversal analysis error")
-                    candle_status = "YF"
+                    except Exception as exc:
+                        print(f"[WARN] {pair} reversal: {exc}")
+                        reversal = ReversalScan(note="Reversal analysis error")
 
         quality = calc_quality(
             direction,
@@ -1686,16 +1696,16 @@ def write_markdown(
         "> Τα TradingView ratings είναι μόνο συμπληρωματικό context και δεν καθορίζουν READY. EMA50, ADX, structure, BRC, entry και zone υπολογίζονται από το ίδιο feed OHLC.",
         "> Στους πίνακες, η τιμή είναι το close του τελευταίου κλεισμένου H1. Δ zone = close μείον H1 zone σε pips (+ πάνω από τη zone, − κάτω από τη zone).",
         "",
-        "> **W1 / Weekly:** χρησιμοποιείται ως ανώτερο context και εμφανίζεται στο scan. **Δεν αλλάζει** το A+ rule: D1/H4/H1 alignment + EMA50 3/3 + D1/H4 structure + ADX + **confirmation στο τελευταίο ή αμέσως προηγούμενο κλεισμένο H1**, χωρίς ακύρωση ή υπερβολική απόσταση από τη zone + **RR ≥ 1.2**.",
+        f"> **W1 / Weekly:** χρησιμοποιείται ως ανώτερο context και εμφανίζεται στο scan. **Δεν αλλάζει** το A+ rule: D1/H4/H1 alignment + EMA50 3/3 + D1/H4 structure + ADX + **confirmation ηλικίας έως {MAX_CONFIRMED_SETUP_AGE_BARS} κλεισμένων H1 κεριών**, χωρίς ακύρωση ή υπερβολική απόσταση από τη zone + **RR ≥ 1.2**.",
         "",
         "## 🟢 ENTRY READY — Trend",
         "",
     ]
-    stale_pairs = [r.pair for r in results if r.candles == "STALE"]
+    stale_pairs = [r.pair for r in results if r.candles == "YF-STALE"]
     if stale_pairs:
         lines += [
             "",
-            f"> ⚠️ STALE DATA: {len(stale_pairs)} pair(s) have no closed H1 candle within {MAX_H1_DATA_AGE_HOURS} hours. Their trend and reversal signals are suppressed.",
+            f"> ⚠️ YF-STALE: {len(stale_pairs)} ζευγάρια ({', '.join(stale_pairs)}) έχουν κλεισμένο H1 παλαιότερο από {MAX_H1_DATA_AGE_HOURS} ώρες. Η ανάλυση συνεχίζεται με τα παλιά δεδομένα.",
             "",
         ]
 

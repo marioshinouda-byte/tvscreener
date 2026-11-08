@@ -1,3 +1,6 @@
+from contextlib import redirect_stdout
+from dataclasses import replace
+from io import StringIO
 import subprocess
 import tempfile
 import textwrap
@@ -43,22 +46,58 @@ class ScannerReliabilityTest(unittest.TestCase):
         self.assertTrue((h4.index + pd.Timedelta(hours=4) <= now).all())
         self.assertTrue((d1.index + pd.Timedelta(days=1) <= now).all())
 
-    def test_stale_candles_cannot_produce_ready_even_with_aligned_ratings(self):
+    def test_stale_candles_warn_and_continue_the_same_analysis(self):
         frame = candle_history()
         frame.index -= pd.Timedelta(hours=scanner.MAX_H1_DATA_AGE_HOURS + 2)
         history = scanner.prepare_candle_history(frame)
         row = pd.Series({"Symbol": "OANDA:EURUSD", "Technical Rating": 1.0,
                          "Recommend All|240": 1.0, "Recommend All|60": 1.0})
+        output = StringIO()
         with patch.object(scanner, "fetch_pair", return_value=row), \
              patch.object(scanner, "fetch_candle_history", return_value=history), \
              patch.object(scanner, "ENABLE_HTF_REVERSAL", True):
-            result = scanner.scan_pair("EURUSD")
+            with patch.object(scanner, "MAX_H1_DATA_AGE_HOURS",
+                              scanner.MAX_H1_DATA_AGE_HOURS + 24):
+                reference = scanner.scan_pair("EURUSD")
+            with redirect_stdout(output):
+                result = scanner.scan_pair("EURUSD")
 
-        self.assertEqual(result.candles, "STALE")
-        self.assertEqual(result.direction, "—")
-        self.assertNotEqual(result.setup_grade, "A+ READY")
-        self.assertEqual(result.reversal.status, "INVALID")
-        self.assertIsNone(result.entry)
+        self.assertEqual(reference.candles, "YF")
+        self.assertEqual(result, replace(reference, candles="YF-STALE"))
+        self.assertEqual(result.direction, "LONG")
+        self.assertIsNotNone(result.price)
+        self.assertIsNotNone(result.reversal)
+        self.assertIn("[WARNING] EURUSD: stale Yahoo candle (", output.getvalue())
+        self.assertIn("h old)", output.getvalue())
+
+        with tempfile.TemporaryDirectory() as directory:
+            report = Path(directory) / "LATEST_FOREX_SCAN.md"
+            scanner.write_markdown([result], path=str(report))
+            text = report.read_text()
+        self.assertIn("YF-STALE: 1 ζευγάρια (EURUSD)", text)
+        self.assertIn("Η ανάλυση συνεχίζεται με τα παλιά δεδομένα", text)
+        self.assertNotIn("signals are suppressed", text)
+
+    def test_candle_diagnostics_cover_batch_missing_and_cached_data(self):
+        frame = candle_history()
+        batch = pd.concat({"EURUSD=X": frame}, axis=1)
+        output = StringIO()
+        with patch.object(scanner, "_CANDLE_HISTORY_CACHE", {}), \
+             patch.object(scanner.yf, "download", return_value=batch) as download, \
+             redirect_stdout(output):
+            scanner.prefetch_candle_histories(["EURUSD", "GBPUSD"])
+            history = scanner.fetch_candle_history("EURUSD")
+            missing = scanner.fetch_candle_history("GBPUSD")
+
+        self.assertIsNotNone(history)
+        self.assertIsNone(missing)
+        download.assert_called_once()
+        self.assertIn(
+            f"[INFO] EURUSD | candles={len(frame)} | last={frame.index[-1]}",
+            output.getvalue(),
+        )
+        self.assertIn("[INFO] GBPUSD | candles=0 | last=NONE", output.getvalue())
+        self.assertEqual(output.getvalue().count("[INFO]"), 2)
 
     def scanner_command(self):
         workflow = (Path(scanner.__file__).parent / ".github/workflows/forex-scanner.yml").read_text()
