@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "request_id": "recovery-validation-1794131960335",
-  "requested_at": "2026-11-08T09:59:20.335Z",
-  "source": "recovery-validation",
-  "force": true
+  "request_id": "hourly-deduplication-check-1794132047940",
+  "requested_at": "2026-11-08T10:00:47.940Z",
+  "source": "chatgpt-hourly-failover",
+  "force": false
 }
