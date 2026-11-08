@@ -56,12 +56,12 @@ SL_ATR_BUFFER = 0.35
 MAX_READY_DISTANCE_ATR = 0.75
 MAX_BREAK_TO_RETEST_BARS = 8
 MAX_RETEST_TO_CONFIRM_BARS = 2
-MAX_CONFIRMED_SETUP_AGE_BARS = 1
+MAX_CONFIRMED_SETUP_AGE_BARS = 3
 MAX_H1_DATA_AGE_HOURS = 48
 WEEKLY_TOP5_PATH = "WEEKLY_FOREX_TOP5.json"
 HOT_NEW_MIN_SCORE = 70.0
-H1_SWING_LEFT = 15
-H1_SWING_RIGHT = 15
+H1_SWING_LEFT = 8
+H1_SWING_RIGHT = 8
 H1_SWING_PROMINENCE_ATR = 0.50
 BREAK_CLOSE_BUFFER_ATR = 0.05
 
@@ -822,8 +822,8 @@ def detect_brc(direction: str, h1: pd.DataFrame):
         if not confirmed:
             continue
 
-        # Permit only the latest confirmation or one immediately preceding
-        # completed H1 candle; older setups are not fresh enough to be READY.
+        # Keep READY only while the confirmation is within the configured
+        # number of completed H1 candles.
         confirm_age = latest_i - confirm_i
         if confirm_age > MAX_CONFIRMED_SETUP_AGE_BARS:
             return "WAIT NEW RETEST", level
