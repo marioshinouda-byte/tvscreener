@@ -236,6 +236,11 @@ QUERY_FIELDS = [
     q("EMA50[1]|60", "EMA50 H1 Prev"),
     q("ADX|240", "ADX H4"),
     q("ADX|60", "ADX H1"),
+    ForexField.CLOSE_60,
+    ForexField.TIME_60,
+    ForexField.LAST_BAR_UPDATE_TIME_60,
+    q("close[1]|60", "OANDA Previous H1 Close"),
+    q("time[1]|60", "OANDA Previous H1 Open"),
 ]
 
 CRYPTO_QUERY_FIELDS = [
@@ -1448,6 +1453,13 @@ def scan_pair(pair: str) -> PairScan:
         h4 = safe_float(row.get("Recommend All|240"))
         h1 = safe_float(row.get("Recommend All|60"))
         oanda_preview = oanda_prescreen_from_row(row)
+        print(
+            f"[OANDA-REF] {pair} | H1={row.get('Close|60')} "
+            f"| H1-start={row.get('Time|60')} "
+            f"| H1-update={row.get('Last Bar Update Time|60')} "
+            f"| Prev-H1={row.get('OANDA Previous H1 Close')} "
+            f"| Prev-H1-start={row.get('OANDA Previous H1 Open')}"
+        )
         price = None
         direction = "—"
         bias = "NO DATA"
