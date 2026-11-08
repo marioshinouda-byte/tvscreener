@@ -57,7 +57,9 @@ jobs:
 
       - name: Check scanner reliability
         if: steps.scan_due.outputs.should_run == 'true'
-        run: python -m unittest discover -s tests/unit -p 'test_forex_scan*.py' -v
+        run: |
+          python -m unittest discover -s tests/unit -p 'test_forex_scan*.py' -v
+          python -m unittest discover -s tests/unit -p 'test_weekly_forex_watchlist.py' -v
 
       - name: Run advanced Forex scanner
         if: steps.scan_due.outputs.should_run == 'true'
