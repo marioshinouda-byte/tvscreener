@@ -61,7 +61,7 @@ class ScannerReliabilityTest(unittest.TestCase):
             with redirect_stdout(output):
                 result = scanner.scan_pair("EURUSD")
 
-        self.assertEqual(reference.candles, "YF")
+        self.assertEqual(reference.candles, "TV-REF-MISSING")
         self.assertEqual(result.candles, "YF-STALE")
         self.assertEqual(result.direction, "—")
         self.assertEqual(result.bias, "STALE DATA")
