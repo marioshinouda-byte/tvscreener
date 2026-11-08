@@ -10,6 +10,7 @@ on:
     branches: [main]
     paths:
       - "forex_scanner.py"
+      - "tests/unit/test_forex_scanner_reliability.py"
       - ".github/workflows/forex-scanner.yml"
 
 permissions:
@@ -40,8 +41,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Check scanner reliability
+        run: python -m unittest discover -s tests/unit -p test_forex_scanner_reliability.py -v
+
       - name: Run advanced Forex scanner
         run: |
+          set -o pipefail
           python forex_scanner.py | tee scan_output.txt
 
       - name: Publish latest results to repository
