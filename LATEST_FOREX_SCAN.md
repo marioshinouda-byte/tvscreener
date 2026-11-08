@@ -1,6 +1,6 @@
 # Latest Forex Scan
 
-**Τελευταία ενημέρωση:** 08/11/2026 19:57 (Europe/Athens)
+**Τελευταία ενημέρωση:** 08/11/2026 20:05 (Europe/Athens)
 
 **Pairs:** 28  |  **Aligned:** 0  |  **A+ READY:** 0
 
@@ -16,11 +16,15 @@
 ## 🟢 ENTRY READY — Trend
 
 
-> ⚠️ YF-STALE: 28 ζευγάρια (EURUSD, GBPUSD, USDJPY, USDCHF, USDCAD, AUDUSD, NZDUSD, EURGBP, EURJPY, EURCHF, EURCAD, EURAUD, EURNZD, GBPJPY, GBPCHF, GBPCAD, GBPAUD, GBPNZD, AUDJPY, AUDCHF, AUDCAD, AUDNZD, NZDJPY, NZDCHF, NZDCAD, CADJPY, CADCHF, CHFJPY) έχουν μη έγκυρο/παλιό κλεισμένο H1 (όριο 4 ώρες). Δεν παράγονται σήματα από παλιά δεδομένα.
+> ⚠️ YF-STALE: 27 ζευγάρια (EURUSD, GBPUSD, USDJPY, USDCHF, USDCAD, AUDUSD, NZDUSD, EURGBP, EURJPY, EURCHF, EURAUD, EURNZD, GBPJPY, GBPCHF, GBPCAD, GBPAUD, GBPNZD, AUDJPY, AUDCHF, AUDCAD, AUDNZD, NZDJPY, NZDCHF, NZDCAD, CADJPY, CADCHF, CHFJPY) έχουν μη έγκυρο/παλιό κλεισμένο H1 (όριο 4 ώρες). Δεν παράγονται σήματα από παλιά δεδομένα.
 
 Κανένα A+ READY στο τρέχον scan.
 
 > Η ένδειξη απαιτεί έλεγχο στο τρέχον chart, spread, ειδήσεων και μεγέθους θέσης πριν από οποιαδήποτε είσοδο.
+
+## OANDA — αυτόματο πρώτο φίλτρο (έως 5 ζευγάρια)
+
+**5 ζευγάρια προς έλεγχο** — δες το [OANDA_SHORTLIST.md](OANDA_SHORTLIST.md). Μόνο ενδείξεις TradingView OANDA, χωρίς BRC/READY. Η ώρα του τελευταίου κεριού TradingView δεν επαληθεύεται από το screener.
 
 ## Weekly Top 5 — 2026-W45 (Europe/Athens)
 
@@ -53,9 +57,9 @@
 
 | Asset | Market | Price | W1 | D1 | H4 | H1 | Direction | W1 Context |
 |---|---|---:|---|---|---|---|---|---|
-| **BTC** | COINBASE:BTCUSD | 75,679.68 | SELL | SELL | STRONG SELL | SELL | **SHORT** | ✅ SUPPORTS |
-| **ETH** | COINBASE:ETHUSD | 2,228.23 | SELL | SELL | STRONG SELL | STRONG SELL | **SHORT** | ✅ SUPPORTS |
-| **SOL** | COINBASE:SOLUSD | 89.0500 | SELL | SELL | SELL | SELL | **SHORT** | ✅ SUPPORTS |
+| **BTC** | COINBASE:BTCUSD | 75,668.82 | SELL | SELL | STRONG SELL | SELL | **SHORT** | ✅ SUPPORTS |
+| **ETH** | COINBASE:ETHUSD | 2,227.35 | SELL | SELL | STRONG SELL | SELL | **SHORT** | ✅ SUPPORTS |
+| **SOL** | COINBASE:SOLUSD | 89.0300 | SELL | SELL | SELL | SELL | **SHORT** | ✅ SUPPORTS |
 
 ## HTF Reversal — ξεχωριστό mode
 
