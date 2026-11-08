@@ -14,7 +14,7 @@ def pair(name, score, *, grade="WATCH", brc="WAIT FOR BREAK", direction="LONG"):
         d1_rating=0.5, h4_rating=0.5, h1_rating=0.5, price=1.0,
         ema_passes=3, ema_total=3, adx_h4=30, adx_h1=30,
         d1_structure="BULL", h4_structure="BULL", brc_status=brc,
-        zone=1.0, quality_score=score, setup_grade=grade, candles="OK",
+        zone=1.0, quality_score=score, setup_grade=grade, candles="YF+OANDA-H1",
         entry=None, stop_loss=None, take_profit=None, rr=None, rr_pass=False,
     )
 
