@@ -9,8 +9,8 @@ from this single feed. TradingView Screener ratings are context only.
 Important:
 - Quality Score is a confluence score, NOT a win probability.
 - A+ READY is a strict filter, NOT an automatic trade instruction.
-- Yahoo H1 candles older than MAX_H1_DATA_AGE_HOURS are marked YF-STALE.
-  Analysis continues with a warning. Yahoo H1 timestamps are shown in the report.
+- Outdated Yahoo H1 candles are marked YF-STALE and are NOT actionable.
+  No trend or reversal signals are generated when the source is stale.
 """
 
 from __future__ import annotations
@@ -57,7 +57,7 @@ MAX_READY_DISTANCE_ATR = 0.75
 MAX_BREAK_TO_RETEST_BARS = 12
 MAX_RETEST_TO_CONFIRM_BARS = 2
 MAX_CONFIRMED_SETUP_AGE_BARS = 3
-MAX_H1_DATA_AGE_HOURS = 48
+MAX_H1_DATA_AGE_HOURS = 4
 WEEKLY_TOP5_PATH = "WEEKLY_FOREX_TOP5.json"
 HOT_NEW_MIN_SCORE = 70.0
 H1_SWING_LEFT = 8
@@ -1345,12 +1345,25 @@ def scan_pair(pair: str) -> PairScan:
                 data_age = pd.Timestamp.now(tz="UTC") - last_close_time
 
                 candle_status = "YF"
-                if data_age > pd.Timedelta(hours=MAX_H1_DATA_AGE_HOURS):
+                if data_age < pd.Timedelta(0) or data_age > pd.Timedelta(hours=MAX_H1_DATA_AGE_HOURS):
                     print(
                         f"[WARNING] {pair}: stale Yahoo candle "
-                        f"({data_age.total_seconds()/3600:.1f}h old)"
+                        f"({data_age.total_seconds()/3600:.1f}h old); signals suppressed"
                     )
-                    candle_status = "YF-STALE"
+                    # Never publish a trading direction, BRC, quality score or
+                    # reversal from old (or future-dated) Yahoo bars. Keep only
+                    # the candle timestamp so the problem can be diagnosed.
+                    return PairScan(
+                        pair=pair, symbol=symbol, provider=provider,
+                        direction="—", bias="STALE DATA",
+                        d1_rating=d1, h4_rating=h4, h1_rating=h1, price=None,
+                        ema_passes=0, ema_total=3, adx_h4=None, adx_h1=None,
+                        d1_structure="N/A", h4_structure="N/A",
+                        brc_status="WAIT", zone=None, quality_score=0.0,
+                        setup_grade="—", candles="YF-STALE", entry=None,
+                        stop_loss=None, take_profit=None, rr=None, rr_pass=False,
+                        reversal=None, w1_rating=w1, h1_closed_at=h1_closed_at,
+                    )
 
                 price = safe_float(h1_candles["Close"].iloc[-1])
                 signals = [
@@ -1510,7 +1523,7 @@ def weekly_context(direction: str, w1: Optional[float]) -> str:
 
 
 def candidates(results: list[PairScan]) -> list[PairScan]:
-    selected = [r for r in results if r.direction in {"LONG", "SHORT"}]
+    selected = [r for r in results if r.direction in {"LONG", "SHORT"} and r.candles not in {"YF-STALE", "N/A", "ERROR"}]
     priority = {"A+ READY": 0, "A": 1, "WATCH": 2, "—": 3}
     selected.sort(key=lambda r: (priority.get(r.setup_grade, 9), -r.quality_score, r.pair))
     return selected
@@ -1522,7 +1535,7 @@ def weekly_trend_watchlist(
     """Persist the Trend watchlist across scans, resetting on Monday in Athens."""
     week = f"{now.isocalendar().year}-W{now.isocalendar().week:02d}"
     ranked = candidates(results)
-    by_pair = {r.pair: r for r in results}
+    by_pair = {r.pair: r for r in ranked}
     state_file = Path(state_path)
     saved_state = json.loads(state_file.read_text(encoding="utf-8")) if state_file.exists() else {}
     state = saved_state
@@ -1547,7 +1560,9 @@ def weekly_trend_watchlist(
                 weakest = min(replaceable, key=lambda p: by_pair[p].quality_score)
                 top_pairs[top_pairs.index(weakest)] = r.pair
 
-    hot_pairs = [p for p in state["hot_new"] if p in by_pair and p not in top_pairs]
+    # Rebuild from THIS scan; never carry a formerly strong pair forward
+    # after its score, structure or feed quality has deteriorated.
+    hot_pairs = []
     for r in ranked:
         if r.pair in top_pairs or r.pair in hot_pairs:
             continue
@@ -1566,7 +1581,7 @@ def weekly_trend_watchlist(
 def trend_state(r: PairScan) -> str:
     if r.setup_grade == "A+ READY":
         return "🟢 ENTRY READY"
-    if r.direction not in {"LONG", "SHORT"} or r.candles in {"N/A", "ERROR"}:
+    if r.direction not in {"LONG", "SHORT"} or r.candles in {"N/A", "ERROR", "YF-STALE"}:
         return "🔴 INVALID"
     if r.brc_status in {"RETEST", "READY"} or r.setup_grade == "A":
         return "🟡 WATCH"
@@ -1705,7 +1720,7 @@ def write_markdown(
     if stale_pairs:
         lines += [
             "",
-            f"> ⚠️ YF-STALE: {len(stale_pairs)} ζευγάρια ({', '.join(stale_pairs)}) έχουν κλεισμένο H1 παλαιότερο από {MAX_H1_DATA_AGE_HOURS} ώρες. Η ανάλυση συνεχίζεται με τα παλιά δεδομένα.",
+            f"> ⚠️ YF-STALE: {len(stale_pairs)} ζευγάρια ({', '.join(stale_pairs)}) έχουν μη έγκυρο/παλιό κλεισμένο H1 (όριο {MAX_H1_DATA_AGE_HOURS} ώρες). Δεν παράγονται σήματα από παλιά δεδομένα.",
             "",
         ]
 

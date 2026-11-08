@@ -62,6 +62,12 @@ class WeeklyForexWatchlistTest(unittest.TestCase):
             self.assertEqual([r.pair for r in weekly], ["P0", "P1", "P2", "P3", "P4"])
             self.assertEqual([r.pair for r in hot], ["NEW"])
 
+            # A previously strong candidate must disappear after losing
+            # its score, even if it remains in the saved weekly state.
+            decayed = updated[:-1] + [pair("NEW", 32)]
+            _, hot, _ = weekly_trend_watchlist(decayed, monday, state_path)
+            self.assertEqual(hot, [])
+
             confirmed = updated[:-1] + [pair("NEW", 90, grade="A+ READY", brc="READY")]
             weekly, hot, _ = weekly_trend_watchlist(confirmed, monday, state_path)
             self.assertEqual([r.pair for r in weekly], ["NEW", "P1", "P2", "P3", "P4"])

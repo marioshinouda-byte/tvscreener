@@ -1,5 +1,4 @@
 from contextlib import redirect_stdout
-from dataclasses import replace
 from io import StringIO
 import subprocess
 import tempfile
@@ -46,7 +45,7 @@ class ScannerReliabilityTest(unittest.TestCase):
         self.assertTrue((h4.index + pd.Timedelta(hours=4) <= now).all())
         self.assertTrue((d1.index + pd.Timedelta(days=1) <= now).all())
 
-    def test_stale_candles_warn_and_continue_the_same_analysis(self):
+    def test_stale_candles_warn_and_suppress_signals(self):
         frame = candle_history()
         frame.index -= pd.Timedelta(hours=scanner.MAX_H1_DATA_AGE_HOURS + 2)
         history = scanner.prepare_candle_history(frame)
@@ -63,20 +62,24 @@ class ScannerReliabilityTest(unittest.TestCase):
                 result = scanner.scan_pair("EURUSD")
 
         self.assertEqual(reference.candles, "YF")
-        self.assertEqual(result, replace(reference, candles="YF-STALE"))
-        self.assertEqual(result.direction, "LONG")
-        self.assertIsNotNone(result.price)
-        self.assertIsNotNone(result.reversal)
-        self.assertIn("[WARNING] EURUSD: stale Yahoo candle (", output.getvalue())
-        self.assertIn("h old)", output.getvalue())
+        self.assertEqual(result.candles, "YF-STALE")
+        self.assertEqual(result.direction, "—")
+        self.assertEqual(result.bias, "STALE DATA")
+        self.assertEqual(result.setup_grade, "—")
+        self.assertEqual(result.quality_score, 0.0)
+        self.assertEqual(result.ema_passes, 0)
+        self.assertIsNone(result.price)
+        self.assertIsNone(result.reversal)
+        self.assertIsNone(result.entry)
+        self.assertIn("signals suppressed", output.getvalue())
 
         with tempfile.TemporaryDirectory() as directory:
             report = Path(directory) / "LATEST_FOREX_SCAN.md"
             scanner.write_markdown([result], path=str(report))
-            text = report.read_text()
-        self.assertIn("YF-STALE: 1 ζευγάρια (EURUSD)", text)
-        self.assertIn("Η ανάλυση συνεχίζεται με τα παλιά δεδομένα", text)
-        self.assertNotIn("signals are suppressed", text)
+            content = report.read_text()
+        self.assertIn("YF-STALE: 1 ζευγάρια (EURUSD)", content)
+        self.assertIn("Δεν παράγονται σήματα από παλιά δεδομένα", content)
+        self.assertNotIn("Η ανάλυση συνεχίζεται με τα παλιά δεδομένα", content)
 
     def test_candle_diagnostics_cover_batch_missing_and_cached_data(self):
         frame = candle_history()
