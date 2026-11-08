@@ -54,7 +54,7 @@ ADX_MIN = 20.0
 MIN_RR = 1.2
 SL_ATR_BUFFER = 0.35
 MAX_READY_DISTANCE_ATR = 0.75
-MAX_BREAK_TO_RETEST_BARS = 8
+MAX_BREAK_TO_RETEST_BARS = 12
 MAX_RETEST_TO_CONFIRM_BARS = 2
 MAX_CONFIRMED_SETUP_AGE_BARS = 3
 MAX_H1_DATA_AGE_HOURS = 48
@@ -769,7 +769,7 @@ def detect_brc(direction: str, h1: pd.DataFrame):
     if break_i is None:
         return "WAIT FOR BREAK", level
 
-    # Keep the broken zone active for up to 8 subsequent closed H1 candles.
+    # Keep the broken zone active for the configured number of closed H1 candles.
     # The retest candle may be the latest candle; confirmation must come after it.
     max_retest_i = min(
         break_i + MAX_BREAK_TO_RETEST_BARS,
@@ -792,7 +792,7 @@ def detect_brc(direction: str, h1: pd.DataFrame):
             break
 
     if retest_i is None:
-        # Once the 8-candle retest window closes, discard this broken zone.
+        # Once the configured retest window closes, discard this broken zone.
         if latest_i - break_i >= MAX_BREAK_TO_RETEST_BARS:
             return "WAIT NEW RETEST", level
         return "BREAK", level
