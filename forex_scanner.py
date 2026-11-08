@@ -118,6 +118,18 @@ class ReversalScan:
 
 
 @dataclass
+class OandaPreScreen:
+    """OANDA-only TradingView context, NEVER a BRC or entry signal."""
+    direction: str
+    score: float
+    price: Optional[float]
+    ema_passes: int
+    ema_checked: int
+    adx_h4: Optional[float]
+    adx_h1: Optional[float]
+
+
+@dataclass
 class PairScan:
     pair: str
     symbol: str
@@ -149,6 +161,7 @@ class PairScan:
     w1_rating: Optional[float] = None
     # Timestamp of the last closed H1 candle used by BRC and structure checks.
     h1_closed_at: Optional[object] = None
+    oanda_prescreen: Optional[OandaPreScreen] = None
 
 
 @dataclass
@@ -1292,6 +1305,129 @@ def setup_grade(
     return "WATCH"
 
 
+def oanda_prescreen_from_row(row) -> Optional[OandaPreScreen]:
+    """
+    First-stage SHORTLIST only. This is an OANDA TradingView Screener snapshot,
+    with NO source-candle timestamp and NO Break/Retest/Confirmation validation.
+    Never infer a trading entry from this function.
+    """
+    symbol = str(row.get("Symbol", ""))
+    if not symbol.startswith("OANDA:"):
+        return None
+    d1 = safe_float(row.get("Technical Rating"))
+    h4 = safe_float(row.get("Recommend All|240"))
+    h1 = safe_float(row.get("Recommend All|60"))
+    if any(rating is None for rating in (d1, h4, h1)):
+        return None
+    if d1 > DIRECTION_LEVEL and h4 > DIRECTION_LEVEL and h1 >= -DIRECTION_LEVEL:
+        direction, sign = "LONG", 1
+    elif d1 < -DIRECTION_LEVEL and h4 < -DIRECTION_LEVEL and h1 <= DIRECTION_LEVEL:
+        direction, sign = "SHORT", -1
+    else:
+        return None
+
+    price = safe_float(row.get("Price"))
+    ema_checked = 0
+    ema_passes = 0
+    d1_h4_ema = []
+    for label, previous in (
+        ("EMA50 D1", "EMA50 D1 Prev"),
+        ("EMA50 H4", "EMA50 H4 Prev"),
+        ("EMA50 H1", "EMA50 H1 Prev"),
+    ):
+        ema = safe_float(row.get(label))
+        prev = safe_float(row.get(previous))
+        if price is None or ema is None or prev is None:
+            d1_h4_ema.append(None)
+            continue
+        checked = ema_frame_ok(direction, price, ema, prev)
+        ema_checked += 1
+        ema_passes += int(checked)
+        d1_h4_ema.append(checked)
+
+    # Reject chart contexts where the available D1/H4 EMA clearly opposes
+    # direction. Missing EMA is reported, never silently marked as passed.
+    if d1_h4_ema[0] is False or d1_h4_ema[1] is False:
+        return None
+
+    adx_h4 = safe_float(row.get("ADX H4"))
+    adx_h1 = safe_float(row.get("ADX H1"))
+    if adx_h4 is not None and adx_h4 < ADX_MIN:
+        return None
+
+    # Deterministic ranking of CONTEXT, not a probability or READY score.
+    rating_points = (
+        min(max(sign * d1, 0.0), 1.0) * 35
+        + min(max(sign * h4, 0.0), 1.0) * 30
+        + min(max(sign * h1, 0.0), 1.0) * 10
+    )
+    ema_points = 15 * ema_passes / 3
+    adx_points = min(max((adx_h4 or 0) / 40, 0.0), 1.0) * 10
+    return OandaPreScreen(
+        direction=direction,
+        score=round(rating_points + ema_points + adx_points, 1),
+        price=price,
+        ema_passes=ema_passes,
+        ema_checked=ema_checked,
+        adx_h4=adx_h4,
+        adx_h1=adx_h1,
+    )
+
+
+def oanda_shortlist(results: list[PairScan], limit: int = 5) -> list[PairScan]:
+    """Up to five OANDA chart-review candidates, independent of Yahoo OHLC."""
+    eligible = [r for r in results if r.oanda_prescreen is not None]
+    eligible.sort(
+        key=lambda r: (
+            -r.oanda_prescreen.score,
+            -r.oanda_prescreen.ema_passes,
+            r.pair,
+        )
+    )
+    return eligible[:limit]
+
+
+def write_oanda_shortlist(results: list[PairScan], path: str = "OANDA_SHORTLIST.md") -> None:
+    now = datetime.now(ZoneInfo("Europe/Athens"))
+    top = oanda_shortlist(results)
+    lines = [
+        "# OANDA — Top 5 προς έλεγχο",
+        "",
+        f"**Δημιουργήθηκε:** {now:%d/%m/%Y %H:%M} (ώρα Ελλάδας)",
+        "",
+        f"**Υποψήφια:** {len(top)} από {len(results)} ζευγάρια",
+        "",
+        "> **ΜΟΝΟ ΑΡΧΙΚΟ ΦΙΛΤΡΟ — ΟΧΙ ΣΗΜΑ ΕΙΣΟΔΟΥ.**",
+        "> Πηγή: TradingView Forex Screener, αποκλειστικά σύμβολα OANDA. "
+        "Οι ενδείξεις δεν έχουν επαληθευμένη ώρα τελευταίου κεριού. "
+        "EMA50/ADX εμφανίζονται μόνο αν επιστράφηκαν από το screener.",
+        "> Ο δείκτης κατάταξης (/100) δεν είναι πιθανότητα επιτυχίας, "
+        "BRC confirmation ή READY.",
+        "",
+        "| # | Ζευγάρι | Κατεύθυνση ελέγχου | Ranking /100 | W1 | D1 | H4 | H1 | EMA50 TV | ADX H4 | ADX H1 |",
+        "|---:|---|---|---:|---|---|---|---|---|---:|---:|",
+    ]
+    for i, r in enumerate(top, 1):
+        preview = r.oanda_prescreen
+        lines.append(
+            f"| {i} | **{r.pair}** | {preview.direction} (WATCH ONLY) | "
+            f"{preview.score:.1f} | {rating_text(r.w1_rating)} | "
+            f"{rating_text(r.d1_rating)} | {rating_text(r.h4_rating)} | "
+            f"{rating_text(r.h1_rating)} | {preview.ema_passes}/{preview.ema_checked} verified fields | "
+            f"{fmt_num(preview.adx_h4)} | {fmt_num(preview.adx_h1)} |"
+        )
+    if not top:
+        lines.append("| — | Καμία επαρκώς συμφωνημένη ένδειξη OANDA ή μη διαθέσιμα δεδομένα | — | — | — | — | — | — | — | — | — |")
+    lines += [
+        "",
+        "Η λίστα είναι υποψήφια για χειροκίνητο τελικό έλεγχο μόνο αυτών των γραφημάτων. "
+        "Δεν προκύπτουν Entry/SL/TP χωρίς ανεξάρτητη επιβεβαίωση πραγματικών OHLC, "
+        "BRC, spread και ειδήσεων.",
+        "Κατά το Σαββατοκύριακο οι Forex ενδείξεις μπορεί να αντανακλούν το κλείσιμο της Παρασκευής.",
+    ]
+    Path(path).write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
 def scan_pair(pair: str) -> PairScan:
     try:
         row = fetch_pair(pair)
@@ -1311,6 +1447,7 @@ def scan_pair(pair: str) -> PairScan:
         d1 = safe_float(row.get("Technical Rating"))
         h4 = safe_float(row.get("Recommend All|240"))
         h1 = safe_float(row.get("Recommend All|60"))
+        oanda_preview = oanda_prescreen_from_row(row)
         price = None
         direction = "—"
         bias = "NO DATA"
@@ -1363,6 +1500,7 @@ def scan_pair(pair: str) -> PairScan:
                         setup_grade="—", candles="YF-STALE", entry=None,
                         stop_loss=None, take_profit=None, rr=None, rr_pass=False,
                         reversal=None, w1_rating=w1, h1_closed_at=h1_closed_at,
+                        oanda_prescreen=oanda_preview,
                     )
 
                 price = safe_float(h1_candles["Close"].iloc[-1])
@@ -1454,6 +1592,7 @@ def scan_pair(pair: str) -> PairScan:
             reversal=reversal,
             w1_rating=w1,
             h1_closed_at=h1_closed_at,
+            oanda_prescreen=oanda_preview,
         )
 
     except Exception as exc:
@@ -1684,6 +1823,7 @@ def write_markdown(
     path: str = "LATEST_FOREX_SCAN.md",
 ) -> None:
     now = datetime.now(ZoneInfo("Europe/Athens"))
+    write_oanda_shortlist(results, str(Path(path).with_name("OANDA_SHORTLIST.md")))
     crypto_results = crypto_results or []
     top = candidates(results)
     weekly, hot_new, week = weekly_trend_watchlist(
@@ -1738,6 +1878,13 @@ def write_markdown(
     lines += [
         "",
         "> Η ένδειξη απαιτεί έλεγχο στο τρέχον chart, spread, ειδήσεων και μεγέθους θέσης πριν από οποιαδήποτε είσοδο.",
+        "",
+        "## OANDA — αυτόματο πρώτο φίλτρο (έως 5 ζευγάρια)",
+        "",
+        f"**{len(oanda_shortlist(results))} ζευγάρια προς έλεγχο** — "
+        "δες το [OANDA_SHORTLIST.md](OANDA_SHORTLIST.md). "
+        "Μόνο ενδείξεις TradingView OANDA, χωρίς BRC/READY. "
+        "Η ώρα του τελευταίου κεριού TradingView δεν επαληθεύεται από το screener.",
         "",
         f"## Weekly Top 5 — {week} (Europe/Athens)",
         "",

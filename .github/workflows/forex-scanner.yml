@@ -73,7 +73,7 @@ jobs:
           python3 scripts/forex_scan_schedule.py --record-success
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add LATEST_FOREX_SCAN.md WEEKLY_FOREX_TOP5.json FOREX_SCAN_HEALTH.json
+          git add LATEST_FOREX_SCAN.md OANDA_SHORTLIST.md WEEKLY_FOREX_TOP5.json FOREX_SCAN_HEALTH.json
           if git diff --cached --quiet; then
             echo "No result changes to commit."
           else
@@ -91,5 +91,6 @@ jobs:
           path: |
             scan_output.txt
             LATEST_FOREX_SCAN.md
+            OANDA_SHORTLIST.md
             WEEKLY_FOREX_TOP5.json
             FOREX_SCAN_HEALTH.json

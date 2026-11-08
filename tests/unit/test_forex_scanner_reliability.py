@@ -81,6 +81,61 @@ class ScannerReliabilityTest(unittest.TestCase):
         self.assertIn("Δεν παράγονται σήματα από παλιά δεδομένα", content)
         self.assertNotIn("Η ανάλυση συνεχίζεται με τα παλιά δεδομένα", content)
 
+    def test_oanda_prescreen_filters_and_ranks_without_yahoo(self):
+        def tv_row(symbol, d1=0.8, h4=0.7, h1=0.5):
+            return pd.Series({
+                "Symbol": symbol, "Technical Rating": d1,
+                "Recommend All|240": h4, "Recommend All|60": h1,
+                "Price": 1.1500, "EMA50 D1": 1.10, "EMA50 D1 Prev": 1.09,
+                "EMA50 H4": 1.12, "EMA50 H4 Prev": 1.11,
+                "EMA50 H1": 1.13, "EMA50 H1 Prev": 1.12,
+                "ADX H4": 31.0, "ADX H1": 25.0,
+            })
+
+        self.assertIsNone(scanner.oanda_prescreen_from_row(tv_row("FOREXCOM:EURUSD")))
+        self.assertIsNone(scanner.oanda_prescreen_from_row(tv_row("OANDA:EURUSD", h4=-0.7)))
+        self.assertIsNone(scanner.oanda_prescreen_from_row(tv_row("OANDA:EURUSD", h1=-0.3)))
+        self.assertIsNone(scanner.oanda_prescreen_from_row(tv_row("OANDA:EURUSD", d1=0.8, h4=0.7, h1=0.5).where(
+            lambda x: x.index != "ADX H4", 12.0)))
+        preview = scanner.oanda_prescreen_from_row(tv_row("OANDA:EURUSD"))
+        self.assertEqual(preview.direction, "LONG")
+        self.assertEqual(preview.ema_passes, 3)
+        self.assertEqual(preview.ema_checked, 3)
+
+        with patch.object(scanner, "fetch_pair", return_value=tv_row("OANDA:EURUSD")), \
+             patch.object(scanner, "fetch_candle_history", return_value=None):
+            no_yahoo = scanner.scan_pair("EURUSD")
+        self.assertIsNone(no_yahoo.price)
+        self.assertEqual(no_yahoo.direction, "—")
+        self.assertIsNotNone(no_yahoo.oanda_prescreen)
+        self.assertEqual(scanner.oanda_shortlist([no_yahoo]), [no_yahoo])
+        with tempfile.TemporaryDirectory() as directory:
+            scanner.write_markdown([no_yahoo], path=str(Path(directory) / "LATEST_FOREX_SCAN.md"))
+            shortlist = Path(directory, "OANDA_SHORTLIST.md").read_text()
+            self.assertIn("EURUSD", shortlist)
+            self.assertIn("WATCH ONLY", shortlist)
+            self.assertNotIn("Entry {", shortlist)
+
+    def test_oanda_shortlist_uses_at_most_five_and_never_non_oanda(self):
+        rows = []
+        for i in range(9):
+            entry = scanner.PairScan(
+                pair=f"P{i}", symbol=f"OANDA:P{i}", provider="OANDA",
+                direction="—", bias="NO DATA", d1_rating=0.4,
+                h4_rating=0.4, h1_rating=0.4, price=None,
+                ema_passes=0, ema_total=3, adx_h4=None, adx_h1=None,
+                d1_structure="N/A", h4_structure="N/A", brc_status="WAIT",
+                zone=None, quality_score=0.0, setup_grade="—",
+                candles="N/A", entry=None, stop_loss=None, take_profit=None,
+                rr=None, rr_pass=False,
+                oanda_prescreen=scanner.OandaPreScreen(
+                    "LONG", 10.0 + i, 1.0, 3, 3, 25, 25),
+            )
+            rows.append(entry)
+        shortlist = scanner.oanda_shortlist(rows)
+        self.assertEqual(len(shortlist), 5)
+        self.assertEqual([r.pair for r in shortlist], ["P8", "P7", "P6", "P5", "P4"])
+
     def test_candle_diagnostics_cover_batch_missing_and_cached_data(self):
         frame = candle_history()
         batch = pd.concat({"EURUSD=X": frame}, axis=1)
