@@ -10,7 +10,11 @@ on:
     branches: [main]
     paths:
       - "forex_scanner.py"
+      - "requirements.txt"
       - "tests/unit/test_forex_scanner_reliability.py"
+      - "tests/unit/test_forex_scan_schedule.py"
+      - "scripts/forex_scan_schedule.py"
+      - "SCAN_REQUEST.json"
       - ".github/workflows/forex-scanner.yml"
 
 permissions:
@@ -23,6 +27,7 @@ concurrency:
 jobs:
   scan:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     env:
       # Repository variable: set to "false" to hide/disable the optional mode.
       ENABLE_HTF_REVERSAL: ${{ vars.ENABLE_HTF_REVERSAL || 'true' }}
@@ -30,30 +35,43 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # Queued requests must see the latest published hourly result.
+          ref: main
+
+      - name: Check whether this hour needs scanning
+        id: scan_due
+        run: python3 scripts/forex_scan_schedule.py
 
       - name: Set up Python
+        if: steps.scan_due.outputs.should_run == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Install dependencies
+        if: steps.scan_due.outputs.should_run == 'true'
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Check scanner reliability
-        run: python -m unittest discover -s tests/unit -p test_forex_scanner_reliability.py -v
+        if: steps.scan_due.outputs.should_run == 'true'
+        run: python -m unittest discover -s tests/unit -p 'test_forex_scan*.py' -v
 
       - name: Run advanced Forex scanner
+        if: steps.scan_due.outputs.should_run == 'true'
         run: |
           set -o pipefail
           python forex_scanner.py | tee scan_output.txt
 
       - name: Publish latest results to repository
+        if: steps.scan_due.outputs.should_run == 'true'
         run: |
+          python3 scripts/forex_scan_schedule.py --record-success
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add LATEST_FOREX_SCAN.md WEEKLY_FOREX_TOP5.json
+          git add LATEST_FOREX_SCAN.md WEEKLY_FOREX_TOP5.json FOREX_SCAN_HEALTH.json
           if git diff --cached --quiet; then
             echo "No result changes to commit."
           else
@@ -63,6 +81,7 @@ jobs:
           fi
 
       - name: Save scanner output artifact
+        if: steps.scan_due.outputs.should_run == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: forex-scan-output
@@ -71,3 +90,4 @@ jobs:
             scan_output.txt
             LATEST_FOREX_SCAN.md
             WEEKLY_FOREX_TOP5.json
+            FOREX_SCAN_HEALTH.json

@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "request_id": "hourly-failover-initialization",
+  "requested_at": null,
+  "source": "hourly-failover",
+  "force": false
+}
