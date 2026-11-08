@@ -12,6 +12,7 @@ on:
       - "forex_scanner.py"
       - "market_data_quality.py"
       - "tests/unit/test_market_data_quality.py"
+      - "tests/unit/test_weekly_forex_watchlist.py"
       - "requirements.txt"
       - "tests/unit/test_forex_scanner_reliability.py"
       - "tests/unit/test_forex_scan_schedule.py"
