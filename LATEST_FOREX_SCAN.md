@@ -1,6 +1,6 @@
 # Latest Forex Scan
 
-**Τελευταία ενημέρωση:** 08/11/2026 23:26 (Europe/Athens)
+**Τελευταία ενημέρωση:** 09/11/2026 00:23 (Europe/Athens)
 
 **Pairs:** 28  |  **Aligned:** 0  |  **A+ READY:** 0
 
@@ -61,7 +61,7 @@
 
 **5 ζευγάρια προς έλεγχο** — δες το [OANDA_SHORTLIST.md](OANDA_SHORTLIST.md). Μόνο ενδείξεις TradingView OANDA, χωρίς BRC/READY. Το report εμφανίζει H1 OANDA timestamps, αλλά δεν έχει επιβεβαιωμένο πλήρες OHLC ιστορικό.
 
-## Weekly Top 5 — 2026-W45 (Europe/Athens)
+## Weekly Top 5 — 2026-W46 (Europe/Athens)
 
 Η πεντάδα διατηρείται όλη την εβδομάδα· ανανεώνονται score και κατάσταση σε κάθε scan. Μόνο νέο επιβεβαιωμένο setup με RR ≥ 1.2 μπορεί να αντικαταστήσει θέση. Νέα επιλογή γίνεται τη Δευτέρα (ώρα Ελλάδας).
 
@@ -92,9 +92,9 @@
 
 | Asset | Market | Price | W1 | D1 | H4 | H1 | Direction | W1 Context |
 |---|---|---:|---|---|---|---|---|---|
-| **BTC** | COINBASE:BTCUSD | 75,654.21 | SELL | SELL | STRONG SELL | STRONG SELL | **SHORT** | ✅ SUPPORTS |
-| **ETH** | COINBASE:ETHUSD | 2,223.54 | SELL | SELL | STRONG SELL | STRONG SELL | **SHORT** | ✅ SUPPORTS |
-| **SOL** | COINBASE:SOLUSD | 88.8900 | SELL | SELL | SELL | SELL | **SHORT** | ✅ SUPPORTS |
+| **BTC** | COINBASE:BTCUSD | 74,456.69 | SELL | SELL | STRONG SELL | SELL | **SHORT** | ✅ SUPPORTS |
+| **ETH** | COINBASE:ETHUSD | 2,127.89 | SELL | STRONG SELL | STRONG SELL | SELL | **SHORT** | ✅ SUPPORTS |
+| **SOL** | COINBASE:SOLUSD | 86.3900 | SELL | STRONG SELL | STRONG SELL | SELL | **SHORT** | ✅ SUPPORTS |
 
 ## HTF Reversal — ξεχωριστό mode
 
@@ -119,34 +119,34 @@ _Εκτός shortlist: WATCH 0 | INVALID 0. Δεν θεωρούνται ενερ
 
 | Pair | W1 | D1 | H4 | H1 | Dir | EMA | D1 Struct | H4 Struct | BRC | RR | Quality |
 |---|---|---|---|---|---|---:|---|---|---|---:|---:|
-| AUDCAD | SELL | STRONG SELL | SELL | NEUTRAL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| AUDCHF | SELL | STRONG SELL | SELL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| AUDCAD | SELL | SELL | SELL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| AUDCHF | SELL | SELL | SELL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
 | AUDJPY | SELL | STRONG SELL | SELL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| AUDNZD | BUY | NEUTRAL | STRONG SELL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| AUDUSD | SELL | STRONG SELL | SELL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| CADCHF | SELL | SELL | SELL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| AUDNZD | BUY | SELL | STRONG SELL | STRONG SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| AUDUSD | SELL | SELL | SELL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| CADCHF | SELL | SELL | STRONG SELL | STRONG SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
 | CADJPY | SELL | SELL | SELL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| CHFJPY | NEUTRAL | BUY | BUY | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| EURAUD | SELL | BUY | BUY | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| CHFJPY | NEUTRAL | NEUTRAL | BUY | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| EURAUD | NEUTRAL | BUY | BUY | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
 | EURCAD | SELL | SELL | BUY | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| EURCHF | STRONG SELL | STRONG SELL | SELL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| EURGBP | SELL | SELL | SELL | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| EURJPY | NEUTRAL | SELL | SELL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| EURNZD | STRONG BUY | BUY | BUY | NEUTRAL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| EURUSD | SELL | STRONG SELL | SELL | STRONG SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| GBPAUD | BUY | STRONG BUY | BUY | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| GBPCAD | STRONG BUY | STRONG BUY | STRONG BUY | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| GBPCHF | NEUTRAL | SELL | SELL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| GBPJPY | BUY | BUY | NEUTRAL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| GBPNZD | STRONG BUY | BUY | BUY | NEUTRAL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| EURCHF | STRONG SELL | STRONG SELL | STRONG SELL | STRONG SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| EURGBP | SELL | SELL | SELL | NEUTRAL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| EURJPY | NEUTRAL | SELL | SELL | STRONG SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| EURNZD | BUY | BUY | BUY | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| EURUSD | SELL | SELL | SELL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| GBPAUD | BUY | BUY | BUY | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| GBPCAD | BUY | BUY | BUY | STRONG BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| GBPCHF | NEUTRAL | SELL | STRONG SELL | STRONG SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| GBPJPY | NEUTRAL | BUY | SELL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| GBPNZD | BUY | BUY | BUY | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
 | GBPUSD | SELL | SELL | SELL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| NZDCAD | SELL | STRONG SELL | SELL | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| NZDCHF | STRONG SELL | STRONG SELL | SELL | NEUTRAL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| NZDJPY | STRONG SELL | STRONG SELL | SELL | NEUTRAL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| NZDUSD | STRONG SELL | STRONG SELL | SELL | SELL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| USDCAD | STRONG BUY | STRONG BUY | BUY | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| USDCHF | BUY | SELL | BUY | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
-| USDJPY | BUY | BUY | STRONG BUY | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| NZDCAD | SELL | SELL | BUY | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| NZDCHF | SELL | SELL | SELL | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| NZDJPY | SELL | SELL | SELL | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| NZDUSD | SELL | SELL | SELL | NEUTRAL | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| USDCAD | STRONG BUY | BUY | BUY | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| USDCHF | NEUTRAL | SELL | NEUTRAL | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
+| USDJPY | BUY | BUY | BUY | BUY | — | 0/3 | N/A | N/A | WAIT | — | 0.0 |
 
 ## Πώς διαβάζεται
 
