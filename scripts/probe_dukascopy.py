@@ -32,3 +32,21 @@ if __name__ == "__main__":
                 probe(pair, y, m)
             except Exception as exc:
                 print(f"FAILED {pair} {y}-{m}: {exc!r}", flush=True)
+
+def probe_minute(pair, day):
+    from datetime import date, timedelta
+    yyyy, mm, dd = map(int, day.split("-"))
+    url = f"https://datafeed.dukascopy.com/datafeed/{pair}/{yyyy}/{mm-1:02d}/{dd:02d}/BID_candles_min_1.bi5"
+    try:
+        response = requests.get(url, timeout=11)
+        print(f"M1 {pair} {day}: HTTP {response.status_code}, bytes={len(response.content)}", flush=True)
+        if response.status_code == 200 and response.content:
+            blob = lzma.decompress(response.content)
+            print(f"M1 decoded {len(blob)} bytes, records={len(blob)//24}", flush=True)
+    except Exception as exc:
+        print(f"M1 failed {pair} {day}: {exc!r}", flush=True)
+
+
+if __name__ == "__main__":
+    for day in ("2026-11-06", "2026-11-07"):
+        probe_minute("EURUSD", day)
