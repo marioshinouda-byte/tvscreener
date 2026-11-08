@@ -27,6 +27,7 @@ from zoneinfo import ZoneInfo
 
 import pandas as pd
 import yfinance as yf
+from market_data_quality import verify_h1_history
 
 from tvscreener import CryptoField, CryptoScreener, ForexField, ForexScreener
 
@@ -1515,6 +1516,45 @@ def scan_pair(pair: str) -> PairScan:
                         oanda_prescreen=oanda_preview,
                     )
 
+                verification = verify_h1_history(pair, h1_candles, row)
+                if not verification.ok:
+                    print(f"[DATA-REJECT] {pair}: {verification.status} — {verification.detail}")
+                    return PairScan(
+                        pair=pair, symbol=symbol, provider=provider,
+                        direction="—", bias="UNVERIFIED DATA",
+                        d1_rating=d1, h4_rating=h4, h1_rating=h1, price=None,
+                        ema_passes=0, ema_total=3, adx_h4=None, adx_h1=None,
+                        d1_structure="N/A", h4_structure="N/A",
+                        brc_status="WAIT", zone=None, quality_score=0.0,
+                        setup_grade="—", candles=verification.status, entry=None,
+                        stop_loss=None, take_profit=None, rr=None, rr_pass=False,
+                        reversal=None, w1_rating=w1, h1_closed_at=h1_closed_at,
+                        oanda_prescreen=oanda_preview,
+                    )
+                # The checked previous H1 open is our safe candle boundary.
+                prepared = prepare_candle_history(verification.h1)
+                if prepared is None:
+                    print(f"[DATA-REJECT] {pair}: insufficient checked OHLC history")
+                    return PairScan(
+                        pair=pair, symbol=symbol, provider=provider,
+                        direction="—", bias="UNVERIFIED DATA",
+                        d1_rating=d1, h4_rating=h4, h1_rating=h1, price=None,
+                        ema_passes=0, ema_total=3, adx_h4=None, adx_h1=None,
+                        d1_structure="N/A", h4_structure="N/A",
+                        brc_status="WAIT", zone=None, quality_score=0.0,
+                        setup_grade="—", candles="NO-VERIFIED-HISTORY",
+                        entry=None, stop_loss=None, take_profit=None,
+                        rr=None, rr_pass=False, reversal=None, w1_rating=w1,
+                        h1_closed_at=h1_closed_at, oanda_prescreen=oanda_preview,
+                    )
+                h1_candles, h4_candles, d1_candles = prepared
+                h1_closed_at = h1_candles.index[-1]
+                candle_status = verification.status
+                print(
+                    f"[DATA-VERIFIED] {pair}: last={h1_closed_at} "
+                    f"| source=Yahoo OHLC + OANDA H1 close "
+                    f"| delta={verification.difference_pips:.1f} pips"
+                )
                 price = safe_float(h1_candles["Close"].iloc[-1])
                 signals = [
                     ema_frame_signal(d1_candles),
@@ -1674,7 +1714,7 @@ def weekly_context(direction: str, w1: Optional[float]) -> str:
 
 
 def candidates(results: list[PairScan]) -> list[PairScan]:
-    selected = [r for r in results if r.direction in {"LONG", "SHORT"} and r.candles not in {"YF-STALE", "N/A", "ERROR"}]
+    selected = [r for r in results if r.direction in {"LONG", "SHORT"} and r.candles == "YF+OANDA-H1"]
     priority = {"A+ READY": 0, "A": 1, "WATCH": 2, "—": 3}
     selected.sort(key=lambda r: (priority.get(r.setup_grade, 9), -r.quality_score, r.pair))
     return selected
@@ -1732,7 +1772,7 @@ def weekly_trend_watchlist(
 def trend_state(r: PairScan) -> str:
     if r.setup_grade == "A+ READY":
         return "🟢 ENTRY READY"
-    if r.direction not in {"LONG", "SHORT"} or r.candles in {"N/A", "ERROR", "YF-STALE"}:
+    if r.direction not in {"LONG", "SHORT"} or r.candles != "YF+OANDA-H1":
         return "🔴 INVALID"
     if r.brc_status in {"RETEST", "READY"} or r.setup_grade == "A":
         return "🟡 WATCH"
@@ -1861,13 +1901,33 @@ def write_markdown(
         "> Το score δείχνει συμφωνία των φίλτρων (/100), **όχι πιθανότητα κέρδους ή επιτυχίας**. Τιμή, EMA50, ADX, δομή, BRC και zones βασίζονται στα ίδια κλεισμένα κεριά Yahoo Finance.",
         "",
         "> Τα TradingView ratings είναι μόνο συμπληρωματικό context και δεν καθορίζουν READY. EMA50, ADX, structure, BRC, entry και zone υπολογίζονται από το ίδιο feed OHLC.",
-        "> Στους πίνακες, η τιμή είναι το close του τελευταίου κλεισμένου H1. Δ zone = close μείον H1 zone σε pips (+ πάνω από τη zone, − κάτω από τη zone).",
+        "> **Δεδομένα:** τα Yahoo OHLC χρησιμοποιούνται για υπολογισμούς μόνο όταν η ώρα και το close του ίδιου κλεισμένου H1 συμφωνούν με ανεξάρτητη αναφορά OANDA (έως 8 pips). Δεν σημαίνει ταύτιση ολόκληρου του ιστορικού.", 
+        "> Στους πίνακες, η τιμή είναι το close του τελευταίου επαληθευμένου κλεισμένου H1. Δ zone = close μείον H1 zone σε pips (+ πάνω από τη zone, − κάτω από τη zone).",
         "",
         f"> **W1 / Weekly:** χρησιμοποιείται ως ανώτερο context και εμφανίζεται στο scan. **Δεν αλλάζει** το A+ rule: D1/H4/H1 alignment + EMA50 3/3 + D1/H4 structure + ADX + **confirmation ηλικίας έως {MAX_CONFIRMED_SETUP_AGE_BARS} κλεισμένων H1 κεριών**, χωρίς ακύρωση ή υπερβολική απόσταση από τη zone + **RR ≥ 1.2**.",
         "",
         "## 🟢 ENTRY READY — Trend",
         "",
     ]
+    verified_pairs = [r.pair for r in results if r.candles == "YF+OANDA-H1"]
+    rejected_pairs = [(r.pair, r.candles) for r in results
+                      if r.candles not in {"YF+OANDA-H1", "N/A"}]
+    lines += [
+        "",
+        f"> **Πηγές δεδομένων:** Yahoo OHLC + OANDA H1 διασταύρωση. "
+        f"Επαληθευμένα: {len(verified_pairs)}/{len(results)} · "
+        f"Απορρίφθηκαν: {len(rejected_pairs)}. "
+        "Για πλήρη εικόνα δες τους λόγους απόρριψης παρακάτω.",
+        "",
+    ]
+    if rejected_pairs:
+        lines += [
+            "| Ζευγάρι | Κατάσταση πηγής |",
+            "|---|---|",
+        ]
+        for rejected_pair, reason in rejected_pairs:
+            lines.append(f"| {rejected_pair} | {reason} |")
+        lines.append("")
     stale_pairs = [r.pair for r in results if r.candles == "YF-STALE"]
     if stale_pairs:
         lines += [

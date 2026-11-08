@@ -11,7 +11,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 REQUEST_FILE = "SCAN_REQUEST.json"
 SOURCE_FILES = (
-    "forex_scanner.py", "requirements.txt", ".github/workflows/forex-scanner.yml",
+    "forex_scanner.py", "market_data_quality.py",
+    "requirements.txt", ".github/workflows/forex-scanner.yml",
     "scripts/forex_scan_schedule.py", "tests/unit/test_forex_scan_schedule.py",
     "tests/unit/test_forex_scanner_reliability.py",
 )
