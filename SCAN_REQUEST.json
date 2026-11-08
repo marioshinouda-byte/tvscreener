@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "request_id": "hourly-failover-initialization",
-  "requested_at": null,
-  "source": "hourly-failover",
-  "force": false
+  "request_id": "recovery-validation-1794131960335",
+  "requested_at": "2026-11-08T09:59:20.335Z",
+  "source": "recovery-validation",
+  "force": true
 }
