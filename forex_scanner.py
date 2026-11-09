@@ -394,36 +394,75 @@ def prepare_candle_history(df: pd.DataFrame):
     if not all(col in df.columns for col in wanted):
         return None
 
+
     h1 = df[wanted].dropna().copy()
     if len(h1) < 80:
         return None
-
     index = pd.DatetimeIndex(h1.index)
-    if index.tz is None:
-        index = index.tz_localize("UTC")
-    else:
-        index = index.tz_convert("UTC")
+    index = index.tz_localize("UTC") if index.tz is None else index.tz_convert("UTC")
     h1.index = index
+    h1 = h1.sort_index()
+    if h1.index.has_duplicates:
+        return None
 
     now = pd.Timestamp.now(tz="UTC")
-    # Yahoo labels intraday bars by their start time. Exclude only bars that
-    # have not closed yet; do not discard a completed bar unconditionally.
+    # Ignore forming H1 candles.
     h1 = h1.loc[h1.index + pd.Timedelta(hours=1) <= now]
     if len(h1) < 80:
         return None
 
-    agg = {"Open": "first", "High": "max", "Low": "min", "Close": "last"}
-    h4 = h1.resample("4h", origin="start_day", label="left", closed="left").agg(agg).dropna()
-    d1 = h1.resample("1D", origin="start_day", label="left", closed="left").agg(agg).dropna()
-
-    # Keep the latest H4/D1 aggregate only after its full interval has closed.
-    h4 = h4.loc[h4.index + pd.Timedelta(hours=4) <= now]
-    d1 = d1.loc[d1.index + pd.Timedelta(days=1) <= now]
-
-    if len(h1) < 30 or len(h4) < 20 or len(d1) < 15:
+    # OANDA default daily alignment: 17:00 America/New_York, DST-aware.
+    # Remove synthetic Yahoo weekend bars before constructing any timeframe.
+    ny = h1.index.tz_convert("America/New_York")
+    market_open = (
+        (ny.dayofweek <= 3)
+        | ((ny.dayofweek == 4) & (ny.hour < 17))
+        | ((ny.dayofweek == 6) & (ny.hour >= 17))
+    )
+    h1 = h1.loc[market_open]
+    if len(h1) < 80:
         return None
 
+    ny = h1.index.tz_convert("America/New_York")
+    session_wall = (
+        (ny.tz_localize(None) - pd.Timedelta(hours=17)).normalize()
+        + pd.Timedelta(hours=17)
+    )
+    session_start = pd.DatetimeIndex(session_wall).tz_localize(
+        "America/New_York"
+    ).tz_convert("UTC")
+    elapsed_h = ((h1.index - session_start).total_seconds() // 3600).astype(int)
+    h4_starts = session_start + pd.to_timedelta((elapsed_h // 4) * 4, unit="h")
+
+    agg = {"Open": "first", "High": "max", "Low": "min", "Close": "last"}
+    h4_group = h1.groupby(h4_starts)
+    d1_group = h1.groupby(session_start)
+    h4 = h4_group.agg(agg)
+    d1 = d1_group.agg(agg)
+
+    # Never calculate structure from incomplete H4 or D1 bars.
+    h4_counts = h4_group.size()
+    d1_counts = d1_group.size()
+    h4_first = h4_group.apply(lambda part: part.index[0])
+    h4_last = h4_group.apply(lambda part: part.index[-1])
+    d1_first = d1_group.apply(lambda part: part.index[0])
+    d1_last = d1_group.apply(lambda part: part.index[-1])
+    h4 = h4.loc[
+        (h4_counts == 4)
+        & (h4_first == h4.index)
+        & (h4_last == h4.index + pd.Timedelta(hours=3))
+        & (h4.index + pd.Timedelta(hours=4) <= now)
+    ]
+    d1 = d1.loc[
+        (d1_counts >= 23)
+        & (d1_first == d1.index)
+        & (d1_last == d1.index + pd.Timedelta(hours=23))
+        & (d1.index + pd.Timedelta(days=1) <= now)
+    ]
+    if len(h1) < 80 or len(h4) < 20 or len(d1) < 15:
+        return None
     return h1, h4, d1
+
 
 def extract_ticker_frame(df: pd.DataFrame, ticker: str):
     """Extract one ticker regardless of yfinance MultiIndex orientation."""
@@ -466,7 +505,7 @@ def prefetch_candle_histories(pairs: list[str]) -> None:
     try:
         batch = yf.download(
             tickers=tickers,
-            period="60d",
+            period="120d",
             interval="1h",
             auto_adjust=False,
             group_by="ticker",
@@ -495,7 +534,7 @@ def fetch_candle_history(pair: str):
     try:
         df = yf.download(
             ticker,
-            period="60d",
+            period="120d",
             interval="1h",
             auto_adjust=False,
             progress=False,
@@ -1933,6 +1972,7 @@ def write_markdown(
         "",
         "> Τα TradingView ratings είναι μόνο συμπληρωματικό context και δεν καθορίζουν READY. EMA50, ADX, structure, BRC, entry και zone υπολογίζονται από το ίδιο feed OHLC.",
         "> **Δεδομένα:** τα Yahoo OHLC χρησιμοποιούνται για υπολογισμούς μόνο όταν η ώρα και το close του ίδιου κλεισμένου H1 συμφωνούν με ανεξάρτητη αναφορά OANDA (έως 8 pips). Δεν σημαίνει ταύτιση ολόκληρου του ιστορικού.", 
+        "> Τα D1/H4 σχηματίζονται πλέον σε συνεδρίες Νέας Υόρκης 17:00, με αποκλεισμό των κλειστών ωρών Σαββατοκύριακου. Απαιτείται ακόμη ξεχωριστός έλεγχος ολόκληρου του ιστορικού OHLC.",
         "> Στους πίνακες, η τιμή είναι το close του τελευταίου επαληθευμένου κλεισμένου H1. Δ zone = close μείον H1 zone σε pips (+ πάνω από τη zone, − κάτω από τη zone).",
         "",
         f"> **W1 / Weekly:** χρησιμοποιείται ως ανώτερο context και εμφανίζεται στο scan. **Δεν αλλάζει** το A+ rule: D1/H4/H1 alignment + EMA50 3/3 + D1/H4 structure + ADX + **confirmation ηλικίας έως {MAX_CONFIRMED_SETUP_AGE_BARS} κλεισμένων H1 κεριών**, χωρίς ακύρωση ή υπερβολική απόσταση από τη zone + **RR ≥ 1.2**.",
