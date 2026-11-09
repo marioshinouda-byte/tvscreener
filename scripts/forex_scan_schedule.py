@@ -15,6 +15,7 @@ SOURCE_FILES = (
     "requirements.txt", ".github/workflows/forex-scanner.yml",
     "scripts/forex_scan_schedule.py", "tests/unit/test_forex_scan_schedule.py",
     "tests/unit/test_forex_scanner_reliability.py",
+    "tests/unit/test_forex_scanner_reversal.py",
 )
 
 

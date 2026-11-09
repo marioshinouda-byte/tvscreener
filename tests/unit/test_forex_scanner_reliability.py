@@ -179,5 +179,31 @@ class ScannerReliabilityTest(unittest.TestCase):
             self.assertEqual(Path(directory, "scan_output.txt").read_text(), "scan completed\n")
 
 
+    def test_new_york_forex_daily_close_and_no_weekend_bars(self):
+        current = pd.Timestamp.now(tz="UTC").floor("h")
+        ix = pd.date_range(current - pd.Timedelta(days=185), current,
+                           freq="h", inclusive="left")
+        values = 1.10 + np.arange(len(ix)) * 0.000001
+        frame = pd.DataFrame({
+            "Open": values, "High": values + 0.0002,
+            "Low": values - 0.0002, "Close": values,
+        }, index=ix)
+        history = scanner.prepare_candle_history(frame)
+        self.assertIsNotNone(history)
+        h1, h4, d1 = history
+        ny_h1 = h1.index.tz_convert("America/New_York")
+        self.assertFalse((ny_h1.dayofweek == 5).any())
+        self.assertFalse(((ny_h1.dayofweek == 6) & (ny_h1.hour < 17)).any())
+        self.assertFalse(((ny_h1.dayofweek == 4) & (ny_h1.hour >= 17)).any())
+        self.assertGreater(len(d1), 50)
+        ny_d1 = d1.index.tz_convert("America/New_York")
+        self.assertTrue((ny_d1.hour == 17).all())
+        self.assertFalse((ny_d1.dayofweek == 5).any())
+        self.assertTrue(
+            set(h4.index.tz_convert("America/New_York").hour)
+            .issubset({17, 21, 1, 5, 9, 13})
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

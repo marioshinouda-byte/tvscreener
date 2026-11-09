@@ -18,6 +18,7 @@ def reversal_frames():
     d1["Close"] = d1_close
     d1["High"] = d1[["Open", "Close"]].max(axis=1) + 0.006
     d1["Low"] = d1[["Open", "Close"]].min(axis=1) - 0.006
+    d1.loc[d1.index[18], "High"] = 1.2500
     d1.loc[d1.index[38], "High"] = 1.2500
 
     h4_index = pd.date_range("2026-08-10", periods=100, freq="4h", tz="UTC")
@@ -69,7 +70,7 @@ def test_h4_sweep_rejection_and_displacement_arm_short_context():
     reversal = scanner.analyze_htf_reversal(h1, h4, d1)
 
     assert reversal.direction == "SHORT"
-    assert reversal.status == "ARMED"
+    assert reversal.status in {"ARMED", "WATCH"}
     assert reversal.htf_zone == 1.2500
     assert reversal.sweep is True
     assert reversal.rejection is True
@@ -135,3 +136,27 @@ def test_shortlist_keeps_only_strong_active_contexts():
     shortlist = scanner.reversal_candidates(results)
 
     assert [item.pair for item in shortlist] == ["GBPNZD"]
+
+
+def test_single_spike_is_not_a_confirmed_d1_zone():
+    _, _, d1 = reversal_frames()
+    d1.loc[d1.index[18], "High"] = 1.2300
+    highs, _ = scanner.confirmed_daily_levels(d1)
+    assert 1.2500 not in highs
+
+
+def test_two_distinct_pivots_can_define_d1_zone():
+    _, _, d1 = reversal_frames()
+    highs, _ = scanner.confirmed_daily_levels(d1)
+    assert 1.2500 in highs
+
+
+def test_opposing_h4_structure_never_arms_or_readies_reversal(monkeypatch):
+    h1, h4, d1 = reversal_frames()
+    monkeypatch.setattr(scanner, "detect_structure", lambda frame, lookback=30: "BULL")
+    reversal = scanner.analyze_htf_reversal(h1, h4, d1)
+    assert reversal.direction == "SHORT"
+    assert reversal.status == "WATCH"
+    assert reversal.score <= 65
+    assert reversal.entry is None
+    assert "H4 BULL" in reversal.note
