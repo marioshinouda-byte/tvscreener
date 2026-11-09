@@ -1,6 +1,6 @@
 # OANDA — Top 5 προς έλεγχο
 
-**Δημιουργήθηκε:** 09/11/2026 02:27 (ώρα Ελλάδας)
+**Δημιουργήθηκε:** 09/11/2026 03:31 (ώρα Ελλάδας)
 
 **Υποψήφια:** 5 από 28 ζευγάρια
 
@@ -10,11 +10,11 @@
 
 | # | Ζευγάρι | Κατεύθυνση ελέγχου | Ranking /100 | W1 | D1 | H4 | H1 | EMA50 TV | ADX H4 | ADX H1 | Προηγούμενο H1 OANDA (Αθήνα) | OANDA update |
 |---:|---|---|---:|---|---|---|---|---|---:|---:|---|---|
-| 1 | **EURCHF** | SHORT (WATCH ONLY) | 60.2 | SELL | SELL | STRONG SELL | SELL | 3/3 verified fields | 40.6 | 32.7 | 09/11 01:00 | RECENT |
-| 2 | **AUDJPY** | SHORT (WATCH ONLY) | 60.0 | SELL | STRONG SELL | SELL | SELL | 3/3 verified fields | 33.5 | 45.4 | 09/11 01:00 | RECENT |
-| 3 | **AUDCHF** | SHORT (WATCH ONLY) | 58.7 | SELL | SELL | SELL | SELL | 3/3 verified fields | 40.9 | 28.8 | 09/11 01:00 | RECENT |
-| 4 | **GBPCAD** | LONG (WATCH ONLY) | 57.0 | BUY | BUY | BUY | STRONG BUY | 3/3 verified fields | 21.2 | 18.1 | 09/11 01:00 | RECENT |
-| 5 | **EURJPY** | SHORT (WATCH ONLY) | 56.3 | NEUTRAL | SELL | SELL | STRONG SELL | 3/3 verified fields | 24.2 | 49.8 | 09/11 01:00 | RECENT |
+| 1 | **GBPCAD** | LONG (WATCH ONLY) | 58.9 | BUY | BUY | STRONG BUY | STRONG BUY | 3/3 verified fields | 21.3 | 16.9 | 09/11 02:00 | RECENT |
+| 2 | **EURJPY** | SHORT (WATCH ONLY) | 55.0 | NEUTRAL | SELL | SELL | SELL | 3/3 verified fields | 24.2 | 50.0 | 09/11 02:00 | RECENT |
+| 3 | **AUDJPY** | SHORT (WATCH ONLY) | 54.7 | SELL | SELL | SELL | NEUTRAL | 3/3 verified fields | 32.8 | 42.6 | 09/11 02:00 | RECENT |
+| 4 | **CADJPY** | SHORT (WATCH ONLY) | 52.2 | SELL | SELL | SELL | SELL | 3/3 verified fields | 29.0 | 40.3 | 09/11 02:00 | RECENT |
+| 5 | **CADCHF** | SHORT (WATCH ONLY) | 48.6 | SELL | SELL | SELL | SELL | 3/3 verified fields | 30.1 | 18.8 | 09/11 02:00 | RECENT |
 
 Η λίστα είναι υποψήφια για χειροκίνητο τελικό έλεγχο μόνο αυτών των γραφημάτων. Δεν προκύπτουν Entry/SL/TP χωρίς ανεξάρτητη επιβεβαίωση πραγματικών OHLC, BRC, spread και ειδήσεων.
 Κατά το Σαββατοκύριακο οι Forex ενδείξεις μπορεί να αντανακλούν το κλείσιμο της Παρασκευής.
