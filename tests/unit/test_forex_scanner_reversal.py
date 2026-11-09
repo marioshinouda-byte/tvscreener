@@ -64,13 +64,18 @@ def test_reversal_mode_can_be_disabled_without_code_changes():
     assert output == "False"
 
 
-def test_h4_sweep_rejection_and_displacement_arm_short_context():
+def test_h4_sweep_rejection_and_displacement_arm_short_context(monkeypatch):
     h1, h4, d1 = reversal_frames()
-
+    # Isolate the known level and the H4 confirmation needed for ARMED;
+    # separate tests exercise the repeated-pivot level selection itself.
+    monkeypatch.setattr(scanner, "confirmed_daily_levels", lambda frame: ([1.2500], []))
+    monkeypatch.setattr(
+        scanner, "detect_structure", lambda frame, lookback=30: "BEAR"
+    )
     reversal = scanner.analyze_htf_reversal(h1, h4, d1)
 
     assert reversal.direction == "SHORT"
-    assert reversal.status in {"ARMED", "WATCH"}
+    assert reversal.status == "ARMED"
     assert reversal.htf_zone == 1.2500
     assert reversal.sweep is True
     assert reversal.rejection is True
