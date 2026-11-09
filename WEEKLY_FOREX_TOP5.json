@@ -4,10 +4,8 @@
     "AUDCHF",
     "AUDUSD",
     "EURAUD",
-    "EURCHF",
-    "GBPAUD"
-  ],
-  "hot_new": [
+    "GBPAUD",
     "CADJPY"
-  ]
+  ],
+  "hot_new": []
 }
