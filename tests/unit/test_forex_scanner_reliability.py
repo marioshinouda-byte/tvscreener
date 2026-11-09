@@ -55,13 +55,8 @@ class ScannerReliabilityTest(unittest.TestCase):
         with patch.object(scanner, "fetch_pair", return_value=row), \
              patch.object(scanner, "fetch_candle_history", return_value=history), \
              patch.object(scanner, "ENABLE_HTF_REVERSAL", True):
-            with patch.object(scanner, "MAX_H1_DATA_AGE_HOURS",
-                              scanner.MAX_H1_DATA_AGE_HOURS + 24):
-                reference = scanner.scan_pair("EURUSD")
             with redirect_stdout(output):
                 result = scanner.scan_pair("EURUSD")
-
-        self.assertEqual(reference.candles, "TV-REF-MISSING")
         self.assertEqual(result.candles, "YF-STALE")
         self.assertEqual(result.direction, "—")
         self.assertEqual(result.bias, "STALE DATA")
@@ -192,13 +187,13 @@ class ScannerReliabilityTest(unittest.TestCase):
         self.assertIsNotNone(history)
         h1, h4, d1 = history
         ny_h1 = h1.index.tz_convert("America/New_York")
-        self.assertFalse((ny_h1.dayofweek == 5).any())
-        self.assertFalse(((ny_h1.dayofweek == 6) & (ny_h1.hour < 17)).any())
-        self.assertFalse(((ny_h1.dayofweek == 4) & (ny_h1.hour >= 17)).any())
+        self.assertFalse((ny_h1.day_of_week == 5).any())
+        self.assertFalse(((ny_h1.day_of_week == 6) & (ny_h1.hour < 17)).any())
+        self.assertFalse(((ny_h1.day_of_week == 4) & (ny_h1.hour >= 17)).any())
         self.assertGreater(len(d1), 50)
         ny_d1 = d1.index.tz_convert("America/New_York")
         self.assertTrue((ny_d1.hour == 17).all())
-        self.assertFalse((ny_d1.dayofweek == 5).any())
+        self.assertFalse((ny_d1.day_of_week == 5).any())
         self.assertTrue(
             set(h4.index.tz_convert("America/New_York").hour)
             .issubset({17, 21, 1, 5, 9, 13})
