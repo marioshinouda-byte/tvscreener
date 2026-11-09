@@ -928,35 +928,49 @@ def detect_brc(direction: str, h1: pd.DataFrame):
     return "WAIT NEW RETEST", level
 
 
+
 def confirmed_daily_levels(frame: pd.DataFrame):
-    """Return older, confirmed D1 swing zones for reversal context."""
-    if frame is None or len(frame) < 12:
-        return [], []
+    """D1 reversal zones require pivot confirmation AND repeated tests.
 
-    data = frame.tail(REVERSAL_D1_LOOKBACK).copy()
-    # Keep the latest two D1 candles out of the reference set. They are the
-    # reaction leg; the zone must already have existed before the reaction.
-    reference = data.iloc[:-2]
-    if len(reference) < 8:
+    Two distinct visits (at least four completed trading days apart) are
+    required. A lone range extreme or an isolated wick is NOT an HTF zone.
+    """
+    if frame is None or len(frame) < 16:
         return [], []
-
+    reference = frame.tail(REVERSAL_D1_LOOKBACK).iloc[:-2]
+    if len(reference) < 12:
+        return [], []
+    atr = current_atr(frame)
+    if atr is None or atr <= 0:
+        return [], []
     highs = reference["High"].astype(float).tolist()
     lows = reference["Low"].astype(float).tolist()
-    swing_highs = []
-    swing_lows = []
+    tolerance = 0.20 * atr
 
+    def has_independent_touches(series, level):
+        last_visit = -5
+        touches = 0
+        for pos, price in enumerate(series):
+            if abs(price - level) <= tolerance and pos - last_visit >= 4:
+                last_visit = pos
+                touches += 1
+                if touches >= 2:
+                    return True
+        return False
+
+    resistance, support = [], []
     for i in range(2, len(reference) - 2):
-        if highs[i] >= max(highs[i - 2:i + 3]):
-            swing_highs.append(highs[i])
-        if lows[i] <= min(lows[i - 2:i + 3]):
-            swing_lows.append(lows[i])
-
-    # Range extremes are valid HTF zones even when the local-pivot test did
-    # not produce one near the edge of the downloaded window.
-    swing_highs.append(float(reference["High"].max()))
-    swing_lows.append(float(reference["Low"].min()))
-
-    return sorted(set(swing_highs)), sorted(set(swing_lows))
+        if (
+            highs[i] >= max(highs[i - 2:i + 3])
+            and has_independent_touches(highs, highs[i])
+        ):
+            resistance.append(highs[i])
+        if (
+            lows[i] <= min(lows[i - 2:i + 3])
+            and has_independent_touches(lows, lows[i])
+        ):
+            support.append(lows[i])
+    return sorted(set(resistance)), sorted(set(support))
 
 
 def directional_rejection(direction: str, candle: pd.Series, atr: float) -> bool:
@@ -1056,9 +1070,9 @@ def analyze_htf_reversal(
     """
     Independent D1 -> H4 -> H1 reversal model.
 
-    D1 supplies an already-confirmed support/resistance zone. A recent H4
-    test must then show rejection, liquidity sweep and/or displacement. H1
-    BRC controls timing. No rating/EMA input from the trend model is used.
+    D1 requires a confirmed pivot with distinct repeated touches. H4 must
+    confirm the reversal structure before the setup can be ARMED or READY.
+    H1 BRC controls timing. TradingView ratings remain context only.
     """
     result = ReversalScan()
     if h1 is None or h4 is None or d1 is None or h4.empty or d1.empty:
@@ -1219,13 +1233,28 @@ def analyze_htf_reversal(
             entry, stop, target, rr, rr_pass = calculate_reversal_trade_plan(
                 direction, brc_status, h1, h4, d1, float(zone)
             )
-            if brc_status == "READY":
+            # An invalidated H4 context cannot be revived by a H1 READY flag.
+            if brc_status == "READY" and status != "INVALID":
                 if rr_pass:
                     status = "READY"
                     note = f"Fresh H1 confirmation και RR ≥ {REVERSAL_MIN_RR:.1f}"
                 else:
                     status = "INVALID"
                     note = f"H1 confirmation αλλά RR < {REVERSAL_MIN_RR:.1f}"
+
+            # Rebound against the prevailing H4 structure is early context,
+            # not a confirmed reversal. Cap confidence and keep WATCH only.
+            if not structure_matches(direction, h4_structure):
+                score = min(score, 65.0)
+                if status != "INVALID":
+                    status = "WATCH"
+                    note = (
+                        f"H4 {h4_structure} — δεν υπάρχει επιβεβαιωμένη "
+                        "αλλαγή δομής για αναστροφή"
+                    )
+                    entry, stop, target, rr, rr_pass = (
+                        None, None, None, None, False
+                    )
 
             evaluations.append(
                 ReversalScan(
@@ -2138,7 +2167,7 @@ def write_markdown(
         "",
         "## HTF Reversal — ξεχωριστό mode",
         "",
-        f"> Δεν αναμειγνύεται με το A+ Trend. Ψάχνει D1 support/resistance → H4 sweep/rejection/displacement → H1 break/retest/confirmation. Πριν από το break, ένα setup γίνεται **ARMED** μόνο όταν το H1 break απέχει έως **{REVERSAL_MAX_ARMED_BREAK_DISTANCE_ATR:.1f}× H1 ATR**. Το shortlist κρατά μόνο ενεργά contexts με **score ≥ {REVERSAL_MIN_ACTIVE_SCORE:.0f}**. Το **READY** απαιτεί φυσικό D1 target με **RR ≥ 3.0**.",
+        f"> Δεν αναμειγνύεται με το A+ Trend. Απαιτεί επιβεβαιωμένο D1 pivot με τουλάχιστον 2 ανεξάρτητες επαφές, H4 δομή προς την αναστροφή και H1 BRC. Όταν η H4 δομή είναι αντίθετη, μένει WATCH με score έως 65. Πριν από το break, ARMED απαιτεί απόσταση έως {REVERSAL_MAX_ARMED_BREAK_DISTANCE_ATR:.1f}× H1 ATR. Το shortlist κρατά score ≥ {REVERSAL_MIN_ACTIVE_SCORE:.0f}. READY απαιτεί RR ≥ 3.0.",
         "> **Το HTF Reversal Score μετρά συμφωνία context (/100), όχι πιθανότητα κέρδους. ΑΝΑΜΟΝΗ H1 ΕΠΙΒΕΒΑΙΩΣΗΣ / WAIT RETEST / ARMED δεν είναι είσοδος. Entry/SL/TP εμφανίζονται μόνο σε READY, με RR ≥ 3.0.**",
         "",
     ]
