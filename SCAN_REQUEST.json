@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "request_id": "manual-20261110T045130417Z",
-  "requested_at": "2026-11-10T04:51:30.417Z",
-  "source": "chatgpt-manual-request",
-  "force": true
+  "request_id": "chatgpt-hourly-20261110T053135Z-hx9nvnco84",
+  "requested_at": "2026-11-10T05:31:35Z",
+  "source": "chatgpt-hourly-failover",
+  "force": false
 }
