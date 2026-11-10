@@ -3,9 +3,9 @@
   "top5": [
     "AUDUSD",
     "EURAUD",
-    "GBPAUD",
     "CADJPY",
-    "USDCAD"
+    "USDCAD",
+    "GBPCAD"
   ],
   "hot_new": []
 }
