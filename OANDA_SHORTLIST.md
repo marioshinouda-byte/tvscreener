@@ -1,6 +1,6 @@
 # OANDA — Top 5 προς έλεγχο
 
-**Δημιουργήθηκε:** 10/11/2026 08:25 (ώρα Ελλάδας)
+**Δημιουργήθηκε:** 10/11/2026 09:27 (ώρα Ελλάδας)
 
 **Υποψήφια:** 5 από 28 ζευγάρια
 
@@ -10,11 +10,11 @@
 
 | # | Ζευγάρι | Κατεύθυνση ελέγχου | Ranking /100 | W1 | D1 | H4 | H1 | EMA50 TV | ADX H4 | ADX H1 | Προηγούμενο H1 OANDA (Αθήνα) | OANDA update |
 |---:|---|---|---:|---|---|---|---|---|---:|---:|---|---|
-| 1 | **GBPUSD** | LONG (WATCH ONLY) | 61.5 | BUY | STRONG BUY | BUY | STRONG BUY | 3/3 verified fields | 22.2 | 33.4 | 10/11 07:00 | RECENT |
-| 2 | **GBPCAD** | LONG (WATCH ONLY) | 60.5 | STRONG BUY | STRONG BUY | BUY | BUY | 3/3 verified fields | 31.0 | 59.4 | 10/11 07:00 | RECENT |
-| 3 | **AUDNZD** | SHORT (WATCH ONLY) | 52.8 | BUY | SELL | SELL | SELL | 3/3 verified fields | 42.7 | 31.2 | 10/11 07:00 | RECENT |
-| 4 | **GBPAUD** | LONG (WATCH ONLY) | 48.9 | BUY | BUY | BUY | NEUTRAL | 3/3 verified fields | 31.8 | 9.1 | 10/11 07:00 | RECENT |
-| 5 | **CADJPY** | SHORT (WATCH ONLY) | 46.7 | SELL | SELL | SELL | SELL | 3/3 verified fields | 37.8 | 31.6 | 10/11 07:00 | RECENT |
+| 1 | **GBPUSD** | LONG (WATCH ONLY) | 63.4 | BUY | STRONG BUY | STRONG BUY | STRONG BUY | 3/3 verified fields | 22.3 | 34.3 | 10/11 08:00 | RECENT |
+| 2 | **GBPAUD** | LONG (WATCH ONLY) | 55.0 | BUY | BUY | BUY | BUY | 3/3 verified fields | 31.9 | 9.0 | 10/11 08:00 | RECENT |
+| 3 | **AUDNZD** | SHORT (WATCH ONLY) | 53.4 | BUY | SELL | SELL | SELL | 3/3 verified fields | 42.7 | 30.8 | 10/11 08:00 | RECENT |
+| 4 | **CADCHF** | SHORT (WATCH ONLY) | 53.0 | SELL | SELL | SELL | STRONG SELL | 3/3 verified fields | 25.3 | 19.8 | 10/11 08:00 | RECENT |
+| 5 | **AUDCHF** | SHORT (WATCH ONLY) | 50.1 | SELL | SELL | SELL | SELL | 3/3 verified fields | 28.1 | 12.4 | 10/11 08:00 | RECENT |
 
 Η λίστα είναι υποψήφια για χειροκίνητο τελικό έλεγχο μόνο αυτών των γραφημάτων. Δεν προκύπτουν Entry/SL/TP χωρίς ανεξάρτητη επιβεβαίωση πραγματικών OHLC, BRC, spread και ειδήσεων.
 Κατά το Σαββατοκύριακο οι Forex ενδείξεις μπορεί να αντανακλούν το κλείσιμο της Παρασκευής.
