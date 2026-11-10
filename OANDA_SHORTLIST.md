@@ -1,6 +1,6 @@
 # OANDA — Top 5 προς έλεγχο
 
-**Δημιουργήθηκε:** 10/11/2026 06:52 (ώρα Ελλάδας)
+**Δημιουργήθηκε:** 10/11/2026 07:32 (ώρα Ελλάδας)
 
 **Υποψήφια:** 5 από 28 ζευγάρια
 
@@ -10,11 +10,11 @@
 
 | # | Ζευγάρι | Κατεύθυνση ελέγχου | Ranking /100 | W1 | D1 | H4 | H1 | EMA50 TV | ADX H4 | ADX H1 | Προηγούμενο H1 OANDA (Αθήνα) | OANDA update |
 |---:|---|---|---:|---|---|---|---|---|---:|---:|---|---|
-| 1 | **GBPUSD** | LONG (WATCH ONLY) | 61.6 | BUY | STRONG BUY | BUY | STRONG BUY | 3/3 verified fields | 22.8 | 32.1 | 10/11 05:00 | RECENT |
-| 2 | **GBPCAD** | LONG (WATCH ONLY) | 54.7 | STRONG BUY | STRONG BUY | BUY | BUY | 3/3 verified fields | 29.3 | 57.3 | 10/11 05:00 | RECENT |
-| 3 | **AUDNZD** | SHORT (WATCH ONLY) | 52.8 | BUY | SELL | SELL | SELL | 3/3 verified fields | 41.3 | 32.3 | 10/11 05:00 | RECENT |
-| 4 | **USDCAD** | LONG (WATCH ONLY) | 50.1 | STRONG BUY | BUY | BUY | BUY | 3/3 verified fields | 31.1 | 32.0 | 10/11 05:00 | RECENT |
-| 5 | **GBPAUD** | LONG (WATCH ONLY) | 49.3 | BUY | BUY | BUY | NEUTRAL | 3/3 verified fields | 33.0 | 10.2 | 10/11 05:00 | RECENT |
+| 1 | **GBPUSD** | LONG (WATCH ONLY) | 61.2 | BUY | STRONG BUY | BUY | BUY | 3/3 verified fields | 22.9 | 32.8 | 10/11 06:00 | RECENT |
+| 2 | **GBPCAD** | LONG (WATCH ONLY) | 59.6 | STRONG BUY | STRONG BUY | BUY | BUY | 3/3 verified fields | 29.3 | 58.4 | 10/11 06:00 | RECENT |
+| 3 | **AUDNZD** | SHORT (WATCH ONLY) | 55.0 | BUY | SELL | SELL | SELL | 3/3 verified fields | 41.3 | 32.2 | 10/11 06:00 | RECENT |
+| 4 | **USDCAD** | LONG (WATCH ONLY) | 50.5 | STRONG BUY | BUY | BUY | BUY | 3/3 verified fields | 31.1 | 31.7 | 10/11 06:00 | RECENT |
+| 5 | **GBPAUD** | LONG (WATCH ONLY) | 50.0 | BUY | BUY | BUY | NEUTRAL | 3/3 verified fields | 33.0 | 9.6 | 10/11 06:00 | RECENT |
 
 Η λίστα είναι υποψήφια για χειροκίνητο τελικό έλεγχο μόνο αυτών των γραφημάτων. Δεν προκύπτουν Entry/SL/TP χωρίς ανεξάρτητη επιβεβαίωση πραγματικών OHLC, BRC, spread και ειδήσεων.
 Κατά το Σαββατοκύριακο οι Forex ενδείξεις μπορεί να αντανακλούν το κλείσιμο της Παρασκευής.
