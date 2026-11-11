@@ -1,6 +1,6 @@
 # OANDA — Top 5 προς έλεγχο
 
-**Δημιουργήθηκε:** 11/11/2026 07:26 (ώρα Ελλάδας)
+**Δημιουργήθηκε:** 11/11/2026 08:15 (ώρα Ελλάδας)
 
 **Υποψήφια:** 5 από 28 ζευγάρια
 
@@ -10,11 +10,11 @@
 
 | # | Ζευγάρι | Κατεύθυνση ελέγχου | Ranking /100 | W1 | D1 | H4 | H1 | EMA50 TV | ADX H4 | ADX H1 | Προηγούμενο H1 OANDA (Αθήνα) | OANDA update |
 |---:|---|---|---:|---|---|---|---|---|---:|---:|---|---|
-| 1 | **CADJPY** | SHORT (WATCH ONLY) | 61.3 | SELL | SELL | SELL | STRONG SELL | 3/3 verified fields | 42.5 | 24.4 | 11/11 06:00 | RECENT |
-| 2 | **USDCAD** | LONG (WATCH ONLY) | 60.2 | STRONG BUY | STRONG BUY | BUY | BUY | 3/3 verified fields | 40.5 | 43.7 | 11/11 06:00 | RECENT |
-| 3 | **GBPUSD** | SHORT (WATCH ONLY) | 55.3 | SELL | SELL | SELL | SELL | 3/3 verified fields | 25.3 | 42.1 | 11/11 06:00 | RECENT |
-| 4 | **AUDUSD** | SHORT (WATCH ONLY) | 50.9 | SELL | SELL | SELL | SELL | 3/3 verified fields | 30.7 | 24.5 | 11/11 06:00 | RECENT |
-| 5 | **GBPCAD** | LONG (WATCH ONLY) | 48.1 | STRONG BUY | BUY | BUY | BUY | 3/3 verified fields | 27.7 | 24.7 | 11/11 06:00 | RECENT |
+| 1 | **USDCAD** | LONG (WATCH ONLY) | 60.7 | STRONG BUY | STRONG BUY | BUY | BUY | 3/3 verified fields | 42.2 | 43.8 | 11/11 07:00 | RECENT |
+| 2 | **CADJPY** | SHORT (WATCH ONLY) | 58.8 | SELL | SELL | SELL | SELL | 3/3 verified fields | 43.4 | 24.8 | 11/11 07:00 | RECENT |
+| 3 | **GBPUSD** | SHORT (WATCH ONLY) | 55.2 | SELL | SELL | SELL | SELL | 3/3 verified fields | 26.1 | 41.7 | 11/11 07:00 | RECENT |
+| 4 | **AUDUSD** | SHORT (WATCH ONLY) | 53.4 | SELL | SELL | SELL | SELL | 3/3 verified fields | 30.7 | 23.4 | 11/11 07:00 | RECENT |
+| 5 | **USDCHF** | LONG (WATCH ONLY) | 51.9 | BUY | BUY | BUY | BUY | 3/3 verified fields | 20.1 | 33.2 | 11/11 07:00 | RECENT |
 
 Η λίστα είναι υποψήφια για χειροκίνητο τελικό έλεγχο μόνο αυτών των γραφημάτων. Δεν προκύπτουν Entry/SL/TP χωρίς ανεξάρτητη επιβεβαίωση πραγματικών OHLC, BRC, spread και ειδήσεων.
 Κατά το Σαββατοκύριακο οι Forex ενδείξεις μπορεί να αντανακλούν το κλείσιμο της Παρασκευής.
