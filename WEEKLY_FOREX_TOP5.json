@@ -2,10 +2,10 @@
   "week": "2026-W46",
   "top5": [
     "EURAUD",
-    "USDCAD",
     "USDJPY",
     "CADJPY",
-    "AUDUSD"
+    "AUDUSD",
+    "CHFJPY"
   ],
   "hot_new": []
 }
