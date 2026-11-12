@@ -5,11 +5,7 @@
     "NZDUSD",
     "GBPUSD",
     "CHFJPY",
-    "GBPNZD"
+    "AUDCAD"
   ],
-  "hot_new": [
-    "AUDCAD",
-    "USDCHF",
-    "EURUSD"
-  ]
+  "hot_new": []
 }
