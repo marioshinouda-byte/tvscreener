@@ -3,9 +3,9 @@
   "top5": [
     "AUDUSD",
     "NZDUSD",
-    "USDJPY",
     "GBPUSD",
-    "CHFJPY"
+    "CHFJPY",
+    "GBPNZD"
   ],
   "hot_new": []
 }
