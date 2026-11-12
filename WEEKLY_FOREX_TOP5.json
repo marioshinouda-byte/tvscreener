@@ -1,5 +1,11 @@
 {
   "week": "2026-W46",
-  "top5": [],
+  "top5": [
+    "AUDUSD",
+    "NZDUSD",
+    "USDJPY",
+    "GBPUSD",
+    "CHFJPY"
+  ],
   "hot_new": []
 }
