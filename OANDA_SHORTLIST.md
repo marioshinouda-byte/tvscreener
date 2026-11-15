@@ -1,6 +1,6 @@
 # OANDA — Top 5 προς έλεγχο
 
-**Δημιουργήθηκε:** 16/11/2026 00:27 (ώρα Ελλάδας)
+**Δημιουργήθηκε:** 16/11/2026 01:24 (ώρα Ελλάδας)
 
 **Υποψήφια:** 5 από 28 ζευγάρια
 
@@ -10,11 +10,11 @@
 
 | # | Ζευγάρι | Κατεύθυνση ελέγχου | Ranking /100 | W1 | D1 | H4 | H1 | EMA50 TV | ADX H4 | ADX H1 | Προηγούμενο H1 OANDA (Αθήνα) | OANDA update |
 |---:|---|---|---:|---|---|---|---|---|---:|---:|---|---|
-| 1 | **EURJPY** | SHORT (WATCH ONLY) | 64.7 | SELL | STRONG SELL | STRONG SELL | SELL | 3/3 verified fields | 34.3 | 37.3 | 13/11 23:00 | RECENT |
-| 2 | **EURGBP** | SHORT (WATCH ONLY) | 60.6 | SELL | SELL | STRONG SELL | STRONG SELL | 3/3 verified fields | 25.9 | 26.0 | 13/11 23:00 | RECENT |
-| 3 | **GBPUSD** | SHORT (WATCH ONLY) | 57.0 | SELL | SELL | SELL | SELL | 3/3 verified fields | 47.5 | 34.2 | 13/11 23:00 | RECENT |
-| 4 | **NZDJPY** | SHORT (WATCH ONLY) | 56.4 | SELL | STRONG SELL | SELL | SELL | 3/3 verified fields | 23.7 | 36.0 | 13/11 23:00 | RECENT |
-| 5 | **CADJPY** | SHORT (WATCH ONLY) | 55.7 | SELL | SELL | SELL | SELL | 3/3 verified fields | 32.2 | 17.4 | 13/11 23:00 | RECENT |
+| 1 | **GBPUSD** | SHORT (WATCH ONLY) | 63.2 | SELL | STRONG SELL | SELL | SELL | 3/3 verified fields | 47.5 | 33.2 | 16/11 00:00 | RECENT |
+| 2 | **USDCHF** | LONG (WATCH ONLY) | 62.5 | BUY | STRONG BUY | BUY | BUY | 3/3 verified fields | 37.3 | 27.2 | 16/11 00:00 | RECENT |
+| 3 | **EURUSD** | SHORT (WATCH ONLY) | 61.4 | STRONG SELL | SELL | SELL | STRONG SELL | 3/3 verified fields | 35.6 | 28.2 | 16/11 00:00 | RECENT |
+| 4 | **USDCAD** | LONG (WATCH ONLY) | 60.2 | BUY | BUY | BUY | STRONG BUY | 3/3 verified fields | 48.0 | 13.2 | 16/11 00:00 | RECENT |
+| 5 | **CHFJPY** | SHORT (WATCH ONLY) | 60.1 | SELL | SELL | SELL | STRONG SELL | 3/3 verified fields | 39.7 | 40.8 | 16/11 00:00 | RECENT |
 
 Η λίστα είναι υποψήφια για χειροκίνητο τελικό έλεγχο μόνο αυτών των γραφημάτων. Δεν προκύπτουν Entry/SL/TP χωρίς ανεξάρτητη επιβεβαίωση πραγματικών OHLC, BRC, spread και ειδήσεων.
 Κατά το Σαββατοκύριακο οι Forex ενδείξεις μπορεί να αντανακλούν το κλείσιμο της Παρασκευής.
