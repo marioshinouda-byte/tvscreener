@@ -13,37 +13,67 @@ import pandas as pd
 import forex_scanner as scanner
 
 
-def candle_history():
-    """Synthetic rising candles, including the most recent completed hour."""
-    current_hour = pd.Timestamp.now(tz="UTC").floor("h")
+def candle_history(current_hour=None):
+    """Synthetic hourly candles, deliberately including out-of-session bars."""
+    current_hour = (
+        pd.Timestamp.now(tz="UTC") if current_hour is None else pd.Timestamp(current_hour)
+    ).floor("h")
     index = pd.date_range(current_hour - pd.Timedelta(days=180), current_hour,
                           freq="h", inclusive="left")
-    index = index[index.day_of_week < 5]
     close = 1.0 + np.arange(len(index)) * 0.00001
     frame = pd.DataFrame(
         {"Open": close - 0.000005, "High": close + 0.00001,
          "Low": close - 0.00001, "Close": close}, index=index,
     )
-    latest = float(frame["Close"].iloc[-1]) + 0.00001
-    frame.loc[current_hour - pd.Timedelta(hours=1)] = [
-        latest - 0.000005, latest + 0.00001, latest - 0.00001, latest,
-    ]
-    return frame.sort_index()
+    return frame
 
 
 class ScannerReliabilityTest(unittest.TestCase):
     def test_keeps_last_closed_h1_and_excludes_current_open_candle(self):
-        frame = candle_history()
-        current_hour = pd.Timestamp.now(tz="UTC").floor("h")
+        now = pd.Timestamp("2026-11-11T12:30:00Z")
+        current_hour = now.floor("h")
+        frame = candle_history(current_hour)
         last_closed = current_hour - pd.Timedelta(hours=1)
         frame.loc[current_hour] = [2.05, 2.2, 2.0, 2.15]
-        h1, h4, d1 = scanner.prepare_candle_history(frame)
+        h1, h4, d1 = scanner.prepare_candle_history(frame, now=now)
 
         self.assertEqual(h1.index[-1], last_closed)
         self.assertNotIn(current_hour, h1.index)
-        now = pd.Timestamp.now(tz="UTC")
         self.assertTrue((h4.index + pd.Timedelta(hours=4) <= now).all())
         self.assertTrue((d1.index + pd.Timedelta(days=1) <= now).all())
+
+    def test_last_h1_respects_weekend_close_reopen_and_dst(self):
+        # Expected opens are fixed calendar examples, independent of CI run time.
+        cases = [
+            ("2026-11-13T21:30:00Z", "2026-11-13T20:00:00Z"),
+            ("2026-11-13T22:00:00Z", "2026-11-13T21:00:00Z"),
+            ("2026-11-13T22:30:00Z", "2026-11-13T21:00:00Z"),
+            ("2026-11-14T12:30:00Z", "2026-11-13T21:00:00Z"),
+            ("2026-11-15T11:23:00Z", "2026-11-13T21:00:00Z"),
+            ("2026-11-15T22:30:00Z", "2026-11-13T21:00:00Z"),
+            ("2026-11-15T23:00:00Z", "2026-11-15T22:00:00Z"),
+            ("2026-11-16T00:30:00Z", "2026-11-15T23:00:00Z"),
+            ("2026-07-12T20:30:00Z", "2026-07-10T20:00:00Z"),
+            ("2026-07-12T21:30:00Z", "2026-07-10T20:00:00Z"),
+            ("2026-07-12T22:00:00Z", "2026-07-12T21:00:00Z"),
+            ("2026-03-08T21:30:00Z", "2026-03-06T21:00:00Z"),
+            ("2026-03-08T22:00:00Z", "2026-03-08T21:00:00Z"),
+            ("2026-11-01T22:30:00Z", "2026-10-30T20:00:00Z"),
+            ("2026-11-01T23:00:00Z", "2026-11-01T22:00:00Z"),
+        ]
+        for instant, expected_open in cases:
+            with self.subTest(now=instant):
+                now = pd.Timestamp(instant)
+                current_hour = now.floor("h")
+                frame = candle_history(current_hour)
+                frame.loc[current_hour] = [2.05, 2.2, 2.0, 2.15]
+                h1, h4, d1 = scanner.prepare_candle_history(frame, now=now)
+
+                self.assertEqual(h1.index[-1], pd.Timestamp(expected_open))
+                self.assertNotIn(current_hour, h1.index)
+                self.assertTrue((h1.index + pd.Timedelta(hours=1) <= now).all())
+                self.assertTrue((h4.index + pd.Timedelta(hours=4) <= now).all())
+                self.assertTrue((d1.index + pd.Timedelta(days=1) <= now).all())
 
     def test_stale_candles_warn_and_suppress_signals(self):
         frame = candle_history()
@@ -175,7 +205,8 @@ class ScannerReliabilityTest(unittest.TestCase):
 
 
     def test_new_york_forex_daily_close_and_no_weekend_bars(self):
-        current = pd.Timestamp.now(tz="UTC").floor("h")
+        now = pd.Timestamp("2026-11-15T11:23:00Z")
+        current = now.floor("h")
         ix = pd.date_range(current - pd.Timedelta(days=185), current,
                            freq="h", inclusive="left")
         values = 1.10 + np.arange(len(ix)) * 0.000001
@@ -183,7 +214,7 @@ class ScannerReliabilityTest(unittest.TestCase):
             "Open": values, "High": values + 0.0002,
             "Low": values - 0.0002, "Close": values,
         }, index=ix)
-        history = scanner.prepare_candle_history(frame)
+        history = scanner.prepare_candle_history(frame, now=now)
         self.assertIsNotNone(history)
         h1, h4, d1 = history
         ny_h1 = h1.index.tz_convert("America/New_York")

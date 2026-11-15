@@ -385,8 +385,8 @@ def calculate_adx(frame: pd.DataFrame, period: int = 14) -> Optional[float]:
     return safe_float(adx.iloc[-1])
 
 
-def prepare_candle_history(df: pd.DataFrame):
-    """Keep only fully closed H1 candles and derive fully closed H4/D1 bars."""
+def prepare_candle_history(df: pd.DataFrame, *, now=None):
+    """Keep closed H1/H4/D1 bars; an explicit clock supports repeatable checks."""
     if df is None or df.empty:
         return None
 
@@ -405,7 +405,8 @@ def prepare_candle_history(df: pd.DataFrame):
     if h1.index.has_duplicates:
         return None
 
-    now = pd.Timestamp.now(tz="UTC")
+    now = pd.Timestamp.now(tz="UTC") if now is None else pd.Timestamp(now)
+    now = now.tz_localize("UTC") if now.tzinfo is None else now.tz_convert("UTC")
     # Ignore forming H1 candles.
     h1 = h1.loc[h1.index + pd.Timedelta(hours=1) <= now]
     if len(h1) < 80:
@@ -415,9 +416,9 @@ def prepare_candle_history(df: pd.DataFrame):
     # Remove synthetic Yahoo weekend bars before constructing any timeframe.
     ny = h1.index.tz_convert("America/New_York")
     market_open = (
-        (ny.dayofweek <= 3)
-        | ((ny.dayofweek == 4) & (ny.hour < 17))
-        | ((ny.dayofweek == 6) & (ny.hour >= 17))
+        (ny.day_of_week <= 3)
+        | ((ny.day_of_week == 4) & (ny.hour < 17))
+        | ((ny.day_of_week == 6) & (ny.hour >= 17))
     )
     h1 = h1.loc[market_open]
     if len(h1) < 80:
