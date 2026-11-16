@@ -5,10 +5,7 @@
     "CADJPY",
     "EURGBP",
     "EURUSD",
-    "USDCAD"
-  ],
-  "hot_new": [
-    "GBPUSD",
     "EURAUD"
-  ]
+  ],
+  "hot_new": []
 }
