@@ -4,10 +4,8 @@
     "GBPNZD",
     "CADJPY",
     "NZDJPY",
-    "EURUSD",
-    "EURAUD"
-  ],
-  "hot_new": [
+    "EURAUD",
     "EURNZD"
-  ]
+  ],
+  "hot_new": []
 }
