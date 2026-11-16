@@ -1,6 +1,6 @@
 # OANDA — Top 5 προς έλεγχο
 
-**Δημιουργήθηκε:** 16/11/2026 23:31 (ώρα Ελλάδας)
+**Δημιουργήθηκε:** 17/11/2026 00:26 (ώρα Ελλάδας)
 
 **Υποψήφια:** 5 από 28 ζευγάρια
 
@@ -10,11 +10,11 @@
 
 | # | Ζευγάρι | Κατεύθυνση ελέγχου | Ranking /100 | W1 | D1 | H4 | H1 | EMA50 TV | ADX H4 | ADX H1 | Προηγούμενο H1 OANDA (Αθήνα) | OANDA update |
 |---:|---|---|---:|---|---|---|---|---|---:|---:|---|---|
-| 1 | **NZDJPY** | SHORT (WATCH ONLY) | 68.1 | STRONG SELL | STRONG SELL | STRONG SELL | SELL | 3/3 verified fields | 33.3 | 57.8 | 16/11 22:00 | RECENT |
-| 2 | **GBPUSD** | SHORT (WATCH ONLY) | 66.1 | SELL | STRONG SELL | STRONG SELL | STRONG SELL | 3/3 verified fields | 50.9 | 24.5 | 16/11 22:00 | RECENT |
-| 3 | **NZDUSD** | SHORT (WATCH ONLY) | 65.3 | STRONG SELL | STRONG SELL | STRONG SELL | SELL | 3/3 verified fields | 26.6 | 40.3 | 16/11 22:00 | RECENT |
-| 4 | **CHFJPY** | SHORT (WATCH ONLY) | 65.2 | SELL | STRONG SELL | STRONG SELL | SELL | 3/3 verified fields | 46.6 | 36.9 | 16/11 22:00 | RECENT |
-| 5 | **EURJPY** | SHORT (WATCH ONLY) | 64.8 | SELL | STRONG SELL | STRONG SELL | SELL | 3/3 verified fields | 45.1 | 52.4 | 16/11 22:00 | RECENT |
+| 1 | **EURJPY** | SHORT (WATCH ONLY) | 63.0 | SELL | STRONG SELL | SELL | SELL | 3/3 verified fields | 47.1 | 52.7 | 16/11 23:00 | RECENT |
+| 2 | **EURGBP** | SHORT (WATCH ONLY) | 62.2 | SELL | SELL | STRONG SELL | STRONG SELL | 3/3 verified fields | 21.5 | 20.9 | 16/11 23:00 | RECENT |
+| 3 | **EURUSD** | SHORT (WATCH ONLY) | 60.9 | STRONG SELL | SELL | SELL | SELL | 3/3 verified fields | 42.5 | 35.2 | 16/11 23:00 | RECENT |
+| 4 | **GBPAUD** | LONG (WATCH ONLY) | 60.7 | BUY | BUY | BUY | STRONG BUY | 3/3 verified fields | 44.5 | 44.3 | 16/11 23:00 | RECENT |
+| 5 | **AUDCHF** | SHORT (WATCH ONLY) | 58.3 | SELL | SELL | STRONG SELL | STRONG SELL | 3/3 verified fields | 23.3 | 46.3 | 16/11 23:00 | RECENT |
 
 Η λίστα είναι υποψήφια για χειροκίνητο τελικό έλεγχο μόνο αυτών των γραφημάτων. Δεν προκύπτουν Entry/SL/TP χωρίς ανεξάρτητη επιβεβαίωση πραγματικών OHLC, BRC, spread και ειδήσεων.
 Κατά το Σαββατοκύριακο οι Forex ενδείξεις μπορεί να αντανακλούν το κλείσιμο της Παρασκευής.
