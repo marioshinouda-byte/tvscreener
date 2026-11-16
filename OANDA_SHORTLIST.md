@@ -1,6 +1,6 @@
 # OANDA — Top 5 προς έλεγχο
 
-**Δημιουργήθηκε:** 16/11/2026 03:33 (ώρα Ελλάδας)
+**Δημιουργήθηκε:** 16/11/2026 04:04 (ώρα Ελλάδας)
 
 **Υποψήφια:** 5 από 28 ζευγάρια
 
@@ -10,11 +10,11 @@
 
 | # | Ζευγάρι | Κατεύθυνση ελέγχου | Ranking /100 | W1 | D1 | H4 | H1 | EMA50 TV | ADX H4 | ADX H1 | Προηγούμενο H1 OANDA (Αθήνα) | OANDA update |
 |---:|---|---|---:|---|---|---|---|---|---:|---:|---|---|
-| 1 | **NZDJPY** | SHORT (WATCH ONLY) | 63.9 | SELL | STRONG SELL | STRONG SELL | STRONG SELL | 3/3 verified fields | 23.6 | 38.0 | 16/11 02:00 | RECENT |
-| 2 | **EURJPY** | SHORT (WATCH ONLY) | 63.6 | NEUTRAL | STRONG SELL | STRONG SELL | STRONG SELL | 3/3 verified fields | 34.3 | 40.4 | 16/11 02:00 | RECENT |
-| 3 | **GBPAUD** | LONG (WATCH ONLY) | 63.5 | BUY | STRONG BUY | STRONG BUY | STRONG BUY | 3/3 verified fields | 34.7 | 34.3 | 16/11 02:00 | RECENT |
-| 4 | **GBPUSD** | SHORT (WATCH ONLY) | 62.3 | SELL | STRONG SELL | SELL | SELL | 3/3 verified fields | 47.5 | 31.2 | 16/11 02:00 | RECENT |
-| 5 | **AUDJPY** | SHORT (WATCH ONLY) | 61.8 | SELL | SELL | SELL | STRONG SELL | 3/3 verified fields | 40.5 | 55.9 | 16/11 02:00 | RECENT |
+| 1 | **EURJPY** | SHORT (WATCH ONLY) | 59.1 | NEUTRAL | STRONG SELL | SELL | SELL | 3/3 verified fields | 36.2 | 41.4 | 16/11 03:00 | RECENT |
+| 2 | **USDCHF** | LONG (WATCH ONLY) | 57.6 | BUY | STRONG BUY | BUY | BUY | 3/3 verified fields | 37.5 | 24.8 | 16/11 03:00 | RECENT |
+| 3 | **CADCHF** | LONG (WATCH ONLY) | 56.8 | BUY | BUY | BUY | BUY | 3/3 verified fields | 28.1 | 34.0 | 16/11 03:00 | RECENT |
+| 4 | **USDCAD** | LONG (WATCH ONLY) | 55.2 | BUY | BUY | BUY | BUY | 3/3 verified fields | 47.3 | 13.5 | 16/11 03:00 | RECENT |
+| 5 | **GBPAUD** | LONG (WATCH ONLY) | 53.7 | BUY | BUY | BUY | BUY | 3/3 verified fields | 36.5 | 35.3 | 16/11 03:00 | RECENT |
 
 Η λίστα είναι υποψήφια για χειροκίνητο τελικό έλεγχο μόνο αυτών των γραφημάτων. Δεν προκύπτουν Entry/SL/TP χωρίς ανεξάρτητη επιβεβαίωση πραγματικών OHLC, BRC, spread και ειδήσεων.
 Κατά το Σαββατοκύριακο οι Forex ενδείξεις μπορεί να αντανακλούν το κλείσιμο της Παρασκευής.
