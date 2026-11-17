@@ -1,11 +1,11 @@
 {
   "week": "2026-W47",
   "top5": [
-    "GBPAUD",
     "EURAUD",
     "CHFJPY",
     "NZDCAD",
-    "AUDJPY"
+    "AUDJPY",
+    "GBPJPY"
   ],
   "hot_new": []
 }
