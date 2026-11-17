@@ -1,34 +1,44 @@
-# TradingView — ανεξάρτητος έλεγχος Trend BRC
+# TradingView BRC — ανεξάρτητος ωριαίος έλεγχος Trend
 
-**Ώρα Ελλάδας:** 17/11/2026, 15:25:58 (Europe/Athens)  
-**Έλεγχος UTC:** 2026-11-17T13:25:58Z  
-**Πηγή:** TradingView Pine · OANDA · BRC TV Triple TF Audit v1, version 1.0.  
-**Script ID:** `USER;ae27f010fee5413b8f5d1cc39e592cde`
+**Ώρα ελέγχου Ελλάδας:** 17/11/26, 4:33:12 μ.μ. EET (Europe/Athens)  
+**UTC:** 2026-11-17T14:33:12Z  
+**Κατάσταση:** TV UNAVAILABLE — δεν επιστράφηκαν ανεξάρτητα δεδομένα Pine.
 
-**Κάλυψη: 9 μοναδικά ζευγάρια.** Weekly Top 5: EURAUD, CHFJPY, NZDCAD, AUDJPY, GBPJPY. OANDA Top 5: AUDCAD, EURUSD, CHFJPY, EURCAD, USDCHF. Επιπλέον Trend TV UNVERIFIED / A+ READY: κανένα στο αναγνωσμένο report.
+Το συνδεδεμένο TradingView MCP επέστρεψε `TOOL_QUOTA_EXCEEDED`: συμπληρώθηκε το ημερήσιο όριο χρήσης και ενεργοποιήθηκε MCP cooldown 10 λεπτών. Η ταυτοποίηση του αποθηκευμένου δείκτη και η εκτέλεσή του ζητήθηκαν, αλλά αποκλείστηκαν από το εργαλείο. Έγινε κλήση του Pine για κάθε ένα από τα 8 ζευγάρια· όλες αποκλείστηκαν. Δεν επιβεβαιώθηκε καμία ένδειξη READY.
 
-**Αποτέλεσμα: 0 TV READY.** Η σύνδεση και η ταυτότητα του δείκτη επιβεβαιώθηκαν για όλα τα ζευγάρια.
+**Δείκτης που ζητήθηκε:** BRC TV Triple TF Audit v1, `USER;ae27f010fee5413b8f5d1cc39e592cde`.  
+**Παράμετροι κάθε κλήσης:** OANDA:PAIR, timeframe `1h`, calc_bars_count `500`, return_bars `1`.
 
-Αποκλειστικά `last_values` (τελευταίο ΚΛΕΙΣΜΕΝΟ H1), ποτέ forming candle από `values[]`. Τα D1/H4 είναι προηγούμενα ολοκληρωμένα κεριά από τον δείκτη. Ηλικία από το κλείσιμο H1 = άνοιγμα + 1 ώρα: 0–2 ώρες, με ανοχή 2 λεπτών.
+## Κάλυψη
 
-| Pair | Direction | EMA | D1/H4 δομή | ADX H4/H1 | BRC | Zone | H1 close price | H1 open UTC | H1 close UTC | TV READY | Status / αιτία |
-|---|---|---:|---|---|---|---:|---:|---|---|---|---|
-| EURAUD | LONG | 3/3 | 1/1 | 43.69/31.54 | WAIT NEW RETEST | 1.63262 | 1.63218 | 2026-11-17T12:00:00.000Z | 2026-11-17T13:00:00.000Z | NO | WATCH / NO TV READY: WAIT NEW RETEST |
-| CHFJPY | SHORT | 3/3 | 0/-1 | 49.47/31.88 | WAIT NEW RETEST | 189.752 | 189.668 | 2026-11-17T12:00:00.000Z | 2026-11-17T13:00:00.000Z | NO | WATCH / NO TV READY: WAIT NEW RETEST; D1/H4 structure not aligned |
-| NZDCAD | SHORT | 3/3 | 0/-1 | 16.81/31.18 | WAIT BREAK | 0.78471 | 0.78584 | 2026-11-17T12:00:00.000Z | 2026-11-17T13:00:00.000Z | NO | WATCH / NO TV READY: WAIT BREAK; D1/H4 structure not aligned; ADX below 20 or missing |
-| AUDJPY | SHORT | 3/3 | -1/-1 | 52.63/63.09 | WAIT NEW RETEST | 107.586 | 107.273 | 2026-11-17T12:00:00.000Z | 2026-11-17T13:00:00.000Z | NO | WATCH / NO TV READY: WAIT NEW RETEST |
-| GBPJPY | SHORT | 3/3 | 0/-1 | 49.91/38.89 | WAIT NEW RETEST | 210.820 | 210.184 | 2026-11-17T12:00:00.000Z | 2026-11-17T13:00:00.000Z | NO | WATCH / NO TV READY: WAIT NEW RETEST; D1/H4 structure not aligned |
-| AUDCAD | SHORT | 3/3 | -1/-1 | 41.86/39.13 | WAIT NEW RETEST | 0.96352 | 0.96254 | 2026-11-17T12:00:00.000Z | 2026-11-17T13:00:00.000Z | NO | WATCH / NO TV READY: WAIT NEW RETEST |
-| EURUSD | SHORT | 3/3 | 0/-1 | 43.31/27.45 | WAIT BREAK | 1.09850 | 1.09927 | 2026-11-17T12:00:00.000Z | 2026-11-17T13:00:00.000Z | NO | WATCH / NO TV READY: WAIT BREAK; D1/H4 structure not aligned |
-| EURCAD | SHORT | 3/3 | 1/-1 | 22.23/20.62 | RETEST | 1.57164 | 1.57105 | 2026-11-17T12:00:00.000Z | 2026-11-17T13:00:00.000Z | NO | WATCH / NO TV READY: RETEST; D1/H4 structure not aligned |
-| USDCHF | LONG | 3/3 | 0/0 | 35.88/11.78 | WAIT BREAK | 0.84136 | 0.83977 | 2026-11-17T12:00:00.000Z | 2026-11-17T13:00:00.000Z | NO | WATCH / NO TV READY: WAIT BREAK; D1/H4 structure not aligned; ADX below 20 or missing |
+- Εβδομαδιαίο Top 5: EURAUD, CHFJPY, NZDCAD, AUDJPY, GBPJPY.
+- OANDA screener Top 5: CADJPY, CHFJPY, EURJPY, NZDJPY, AUDJPY.
+- Επιπλέον Trend ζευγάρια με TV UNVERIFIED ή A+ READY στο αναγνωσμένο GitHub report: κανένα.
+- Μοναδικά ζευγάρια: 8. Bitcoin/ETH/SOL και HTF Reversal εξαιρούνται από αυτόν τον Trend έλεγχο.
 
-**READY ισχύει μόνο όταν συμφωνούν η ανεξάρτητη TradingView Pine audit και το υπάρχον Yahoo/OANDA Trend BRC για το ΙΔΙΟ κλεισμένο H1, direction και zone.** Το GitHub READY από μόνο του δεν είναι επαληθευμένο. Το gate ελέγχει επίσης συμφωνία τιμής και RR.
+## Ανεξάρτητος πίνακας audit
 
-Το TV READY απαιτεί success=true, ακριβές symbol/indicator/plots, πρόσφατο κλεισμένο H1, verified_ready=1, brc_stage=4, EMA50 3/3, ίδια κατεύθυνση D1/H4 structure, ADX H4/H1≥20, θετικά πεπερασμένα zone/Entry/SL/TP, σωστό προσανατολισμό SL/TP και RR≥1.2. Διαφωνία, έλλειψη ή παλαιότητα κρατά tv_ready=false. Για false τα Entry/SL/TP/RR παραμένουν null στο JSON.
+| Ζευγάρι | Πηγή | Κλεισμένο H1 open UTC | Direction | EMA /3 | D1 / H4 structure | ADX H4 / H1 | BRC | Zone | Κλείσιμο H1 | tv_ready | Status |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| EURAUD | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
+| CHFJPY | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
+| NZDCAD | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
+| AUDJPY | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
+| GBPJPY | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
+| CADJPY | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
+| EURJPY | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
+| NZDJPY | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
 
-**BRC:** 0 NO ALIGNMENT · 1 WAIT BREAK · 2 BREAK · 3 RETEST · 4 READY · 5 WAIT NEW RETEST. **Δομή:** 1 BULL, −1 BEAR, 0 χωρίς επιβεβαιωμένη κατεύθυνση. WATCH/BREAK/RETEST δεν είναι READY.
+Τα κενά πεδία είναι `null` στο JSON, επειδή δεν επιστράφηκαν δεδομένα. Δεν επαναχρησιμοποιούνται τιμές προηγούμενου audit και δεν δημοσιεύονται Entry/SL/TP/RR όταν `tv_ready=false`. Δεν έχουν δημοσιευθεί raw OHLC candles.
 
-[LATEST_FOREX_SCAN.md](https://github.com/marioshinouda-byte/tvscreener/blob/main/LATEST_FOREX_SCAN.md) · [Snapshot JSON](https://github.com/marioshinouda-byte/tvscreener/blob/main/TRADINGVIEW_BRC_VERIFIED.json)
+BRC στάδια όταν υπάρχουν πραγματικές τιμές Pine: 0 = NO ALIGNMENT, 1 = WAIT BREAK, 2 = BREAK, 3 = RETEST, 4 = READY, 5 = WAIT NEW RETEST. Το TV UNAVAILABLE δεν αποτελεί αριθμητικό στάδιο BRC.
 
-Μόνο Trend audit: δεν επαληθεύεται το ξεχωριστό HTF Reversal και δεν περιλαμβάνονται BTC/ETH/SOL. Μόνο παράγωγες ενδείξεις, χωρίς πλήρη raw OHLC. Δεν δίνονται εντολές συναλλαγών και δεν ενεργοποιούνται READY alerts. Η ολοκλήρωση του νέου scanner workflow επαληθεύεται χωριστά μετά το JSON push.
+## Κανόνας ανεξάρτητης επιβεβαίωσης
+
+READY ισχύει μόνο όταν συμφωνούν η ανεξάρτητη TradingView Pine audit και το υπάρχον Yahoo/OANDA Trend BRC για **το ίδιο κλεισμένο H1, την ίδια direction και την ίδια zone**. Απαιτούνται επίσης πρόσφατο κλεισμένο H1, EMA 3/3, ευθυγραμμισμένες D1/H4 δομές, ADX H4/H1 ≥ 20, έγκυρα θετικά επίπεδα και RR ≥ 1.2. Το τρέχον audit έχει `tv_ready=false` για όλα τα ζευγάρια, ώστε ο έλεγχος να μπλοκάρει ανεπιβεβαίωτο READY.
+
+Η ενημέρωση του συνοδευτικού JSON ζητά νέο scan μέσω του υπάρχοντος workflow. Η παρούσα αναφορά δεν ισχυρίζεται ότι το νέο scan έχει ήδη ολοκληρωθεί. Η ολοκλήρωση επαληθεύεται ξεχωριστά από το GitHub Actions και τη νέα εγγραφή υγείας.
+
+[Τελευταίο GitHub report](LATEST_FOREX_SCAN.md) · [Machine-readable audit](TRADINGVIEW_BRC_VERIFIED.json)
+
+Αυτός ο έλεγχος αφορά μόνο Trend. Δεν επιβεβαιώνει HTF Reversal, δεν παρέχει εντολή συναλλαγής και δεν ενεργοποιεί READY alerts.
