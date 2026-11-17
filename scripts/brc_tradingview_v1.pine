@@ -1,0 +1,99 @@
+//@version=6
+indicator("BRC TV Triple TF Audit v1", overlay=false, max_bars_back=500)
+leftBars = input.int(8, "H1 swing left", minval=2, maxval=30)
+rightBars = input.int(8, "H1 swing right", minval=2, maxval=30)
+minRR = input.float(1.2, "Minimum RR", minval=1.0)
+f_adx() =>
+    [plusDI, minusDI, strength] = ta.dmi(14, 14)
+    strength
+f_structure() =>
+    hi = ta.pivothigh(high, 1, 1)
+    lo = ta.pivotlow(low, 1, 1)
+    h0 = ta.valuewhen(not na(hi), hi, 0)
+    h1 = ta.valuewhen(not na(hi), hi, 1)
+    l0 = ta.valuewhen(not na(lo), lo, 0)
+    l1 = ta.valuewhen(not na(lo), lo, 1)
+    not na(h1) and not na(l1) and h0 > h1 and l0 > l1 ? 1 : not na(h1) and not na(l1) and h0 < h1 and l0 < l1 ? -1 : 0
+// Higher timeframe values refer ONLY to previous fully closed H4 and D1 candles.
+[dClose, dEma, dEmaPrev, dStructure] = request.security(syminfo.tickerid, "D", [close[1], ta.ema(close, 50)[1], ta.ema(close, 50)[2], f_structure()[1]], lookahead=barmerge.lookahead_on)
+[h4Close, h4Ema, h4EmaPrev, h4Structure, h4ADX, h4Hi20, h4Lo20] = request.security(syminfo.tickerid, "240", [close[1], ta.ema(close, 50)[1], ta.ema(close, 50)[2], f_structure()[1], f_adx()[1], ta.highest(high, 20)[1], ta.lowest(low, 20)[1]], lookahead=barmerge.lookahead_on)
+h1Ema = ta.ema(close, 50)
+h1ADX = f_adx()
+h1Atr = ta.atr(14)
+h1Signal = close > h1Ema and h1Ema > h1Ema[1] ? 1 : close < h1Ema and h1Ema < h1Ema[1] ? -1 : 0
+dSignal = dClose > dEma and dEma > dEmaPrev ? 1 : dClose < dEma and dEma < dEmaPrev ? -1 : 0
+h4Signal = h4Close > h4Ema and h4Ema > h4EmaPrev ? 1 : h4Close < h4Ema and h4Ema < h4EmaPrev ? -1 : 0
+direction = dSignal != 0 and dSignal == h4Signal ? dSignal : 0
+emaPasses = direction == 0 ? 0 : (dSignal == direction ? 1 : 0) + (h4Signal == direction ? 1 : 0) + (h1Signal == direction ? 1 : 0)
+// Status: 0=NO ALIGNMENT, 1=WAIT BREAK, 2=BREAK, 3=RETEST, 4=READY, 5=WAIT NEW RETEST.
+swingHigh = ta.pivothigh(high, leftBars, rightBars)
+swingLow = ta.pivotlow(low, leftBars, rightBars)
+highLevel = ta.valuewhen(not na(swingHigh), swingHigh, 0)
+lowLevel = ta.valuewhen(not na(swingLow), swingLow, 0)
+highAgo = ta.barssince(not na(swingHigh)) + rightBars
+lowAgo = ta.barssince(not na(swingLow)) + rightBars
+zone = direction == 1 ? highLevel : direction == -1 ? lowLevel : na
+pivotAgo = direction == 1 ? highAgo : direction == -1 ? lowAgo : na
+int brc = 0
+int breakAgo = na
+int retestAgo = na
+int confirmAgo = na
+tolerance = 0.25 * h1Atr
+breakBuffer = 0.05 * h1Atr
+if direction != 0 and not na(zone) and not na(pivotAgo) and pivotAgo >= rightBars and pivotAgo < 180 and not na(h1Atr)
+    brc := 1
+    for ago = pivotAgo - 1 to 0
+        broke = direction == 1 ? close[ago] > zone + breakBuffer : close[ago] < zone - breakBuffer
+        if broke
+            breakAgo := ago
+            break
+    if not na(breakAgo)
+        brc := 2
+        if breakAgo >= 1
+            for ago = breakAgo - 1 to math.max(breakAgo - 12, 0)
+                touched = direction == 1 ? low[ago] <= zone + tolerance : high[ago] >= zone - tolerance
+                held = direction == 1 ? close[ago] >= zone - tolerance : close[ago] <= zone + tolerance
+                if touched and held
+                    retestAgo := ago
+                    break
+        if na(retestAgo)
+            if breakAgo >= 12
+                brc := 5
+        else
+            brc := 3
+            if retestAgo >= 1
+                for ago = retestAgo - 1 to math.max(retestAgo - 2, 0)
+                    confirmed = direction == 1 ? close[ago] > open[ago] and close[ago] > zone and close[ago] > high[retestAgo] : close[ago] < open[ago] and close[ago] < zone and close[ago] < low[retestAgo]
+                    if confirmed
+                        confirmAgo := ago
+                        break
+            if not na(confirmAgo)
+                invalidated = false
+                if confirmAgo >= 1
+                    for ago = confirmAgo - 1 to 0
+                        if direction == 1 and close[ago] < zone - tolerance or direction == -1 and close[ago] > zone + tolerance
+                            invalidated := true
+                brc := confirmAgo <= 3 and not invalidated and math.abs(close - zone) <= 0.75 * h1Atr ? 4 : 5
+            else if retestAgo > 2
+                brc := 5
+entry = brc == 4 ? close : na
+stop = brc == 4 ? zone - direction * (0.35 * h1Atr) : na
+target = brc == 4 ? (direction == 1 ? h4Hi20 : h4Lo20) : na
+risk = brc == 4 ? direction * (entry - stop) : na
+reward = brc == 4 ? direction * (target - entry) : na
+rr = not na(risk) and risk > 0 and reward > 0 ? reward / risk : na
+ready = brc == 4 and emaPasses == 3 and dStructure == direction and h4Structure == direction and h4ADX >= 20 and h1ADX >= 20 and not na(rr) and rr >= minRR ? 1 : 0
+plot(direction, title="direction")
+plot(emaPasses, title="ema_passes")
+plot(dStructure, title="d1_structure")
+plot(h4Structure, title="h4_structure")
+plot(h4ADX, title="adx_h4")
+plot(h1ADX, title="adx_h1")
+plot(brc, title="brc_stage")
+plot(zone, title="h1_zone")
+plot(ready, title="verified_ready")
+plot(ready == 1 ? entry : na, title="entry")
+plot(ready == 1 ? stop : na, title="stop")
+plot(ready == 1 ? target : na, title="target")
+plot(ready == 1 ? rr : na, title="rr")
+plot(close, title="closed_h1_price")
