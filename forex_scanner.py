@@ -28,6 +28,7 @@ from zoneinfo import ZoneInfo
 import pandas as pd
 import yfinance as yf
 from market_data_quality import verify_h1_history
+from tradingview_gate import gate_trend_results
 
 from tvscreener import CryptoField, CryptoScreener, ForexField, ForexScreener
 
@@ -1765,7 +1766,9 @@ def scan_all_pairs() -> list[PairScan]:
         print(f"[{index:02d}/{len(PAIRS)}] Scan {pair}...")
         results.append(scan_pair(pair))
         time.sleep(0.15)
-    return results
+    # Last, fail-closed TradingView audit: a Yahoo READY cannot be published
+    # without matching independent closed H1 and BRC/HTF checks on OANDA.
+    return gate_trend_results(results)
 
 
 def scan_crypto_asset(asset: str) -> CryptoScan:
@@ -2000,7 +2003,7 @@ def write_markdown(
         "",
         "> Το score δείχνει συμφωνία των φίλτρων (/100), **όχι πιθανότητα κέρδους ή επιτυχίας**. Τιμή, EMA50, ADX, δομή, BRC και zones βασίζονται στα ίδια κλεισμένα κεριά Yahoo Finance.",
         "",
-        "> Τα TradingView ratings είναι μόνο συμπληρωματικό context και δεν καθορίζουν READY. EMA50, ADX, structure, BRC, entry και zone υπολογίζονται από το ίδιο feed OHLC.",
+        "> Το αρχικό μοντέλο υπολογίζει EMA50/ADX/structure/BRC από Yahoo OHLC. **Trend READY/Entry επιτρέπεται μόνο όταν το ανεξάρτητο TradingView Pine audit συμφωνεί** στο ίδιο κλεισμένο OANDA H1, κατεύθυνση, BRC zone και RR. Αν ο έλεγχος TV λείπει ή είναι παλιός, η είσοδος μπλοκάρεται ως TV UNVERIFIED. Το HTF Reversal είναι ξεχωριστό μοντέλο.",
         "> **Δεδομένα:** τα Yahoo OHLC χρησιμοποιούνται για υπολογισμούς μόνο όταν η ώρα και το close του ίδιου κλεισμένου H1 συμφωνούν με ανεξάρτητη αναφορά OANDA (έως 8 pips). Δεν σημαίνει ταύτιση ολόκληρου του ιστορικού.", 
         "> Τα D1/H4 σχηματίζονται πλέον σε συνεδρίες Νέας Υόρκης 17:00, με αποκλεισμό των κλειστών ωρών Σαββατοκύριακου. Απαιτείται ακόμη ξεχωριστός έλεγχος ολόκληρου του ιστορικού OHLC.",
         "> Στους πίνακες, η τιμή είναι το close του τελευταίου επαληθευμένου κλεισμένου H1. Δ zone = close μείον H1 zone σε pips (+ πάνω από τη zone, − κάτω από τη zone).",
@@ -2251,7 +2254,7 @@ def write_markdown(
         "- **BRC:** break σε επιβεβαιωμένο H1 swing, retest στη ζώνη και confirmation με κλείσιμο πέρα από το high/low του retest candle. READY ισχύει μόνο για confirmation στο τελευταίο ή αμέσως προηγούμενο κλεισμένο H1. Ανοιχτά κεριά αποκλείονται.",
         "- **Entry/SL/TP:** εμφανίζονται μόνο όταν το BRC είναι READY. Entry = τελευταίο κλεισμένο H1, SL = H1 zone ± 0.35×ATR, TP = κοντινότερο ολοκληρωμένο H4 swing target.",
         f"- **RR:** ✅ όταν RR ≥ {MIN_RR:.1f}, ❌ όταν είναι χαμηλότερο. Το A+ READY απαιτεί RR pass.",
-        "- **A+ READY:** το αυστηρότερο φίλτρο. Πριν από trade χρειάζεται τελικός οπτικός έλεγχος chart, spread/news και sizing.",
+        "- **A+ READY (Trend):** απαιτεί συμφωνία Yahoo/OANDA H1 και ανεξάρτητο TradingView Pine audit στα D1/H4/H1 με ίδιο H1/zone/κατεύθυνση. Χωρίς φρέσκια ανεξάρτητη επιβεβαίωση δεν εμφανίζεται Entry. Πριν από trade χρειάζεται οπτικός έλεγχος chart, spread/news και sizing.",
         "",
     ]
 
