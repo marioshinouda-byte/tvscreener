@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "status": "completed",
-  "completed_at": "2026-11-17T13:27:09.173681+00:00",
-  "run_id": "44092742966",
-  "trigger": "push",
-  "report_sha256": "c146c5cd131ca19bdeb3305ccd9b056babd3f6b51c7c07956f5528a80c3233d2",
+  "completed_at": "2026-11-17T14:13:47.037368+00:00",
+  "run_id": "44100697664",
+  "trigger": "workflow_dispatch",
+  "report_sha256": "39050bd9c18449bf9df9a007b69665fcca570588b7e601e5a4bff12800c0cf00",
   "source_sha256": "7e039ca96f4a6055d99141b320e00f0d090dbb589ac291e031a01c413bee0c08"
 }
