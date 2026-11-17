@@ -1,7 +1,7 @@
 # TradingView BRC — ανεξάρτητος ωριαίος έλεγχος Trend
 
-**Ώρα Ελλάδας:** 17/11/2026, 20:28:25 (Europe/Athens)  
-**UTC:** 2026-11-17T18:28:25Z  
+**Ώρα Ελλάδας:** 17/11/2026, 21:33:24 (Europe/Athens)  
+**UTC:** 2026-11-17T19:33:24Z  
 **Κατάσταση:** TV UNAVAILABLE.
 
 Το συνδεδεμένο TradingView MCP επέστρεψε `TOOL_QUOTA_EXCEEDED`: ημερήσιο όριο χρήσης και MCP cooldown 10 λεπτών. Οι κλήσεις για όλα τα 9 μοναδικά ζευγάρια αποκλείστηκαν. Δεν επιστράφηκαν metadata ή last_values· δεν επιβεβαιώθηκε READY.
@@ -11,7 +11,7 @@
 ## Κάλυψη
 
 - Εβδομαδιαίο Top 5: EURAUD, CHFJPY, NZDCAD, AUDJPY, GBPJPY.
-- OANDA screener Top 5: GBPAUD, CADJPY, EURAUD, GBPCAD, AUDCHF.
+- OANDA screener Top 5: EURGBP, GBPNZD, EURAUD, CADCHF, GBPAUD.
 - Επιπλέον Trend BRC=TV UNVERIFIED ή A+ READY στο αναγνωσμένο GitHub report: κανένα.
 - Σύνολο 9 μοναδικά Forex ζευγάρια. Bitcoin/ETH/SOL και HTF Reversal εξαιρούνται.
 
@@ -24,10 +24,10 @@
 | NZDCAD | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
 | AUDJPY | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
 | GBPJPY | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
+| EURGBP | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
+| GBPNZD | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
+| CADCHF | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
 | GBPAUD | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
-| CADJPY | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
-| GBPCAD | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
-| AUDCHF | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
 
 Τα μη διαθέσιμα πεδία και όλα τα Entry/SL/TP/RR είναι `null` στο JSON. Δεν επαναχρησιμοποιούνται τιμές προηγούμενου audit. Δημοσιεύονται μόνο παράγωγα audit signals, ποτέ raw OHLC candles.
 
