@@ -2,30 +2,9 @@
   "schema_version": 1,
   "script_id": "USER;ae27f010fee5413b8f5d1cc39e592cde",
   "source": "TradingView MCP Pine indicator",
-  "generated_at": "2026-11-17T22:26:39Z",
+  "generated_at": "2026-11-17T23:30:59Z",
   "method": "Independent TradingView Pine OANDA D1 H4 H1 audit, derived values only",
   "pairs": [
-    {
-      "pair": "CHFJPY",
-      "symbol": "OANDA:CHFJPY",
-      "source": "TradingView Pine",
-      "h1_open_at": null,
-      "direction": null,
-      "tv_ready": false,
-      "brc_stage": null,
-      "ema_passes": null,
-      "d1_structure": null,
-      "h4_structure": null,
-      "adx_h4": null,
-      "adx_h1": null,
-      "zone": null,
-      "entry": null,
-      "stop": null,
-      "target": null,
-      "rr": null,
-      "last_closed_h1_close": null,
-      "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: daily usage limit reached; MCP cooldown active (10 minutes); no Pine data returned"
-    },
     {
       "pair": "NZDCAD",
       "symbol": "OANDA:NZDCAD",
@@ -111,8 +90,8 @@
       "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: daily usage limit reached; MCP cooldown active (10 minutes); no Pine data returned"
     },
     {
-      "pair": "CADJPY",
-      "symbol": "OANDA:CADJPY",
+      "pair": "AUDUSD",
+      "symbol": "OANDA:AUDUSD",
       "source": "TradingView Pine",
       "h1_open_at": null,
       "direction": null,
@@ -132,8 +111,8 @@
       "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: daily usage limit reached; MCP cooldown active (10 minutes); no Pine data returned"
     },
     {
-      "pair": "EURJPY",
-      "symbol": "OANDA:EURJPY",
+      "pair": "EURUSD",
+      "symbol": "OANDA:EURUSD",
       "source": "TradingView Pine",
       "h1_open_at": null,
       "direction": null,
@@ -153,8 +132,8 @@
       "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: daily usage limit reached; MCP cooldown active (10 minutes); no Pine data returned"
     },
     {
-      "pair": "USDCAD",
-      "symbol": "OANDA:USDCAD",
+      "pair": "EURGBP",
+      "symbol": "OANDA:EURGBP",
       "source": "TradingView Pine",
       "h1_open_at": null,
       "direction": null,
@@ -195,8 +174,29 @@
       "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: daily usage limit reached; MCP cooldown active (10 minutes); no Pine data returned"
     },
     {
-      "pair": "EURUSD",
-      "symbol": "OANDA:EURUSD",
+      "pair": "NZDUSD",
+      "symbol": "OANDA:NZDUSD",
+      "source": "TradingView Pine",
+      "h1_open_at": null,
+      "direction": null,
+      "tv_ready": false,
+      "brc_stage": null,
+      "ema_passes": null,
+      "d1_structure": null,
+      "h4_structure": null,
+      "adx_h4": null,
+      "adx_h1": null,
+      "zone": null,
+      "entry": null,
+      "stop": null,
+      "target": null,
+      "rr": null,
+      "last_closed_h1_close": null,
+      "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: daily usage limit reached; MCP cooldown active (10 minutes); no Pine data returned"
+    },
+    {
+      "pair": "NZDJPY",
+      "symbol": "OANDA:NZDJPY",
       "source": "TradingView Pine",
       "h1_open_at": null,
       "direction": null,
