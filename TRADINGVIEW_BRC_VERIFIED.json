@@ -2,7 +2,7 @@
   "schema_version": 1,
   "script_id": "USER;ae27f010fee5413b8f5d1cc39e592cde",
   "source": "TradingView MCP Pine indicator",
-  "generated_at": "2026-11-17T11:06:23.215Z",
+  "generated_at": "2026-11-17T11:29:52Z",
   "method": "Independent TradingView Pine OANDA D1 H4 H1 audit, derived values only",
   "pairs": [
     {
@@ -24,7 +24,7 @@
       "target": null,
       "rr": null,
       "last_closed_h1_close": 1.63065,
-      "status": "WATCH / NO TV READY"
+      "status": "WATCH / NO TV READY: WAIT NEW RETEST"
     },
     {
       "pair": "CHFJPY",
@@ -45,7 +45,7 @@
       "target": null,
       "rr": null,
       "last_closed_h1_close": 189.612,
-      "status": "WATCH / NO TV READY"
+      "status": "WATCH / NO TV READY: WAIT NEW RETEST; D1/H4 structure not aligned"
     },
     {
       "pair": "NZDCAD",
@@ -66,7 +66,7 @@
       "target": null,
       "rr": null,
       "last_closed_h1_close": 0.78605,
-      "status": "WATCH / NO TV READY"
+      "status": "WATCH / NO TV READY: WAIT BREAK; D1/H4 structure not aligned; ADX below 20 or missing"
     },
     {
       "pair": "AUDJPY",
@@ -87,7 +87,7 @@
       "target": null,
       "rr": null,
       "last_closed_h1_close": 107.237,
-      "status": "WATCH / NO TV READY"
+      "status": "WATCH / NO TV READY: WAIT NEW RETEST"
     },
     {
       "pair": "GBPJPY",
@@ -108,7 +108,70 @@
       "target": null,
       "rr": null,
       "last_closed_h1_close": 209.886,
-      "status": "WATCH / NO TV READY"
+      "status": "WATCH / NO TV READY: WAIT NEW RETEST; D1/H4 structure not aligned"
+    },
+    {
+      "pair": "EURUSD",
+      "symbol": "OANDA:EURUSD",
+      "source": "TradingView Pine",
+      "h1_open_at": "2026-11-17T10:00:00.000Z",
+      "direction": "SHORT",
+      "tv_ready": false,
+      "brc_stage": 1,
+      "ema_passes": 3,
+      "d1_structure": 0,
+      "h4_structure": -1,
+      "adx_h4": 43.31038587890417,
+      "adx_h1": 25.70462841228725,
+      "zone": 1.0985,
+      "entry": null,
+      "stop": null,
+      "target": null,
+      "rr": null,
+      "last_closed_h1_close": 1.09872,
+      "status": "WATCH / NO TV READY: WAIT BREAK; D1/H4 structure not aligned"
+    },
+    {
+      "pair": "EURJPY",
+      "symbol": "OANDA:EURJPY",
+      "source": "TradingView Pine",
+      "h1_open_at": "2026-11-17T10:00:00.000Z",
+      "direction": "SHORT",
+      "tv_ready": false,
+      "brc_stage": 5,
+      "ema_passes": 3,
+      "d1_structure": 0,
+      "h4_structure": -1,
+      "adx_h4": 51.11781499014742,
+      "adx_h1": 50.223716034475515,
+      "zone": 176.245,
+      "entry": null,
+      "stop": null,
+      "target": null,
+      "rr": null,
+      "last_closed_h1_close": 174.869,
+      "status": "WATCH / NO TV READY: WAIT NEW RETEST; D1/H4 structure not aligned"
+    },
+    {
+      "pair": "GBPUSD",
+      "symbol": "OANDA:GBPUSD",
+      "source": "TradingView Pine",
+      "h1_open_at": "2026-11-17T10:00:00.000Z",
+      "direction": "SHORT",
+      "tv_ready": false,
+      "brc_stage": 1,
+      "ema_passes": 3,
+      "d1_structure": 0,
+      "h4_structure": 0,
+      "adx_h4": 51.324588026755954,
+      "adx_h1": 18.873066876188137,
+      "zone": 1.31688,
+      "entry": null,
+      "stop": null,
+      "target": null,
+      "rr": null,
+      "last_closed_h1_close": 1.31878,
+      "status": "WATCH / NO TV READY: WAIT BREAK; D1/H4 structure not aligned; ADX below 20 or missing"
     }
   ]
 }
