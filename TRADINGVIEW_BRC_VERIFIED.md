@@ -1,10 +1,10 @@
 # TradingView BRC — ανεξάρτητος ωριαίος έλεγχος Trend
 
-**Ώρα Ελλάδας:** 17/11/2026, 17:28:06 (Europe/Athens)  
-**UTC:** 2026-11-17T15:28:06Z  
+**Ώρα Ελλάδας:** 17/11/2026, 18:30:29 (Europe/Athens)  
+**UTC:** 2026-11-17T16:30:29Z  
 **Κατάσταση:** TV UNAVAILABLE — δεν επιστράφηκαν ανεξάρτητα δεδομένα Pine.
 
-Το συνδεδεμένο TradingView MCP επέστρεψε `TOOL_QUOTA_EXCEEDED`: συμπληρώθηκε το ημερήσιο όριο χρήσης και ενεργοποιήθηκε MCP cooldown 10 λεπτών. Ζητήθηκε εκτέλεση του αποθηκευμένου δείκτη για κάθε ένα από τα 8 μοναδικά ζευγάρια· όλες οι κλήσεις αποκλείστηκαν. Δεν επιστράφηκαν metadata ή last_values και δεν επιβεβαιώθηκε καμία ένδειξη READY.
+Το συνδεδεμένο TradingView MCP επέστρεψε `TOOL_QUOTA_EXCEEDED`: συμπληρώθηκε το ημερήσιο όριο χρήσης και ενεργοποιήθηκε MCP cooldown 10 λεπτών. Ζητήθηκε εκτέλεση του αποθηκευμένου δείκτη για κάθε ένα από τα 9 μοναδικά ζευγάρια· όλες οι κλήσεις αποκλείστηκαν. Δεν επιστράφηκαν metadata ή last_values και δεν επιβεβαιώθηκε καμία ένδειξη READY.
 
 **Ζητούμενος δείκτης:** BRC TV Triple TF Audit v1 — `USER;ae27f010fee5413b8f5d1cc39e592cde`.  
 **Παράμετροι κάθε κλήσης:** symbol `OANDA:PAIR`, timeframe `1h`, calc_bars_count `500`, return_bars `1`.
@@ -12,9 +12,9 @@
 ## Κάλυψη
 
 - Εβδομαδιαίο Top 5: EURAUD, CHFJPY, NZDCAD, AUDJPY, GBPJPY.
-- OANDA screener Top 5: CADJPY, EURJPY, AUDJPY, CHFJPY, GBPAUD.
+- OANDA screener Top 5: CADJPY, USDCAD, EURJPY, AUDJPY, GBPAUD.
 - Επιπλέον Trend ζευγάρια με BRC=TV UNVERIFIED ή A+ READY στο αναγνωσμένο GitHub report: κανένα.
-- Σύνολο: 8 μοναδικά ζευγάρια. Bitcoin/ETH/SOL και HTF Reversal εξαιρούνται από το συγκεκριμένο Trend audit.
+- Σύνολο: 9 μοναδικά ζευγάρια. Bitcoin/ETH/SOL και HTF Reversal εξαιρούνται από το συγκεκριμένο Trend audit.
 
 ## Ανεξάρτητος πίνακας audit
 
@@ -26,6 +26,7 @@
 | AUDJPY | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
 | GBPJPY | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
 | CADJPY | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
+| USDCAD | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
 | EURJPY | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
 | GBPAUD | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
 
