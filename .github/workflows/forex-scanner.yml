@@ -11,6 +11,9 @@ on:
     paths:
       - "forex_scanner.py"
       - "market_data_quality.py"
+      - "tradingview_gate.py"
+      - "TRADINGVIEW_BRC_VERIFIED.json"
+      - "tests/unit/test_forex_scan_tv_gate.py"
       - "tests/unit/test_market_data_quality.py"
       - "tests/unit/test_weekly_forex_watchlist.py"
       - "tests/unit/test_forex_scanner_reversal.py"
