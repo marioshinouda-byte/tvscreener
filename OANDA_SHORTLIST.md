@@ -1,6 +1,6 @@
 # OANDA — Top 5 προς έλεγχο
 
-**Δημιουργήθηκε:** 18/11/2026 04:29 (ώρα Ελλάδας)
+**Δημιουργήθηκε:** 18/11/2026 05:25 (ώρα Ελλάδας)
 
 **Υποψήφια:** 5 από 28 ζευγάρια
 
@@ -10,11 +10,11 @@
 
 | # | Ζευγάρι | Κατεύθυνση ελέγχου | Ranking /100 | W1 | D1 | H4 | H1 | EMA50 TV | ADX H4 | ADX H1 | Προηγούμενο H1 OANDA (Αθήνα) | OANDA update |
 |---:|---|---|---:|---|---|---|---|---|---:|---:|---|---|
-| 1 | **EURUSD** | SHORT (WATCH ONLY) | 61.5 | STRONG SELL | SELL | SELL | STRONG SELL | 3/3 verified fields | 42.8 | 25.4 | 18/11 03:00 | RECENT |
-| 2 | **USDCHF** | LONG (WATCH ONLY) | 58.0 | BUY | BUY | STRONG BUY | BUY | 3/3 verified fields | 34.8 | 12.5 | 18/11 03:00 | RECENT |
-| 3 | **AUDCHF** | SHORT (WATCH ONLY) | 57.1 | SELL | STRONG SELL | SELL | SELL | 3/3 verified fields | 24.0 | 28.2 | 18/11 03:00 | RECENT |
-| 4 | **USDCAD** | LONG (WATCH ONLY) | 57.0 | STRONG BUY | BUY | BUY | BUY | 3/3 verified fields | 42.7 | 19.3 | 18/11 03:00 | RECENT |
-| 5 | **EURGBP** | SHORT (WATCH ONLY) | 55.9 | SELL | SELL | SELL | SELL | 3/3 verified fields | 30.6 | 31.8 | 18/11 03:00 | RECENT |
+| 1 | **AUDCHF** | SHORT (WATCH ONLY) | 63.3 | SELL | STRONG SELL | SELL | STRONG SELL | 3/3 verified fields | 24.1 | 28.0 | 18/11 04:00 | RECENT |
+| 2 | **AUDCAD** | SHORT (WATCH ONLY) | 61.8 | SELL | SELL | SELL | STRONG SELL | 3/3 verified fields | 43.5 | 25.6 | 18/11 04:00 | RECENT |
+| 3 | **AUDJPY** | SHORT (WATCH ONLY) | 61.5 | SELL | SELL | STRONG SELL | SELL | 3/3 verified fields | 52.0 | 37.0 | 18/11 04:00 | RECENT |
+| 4 | **EURUSD** | SHORT (WATCH ONLY) | 61.5 | STRONG SELL | SELL | SELL | STRONG SELL | 3/3 verified fields | 42.8 | 26.1 | 18/11 04:00 | RECENT |
+| 5 | **NZDJPY** | SHORT (WATCH ONLY) | 60.0 | STRONG SELL | SELL | STRONG SELL | SELL | 3/3 verified fields | 42.2 | 31.4 | 18/11 04:00 | RECENT |
 
 Η λίστα είναι υποψήφια για χειροκίνητο τελικό έλεγχο μόνο αυτών των γραφημάτων. Δεν προκύπτουν Entry/SL/TP χωρίς ανεξάρτητη επιβεβαίωση πραγματικών OHLC, BRC, spread και ειδήσεων.
 Κατά το Σαββατοκύριακο οι Forex ενδείξεις μπορεί να αντανακλούν το κλείσιμο της Παρασκευής.
