@@ -1,7 +1,7 @@
 # TradingView BRC — ανεξάρτητος ωριαίος έλεγχος Trend
 
-**Ώρα Ελλάδας:** 18/11/2026, 04:28:32 (Europe/Athens)  
-**UTC:** 2026-11-18T02:28:32Z  
+**Ώρα Ελλάδας:** 18/11/2026, 05:25:01 (Europe/Athens)  
+**UTC:** 2026-11-18T03:25:01Z  
 **Κατάσταση:** TV UNAVAILABLE.
 
 Το συνδεδεμένο TradingView MCP επέστρεψε `TOOL_QUOTA_EXCEEDED`: ημερήσιο όριο χρήσης και MCP cooldown 10 λεπτών. Οι κλήσεις για όλα τα 9 μοναδικά ζευγάρια αποκλείστηκαν. Δεν επιστράφηκαν metadata ή last_values· δεν επιβεβαιώθηκε READY.
@@ -11,7 +11,7 @@
 ## Κάλυψη
 
 - Εβδομαδιαίο Top 5: NZDCAD, AUDJPY, GBPJPY, AUDCHF, AUDUSD.
-- OANDA screener Top 5: USDCAD, EURGBP, EURUSD, AUDUSD, USDCHF.
+- OANDA screener Top 5: EURUSD, USDCHF, AUDCHF, USDCAD, EURGBP.
 - Επιπλέον Trend BRC=TV UNVERIFIED ή A+ READY στο αναγνωσμένο GitHub report: κανένα.
 - Σύνολο 9 μοναδικά Forex ζευγάρια. Bitcoin/ETH/SOL και HTF Reversal εξαιρούνται.
 
@@ -24,10 +24,10 @@
 | GBPJPY | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
 | AUDCHF | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
 | AUDUSD | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
-| USDCAD | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
-| EURGBP | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
 | EURUSD | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
 | USDCHF | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
+| USDCAD | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
+| EURGBP | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
 
 Τα μη διαθέσιμα πεδία και όλα τα Entry/SL/TP/RR είναι `null` στο JSON. Δεν επαναχρησιμοποιούνται τιμές προηγούμενου audit. Δημοσιεύονται μόνο παράγωγα audit signals, ποτέ raw OHLC candles.
 
