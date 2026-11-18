@@ -1,7 +1,7 @@
 # TradingView BRC — ανεξάρτητος ωριαίος έλεγχος Trend
 
-**Ώρα Ελλάδας:** 19/11/2026, 00:24:14 (Europe/Athens)  
-**UTC:** 2026-11-18T22:24:14Z  
+**Ώρα Ελλάδας:** 19/11/2026, 01:28:21 (Europe/Athens)  
+**UTC:** 2026-11-18T23:28:21Z  
 **Κατάσταση:** TV UNAVAILABLE.
 
 Το συνδεδεμένο TradingView MCP επέστρεψε `TOOL_QUOTA_EXCEEDED`: ημερήσιο όριο χρήσης και cooldown 10 λεπτών στην πρώτη κλήση (NZDCAD), ενεργό cooldown στις υπόλοιπες 8. Και οι 9 κλήσεις αποκλείστηκαν πριν από την εκτέλεση. Δεν επιστράφηκαν metainfo ή last_values· δεν ταυτοποιήθηκε δείκτης από απόκριση και δεν επιβεβαιώθηκε TradingView READY.
@@ -12,8 +12,8 @@
 
 ## Κάλυψη
 
-- Weekly Top 5: NZDCAD, AUDJPY, GBPJPY, AUDCHF, AUDUSD.
-- OANDA Top 5: USDCHF, NZDUSD, AUDUSD, CHFJPY, AUDCAD.
+- Weekly Top 5: NZDCAD, AUDJPY, AUDCHF, AUDUSD, AUDNZD.
+- OANDA Top 5: AUDCAD, GBPJPY, AUDNZD, NZDUSD, CADCHF.
 - Trend TV UNVERIFIED / READY: κανένας.
 - Πρόσθετοι εκτός πεντάδων: κανένας.
 - Μοναδικά ζευγάρια: 9. Εξετάστηκαν όλες οι γραμμές Trend, μαζί με τον πίνακα όλων των 28 Forex pairs. Crypto και HTF Reversal εξαιρούνται.
@@ -24,13 +24,13 @@
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | NZDCAD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
 | AUDJPY | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
-| GBPJPY | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
 | AUDCHF | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
 | AUDUSD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
-| USDCHF | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
-| NZDUSD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
-| CHFJPY | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
+| AUDNZD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
 | AUDCAD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
+| GBPJPY | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
+| NZDUSD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
+| CADCHF | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
 
 UNKNOWN = μη διαθέσιμο BRC stage. Οι παύλες αντιστοιχούν σε null, όχι σε τιμές αγοράς. Δεν χρησιμοποιήθηκαν παλιά δεδομένα ή raw OHLC candles. Για κάθε tv_ready=false, Entry/SL/TP/RR παραμένουν null στο JSON.
 
