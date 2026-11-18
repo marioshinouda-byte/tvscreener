@@ -1,10 +1,10 @@
 # TradingView BRC — ανεξάρτητος ωριαίος έλεγχος Trend
 
-**Ώρα Ελλάδας:** 18/11/2026, 18:35:00 (Europe/Athens)  
-**UTC:** 2026-11-18T16:35:00Z  
+**Ώρα Ελλάδας:** 18/11/2026, 19:25:46 (Europe/Athens)  
+**UTC:** 2026-11-18T17:25:46Z  
 **Κατάσταση:** TV UNAVAILABLE.
 
-Το συνδεδεμένο TradingView MCP επέστρεψε `TOOL_QUOTA_EXCEEDED`: ημερήσιο όριο χρήσης και MCP cooldown 10 λεπτών στην πρώτη κλήση (NZDCAD), ενεργό cooldown στις επόμενες 7 κλήσεις. Και οι 8 κλήσεις αποκλείστηκαν πριν από την εκτέλεση. Δεν επιστράφηκαν metainfo ή last_values και δεν επιβεβαιώθηκε κανένα TradingView READY.
+Το συνδεδεμένο TradingView MCP επέστρεψε `TOOL_QUOTA_EXCEEDED`: ημερήσιο όριο χρήσης και MCP cooldown 10 λεπτών στην πρώτη κλήση (NZDCAD), ενεργό cooldown στις επόμενες 8 κλήσεις. Και οι 9 κλήσεις αποκλείστηκαν πριν από την εκτέλεση. Δεν επιστράφηκαν metainfo ή last_values και δεν επιβεβαιώθηκε κανένα TradingView READY.
 
 **Ζητούμενος δείκτης:** BRC TV Triple TF Audit v1, `USER;ae27f010fee5413b8f5d1cc39e592cde`.  
 **Παράμετροι κάθε κλήσης:** OANDA:PAIR, timeframe=1h, calc_bars_count=500, return_bars=1.  
@@ -13,9 +13,10 @@
 ## Κάλυψη
 
 - Εβδομαδιαίο Top 5: NZDCAD, AUDJPY, GBPJPY, AUDCHF, AUDUSD.
-- OANDA shortlist Top 5: CHFJPY, CADJPY, GBPJPY, EURJPY, AUDJPY.
-- Πρόσθετοι Trend υποψήφιοι με TV UNVERIFIED ή READY στο τελευταίο report: κανένας.
-- Μοναδικά ζευγάρια: 8. Ελέγχθηκαν όλες οι γραμμές Trend του report, συμπεριλαμβανομένου του πίνακα όλων των 28 Forex pairs.
+- OANDA shortlist Top 5: EURJPY, CHFJPY, CADJPY, GBPJPY, NZDJPY.
+- Trend υποψήφιοι με TV UNVERIFIED ή READY στο τελευταίο report: GBPJPY.
+- Πρόσθετοι υποψήφιοι εκτός των δύο πεντάδων: κανένας.
+- Μοναδικά ζευγάρια: 9. Ελέγχθηκαν όλες οι γραμμές Trend του report, συμπεριλαμβανομένου του πίνακα όλων των 28 Forex pairs.
 - Bitcoin/ETH/SOL και HTF Reversal εξαιρούνται από αυτόν τον Trend έλεγχο.
 
 ## Ανεξάρτητος πίνακας audit
@@ -27,9 +28,10 @@
 | GBPJPY | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
 | AUDCHF | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
 | AUDUSD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
+| EURJPY | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
 | CHFJPY | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
 | CADJPY | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
-| EURJPY | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
+| NZDJPY | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
 
 Το UNKNOWN σημαίνει ότι δεν επέστρεψε ο δείκτης BRC stage. Οι παύλες αντιστοιχούν σε null, όχι σε τιμές αγοράς. Δεν επαναχρησιμοποιήθηκαν προηγούμενα δεδομένα. Για όλα τα tv_ready=false τα Entry/SL/TP/RR παραμένουν null στο JSON και δεν δημοσιεύονται επίπεδα συναλλαγής. Δεν δημοσιεύονται raw OHLC candles.
 
