@@ -2,7 +2,7 @@
   "schema_version": 1,
   "script_id": "USER;ae27f010fee5413b8f5d1cc39e592cde",
   "source": "TradingView MCP Pine indicator",
-  "generated_at": "2026-11-18T08:31:21Z",
+  "generated_at": "2026-11-18T09:31:24Z",
   "method": "Independent TradingView Pine OANDA D1 H4 H1 audit, derived values only",
   "pairs": [
     {
@@ -24,7 +24,7 @@
       "target": null,
       "rr": null,
       "last_closed_h1_close": null,
-      "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: daily usage limit reached; MCP cooldown active (10 minutes); no Pine data returned"
+      "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: Pine audit blocked by MCP cooldown; daily usage limit confirmed on post-cooldown retry; no Pine data returned"
     },
     {
       "pair": "AUDJPY",
@@ -45,7 +45,7 @@
       "target": null,
       "rr": null,
       "last_closed_h1_close": null,
-      "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: daily usage limit reached; MCP cooldown active (10 minutes); no Pine data returned"
+      "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: Pine audit blocked by MCP cooldown; daily usage limit confirmed on post-cooldown retry; no Pine data returned"
     },
     {
       "pair": "GBPJPY",
@@ -66,7 +66,7 @@
       "target": null,
       "rr": null,
       "last_closed_h1_close": null,
-      "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: daily usage limit reached; MCP cooldown active (10 minutes); no Pine data returned"
+      "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: Pine audit blocked by MCP cooldown; daily usage limit confirmed on post-cooldown retry; no Pine data returned"
     },
     {
       "pair": "AUDCHF",
@@ -87,7 +87,7 @@
       "target": null,
       "rr": null,
       "last_closed_h1_close": null,
-      "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: daily usage limit reached; MCP cooldown active (10 minutes); no Pine data returned"
+      "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: Pine audit blocked by MCP cooldown; daily usage limit confirmed on post-cooldown retry; no Pine data returned"
     },
     {
       "pair": "AUDUSD",
@@ -108,28 +108,7 @@
       "target": null,
       "rr": null,
       "last_closed_h1_close": null,
-      "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: daily usage limit reached; MCP cooldown active (10 minutes); no Pine data returned"
-    },
-    {
-      "pair": "CADJPY",
-      "symbol": "OANDA:CADJPY",
-      "source": "TradingView Pine",
-      "h1_open_at": null,
-      "direction": null,
-      "tv_ready": false,
-      "brc_stage": null,
-      "ema_passes": null,
-      "d1_structure": null,
-      "h4_structure": null,
-      "adx_h4": null,
-      "adx_h1": null,
-      "zone": null,
-      "entry": null,
-      "stop": null,
-      "target": null,
-      "rr": null,
-      "last_closed_h1_close": null,
-      "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: daily usage limit reached; MCP cooldown active (10 minutes); no Pine data returned"
+      "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: Pine audit blocked by MCP cooldown; daily usage limit confirmed on post-cooldown retry; no Pine data returned"
     },
     {
       "pair": "EURJPY",
@@ -150,11 +129,11 @@
       "target": null,
       "rr": null,
       "last_closed_h1_close": null,
-      "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: daily usage limit reached; MCP cooldown active (10 minutes); no Pine data returned"
+      "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: Pine audit blocked by MCP cooldown; daily usage limit confirmed on post-cooldown retry; no Pine data returned"
     },
     {
-      "pair": "USDCAD",
-      "symbol": "OANDA:USDCAD",
+      "pair": "CADJPY",
+      "symbol": "OANDA:CADJPY",
       "source": "TradingView Pine",
       "h1_open_at": null,
       "direction": null,
@@ -171,11 +150,11 @@
       "target": null,
       "rr": null,
       "last_closed_h1_close": null,
-      "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: daily usage limit reached; MCP cooldown active (10 minutes); no Pine data returned"
+      "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: Pine audit blocked by MCP cooldown; daily usage limit confirmed on post-cooldown retry; no Pine data returned"
     },
     {
-      "pair": "NZDJPY",
-      "symbol": "OANDA:NZDJPY",
+      "pair": "EURUSD",
+      "symbol": "OANDA:EURUSD",
       "source": "TradingView Pine",
       "h1_open_at": null,
       "direction": null,
@@ -192,7 +171,7 @@
       "target": null,
       "rr": null,
       "last_closed_h1_close": null,
-      "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: daily usage limit reached; MCP cooldown active (10 minutes); no Pine data returned"
+      "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: Pine audit blocked by MCP cooldown; daily usage limit confirmed on post-cooldown retry; no Pine data returned"
     }
   ]
 }
