@@ -3,11 +3,9 @@
   "top5": [
     "NZDCAD",
     "AUDJPY",
-    "GBPJPY",
     "AUDCHF",
-    "AUDUSD"
-  ],
-  "hot_new": [
+    "AUDUSD",
     "AUDNZD"
-  ]
+  ],
+  "hot_new": []
 }

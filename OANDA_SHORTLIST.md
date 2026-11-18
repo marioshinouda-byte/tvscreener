@@ -1,6 +1,6 @@
 # OANDA — Top 5 προς έλεγχο
 
-**Δημιουργήθηκε:** 18/11/2026 23:32 (ώρα Ελλάδας)
+**Δημιουργήθηκε:** 19/11/2026 00:24 (ώρα Ελλάδας)
 
 **Υποψήφια:** 5 από 28 ζευγάρια
 
@@ -10,11 +10,11 @@
 
 | # | Ζευγάρι | Κατεύθυνση ελέγχου | Ranking /100 | W1 | D1 | H4 | H1 | EMA50 TV | ADX H4 | ADX H1 | Προηγούμενο H1 OANDA (Αθήνα) | OANDA update |
 |---:|---|---|---:|---|---|---|---|---|---:|---:|---|---|
-| 1 | **USDCHF** | LONG (WATCH ONLY) | 63.2 | BUY | STRONG BUY | STRONG BUY | BUY | 3/3 verified fields | 38.4 | 23.0 | 18/11 22:00 | RECENT |
-| 2 | **NZDUSD** | SHORT (WATCH ONLY) | 61.7 | SELL | STRONG SELL | STRONG SELL | SELL | 3/3 verified fields | 35.1 | 24.9 | 18/11 22:00 | RECENT |
-| 3 | **AUDUSD** | SHORT (WATCH ONLY) | 61.5 | SELL | SELL | STRONG SELL | SELL | 3/3 verified fields | 57.7 | 33.9 | 18/11 22:00 | RECENT |
-| 4 | **CHFJPY** | SHORT (WATCH ONLY) | 61.4 | SELL | SELL | SELL | SELL | 3/3 verified fields | 51.8 | 41.8 | 18/11 22:00 | RECENT |
-| 5 | **AUDCAD** | SHORT (WATCH ONLY) | 61.3 | SELL | SELL | SELL | STRONG SELL | 3/3 verified fields | 41.0 | 23.8 | 18/11 22:00 | RECENT |
+| 1 | **AUDCAD** | SHORT (WATCH ONLY) | 52.7 | SELL | SELL | SELL | SELL | 3/3 verified fields | 40.6 | 23.5 | 18/11 23:00 | RECENT |
+| 2 | **GBPJPY** | SHORT (WATCH ONLY) | 52.1 | SELL | SELL | SELL | SELL | 3/3 verified fields | 54.6 | 34.2 | 18/11 23:00 | RECENT |
+| 3 | **AUDNZD** | SHORT (WATCH ONLY) | 51.0 | NEUTRAL | SELL | SELL | SELL | 3/3 verified fields | 32.8 | 33.3 | 18/11 23:00 | RECENT |
+| 4 | **NZDUSD** | SHORT (WATCH ONLY) | 49.6 | SELL | SELL | SELL | NEUTRAL | 3/3 verified fields | 35.1 | 23.8 | 18/11 23:00 | RECENT |
+| 5 | **CADCHF** | LONG (WATCH ONLY) | 48.7 | BUY | BUY | BUY | BUY | 3/3 verified fields | 25.7 | 12.3 | 18/11 23:00 | RECENT |
 
 Η λίστα είναι υποψήφια για χειροκίνητο τελικό έλεγχο μόνο αυτών των γραφημάτων. Δεν προκύπτουν Entry/SL/TP χωρίς ανεξάρτητη επιβεβαίωση πραγματικών OHLC, BRC, spread και ειδήσεων.
 Κατά το Σαββατοκύριακο οι Forex ενδείξεις μπορεί να αντανακλούν το κλείσιμο της Παρασκευής.
