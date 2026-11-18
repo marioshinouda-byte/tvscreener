@@ -1,6 +1,6 @@
 # OANDA — Top 5 προς έλεγχο
 
-**Δημιουργήθηκε:** 18/11/2026 15:25 (ώρα Ελλάδας)
+**Δημιουργήθηκε:** 18/11/2026 16:33 (ώρα Ελλάδας)
 
 **Υποψήφια:** 5 από 28 ζευγάρια
 
@@ -10,11 +10,11 @@
 
 | # | Ζευγάρι | Κατεύθυνση ελέγχου | Ranking /100 | W1 | D1 | H4 | H1 | EMA50 TV | ADX H4 | ADX H1 | Προηγούμενο H1 OANDA (Αθήνα) | OANDA update |
 |---:|---|---|---:|---|---|---|---|---|---:|---:|---|---|
-| 1 | **GBPJPY** | SHORT (WATCH ONLY) | 62.7 | SELL | STRONG SELL | STRONG SELL | SELL | 3/3 verified fields | 51.5 | 28.9 | 18/11 14:00 | RECENT |
-| 2 | **USDCHF** | LONG (WATCH ONLY) | 61.1 | BUY | BUY | STRONG BUY | BUY | 3/3 verified fields | 36.3 | 20.4 | 18/11 14:00 | RECENT |
-| 3 | **EURUSD** | SHORT (WATCH ONLY) | 60.6 | STRONG SELL | SELL | SELL | SELL | 3/3 verified fields | 44.0 | 41.2 | 18/11 14:00 | RECENT |
-| 4 | **GBPUSD** | SHORT (WATCH ONLY) | 60.2 | SELL | SELL | STRONG SELL | SELL | 3/3 verified fields | 45.2 | 31.3 | 18/11 14:00 | RECENT |
-| 5 | **CHFJPY** | SHORT (WATCH ONLY) | 59.7 | SELL | SELL | SELL | SELL | 3/3 verified fields | 50.3 | 30.8 | 18/11 14:00 | RECENT |
+| 1 | **CHFJPY** | SHORT (WATCH ONLY) | 67.9 | SELL | STRONG SELL | STRONG SELL | STRONG SELL | 3/3 verified fields | 50.9 | 32.6 | 18/11 15:00 | RECENT |
+| 2 | **GBPJPY** | SHORT (WATCH ONLY) | 64.1 | SELL | STRONG SELL | STRONG SELL | STRONG SELL | 3/3 verified fields | 52.1 | 29.4 | 18/11 15:00 | RECENT |
+| 3 | **EURJPY** | SHORT (WATCH ONLY) | 63.7 | SELL | STRONG SELL | SELL | SELL | 3/3 verified fields | 54.6 | 34.7 | 18/11 15:00 | RECENT |
+| 4 | **USDCHF** | LONG (WATCH ONLY) | 63.4 | BUY | STRONG BUY | STRONG BUY | BUY | 3/3 verified fields | 37.2 | 22.1 | 18/11 15:00 | RECENT |
+| 5 | **AUDUSD** | SHORT (WATCH ONLY) | 61.3 | SELL | SELL | SELL | STRONG SELL | 3/3 verified fields | 57.0 | 29.9 | 18/11 15:00 | RECENT |
 
 Η λίστα είναι υποψήφια για χειροκίνητο τελικό έλεγχο μόνο αυτών των γραφημάτων. Δεν προκύπτουν Entry/SL/TP χωρίς ανεξάρτητη επιβεβαίωση πραγματικών OHLC, BRC, spread και ειδήσεων.
 Κατά το Σαββατοκύριακο οι Forex ενδείξεις μπορεί να αντανακλούν το κλείσιμο της Παρασκευής.
