@@ -1,19 +1,19 @@
 # TradingView BRC — ανεξάρτητος ωριαίος έλεγχος Trend
 
-**Ώρα Ελλάδας:** 18/11/2026, 06:28:09 (Europe/Athens)  
-**UTC:** 2026-11-18T04:28:09Z  
+**Ώρα Ελλάδας:** 18/11/2026, 07:24:22 (Europe/Athens)  
+**UTC:** 2026-11-18T05:24:22Z  
 **Κατάσταση:** TV UNAVAILABLE.
 
-Το συνδεδεμένο TradingView MCP επέστρεψε `TOOL_QUOTA_EXCEEDED`: ημερήσιο όριο χρήσης και MCP cooldown 10 λεπτών. Οι κλήσεις για όλα τα 9 μοναδικά ζευγάρια αποκλείστηκαν. Δεν επιστράφηκαν metadata ή last_values· δεν επιβεβαιώθηκε READY.
+Το συνδεδεμένο TradingView MCP επέστρεψε `TOOL_QUOTA_EXCEEDED`: ημερήσιο όριο χρήσης και MCP cooldown 10 λεπτών. Οι κλήσεις για όλα τα 10 μοναδικά ζευγάρια αποκλείστηκαν. Δεν επιστράφηκαν metadata ή last_values· δεν επιβεβαιώθηκε READY.
 
 **Ζητούμενος δείκτης:** BRC TV Triple TF Audit v1, `USER;ae27f010fee5413b8f5d1cc39e592cde`. Κάθε κλήση: `OANDA:PAIR`, timeframe `1h`, calc_bars_count `500`, return_bars `1`.
 
 ## Κάλυψη
 
 - Εβδομαδιαίο Top 5: NZDCAD, AUDJPY, GBPJPY, AUDCHF, AUDUSD.
-- OANDA screener Top 5: CADJPY, EURJPY, EURUSD, NZDJPY, AUDJPY.
+- OANDA screener Top 5: NZDUSD, NZDJPY, EURJPY, CADJPY, EURUSD.
 - Επιπλέον Trend BRC=TV UNVERIFIED ή A+ READY στο αναγνωσμένο GitHub report: κανένα.
-- Σύνολο 9 μοναδικά Forex ζευγάρια. Bitcoin/ETH/SOL και HTF Reversal εξαιρούνται.
+- Σύνολο 10 μοναδικά Forex ζευγάρια. Bitcoin/ETH/SOL και HTF Reversal εξαιρούνται.
 
 ## Ανεξάρτητος πίνακας audit
 
@@ -24,10 +24,11 @@
 | GBPJPY | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
 | AUDCHF | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
 | AUDUSD | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
-| CADJPY | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
-| EURJPY | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
-| EURUSD | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
+| NZDUSD | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
 | NZDJPY | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
+| EURJPY | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
+| CADJPY | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
+| EURUSD | TradingView Pine | — | — | — | — | — | TV UNAVAILABLE | — | — | false | TOOL_QUOTA_EXCEEDED / MCP cooldown |
 
 Τα μη διαθέσιμα πεδία και όλα τα Entry/SL/TP/RR είναι `null` στο JSON. Δεν επαναχρησιμοποιούνται τιμές προηγούμενου audit. Δημοσιεύονται μόνο παράγωγα audit signals, ποτέ raw OHLC candles.
 
