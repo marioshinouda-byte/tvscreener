@@ -1,7 +1,7 @@
 # TradingView BRC — ανεξάρτητος ωριαίος έλεγχος Trend
 
-**Ώρα Ελλάδας:** 18/11/2026, 14:34:01 (Europe/Athens)  
-**UTC:** 2026-11-18T12:34:01Z  
+**Ώρα Ελλάδας:** 18/11/2026, 15:25:08 (Europe/Athens)  
+**UTC:** 2026-11-18T13:25:08Z  
 **Κατάσταση:** TV UNAVAILABLE.
 
 Το συνδεδεμένο TradingView MCP επέστρεψε `TOOL_QUOTA_EXCEEDED`: ημερήσιο όριο χρήσης και MCP cooldown 10 λεπτών στην πρώτη κλήση (NZDCAD), ενεργό cooldown στις επόμενες οκτώ. Και οι 9 κλήσεις αποκλείστηκαν πριν από την εκτέλεση. Δεν επιστράφηκαν metainfo ή last_values και δεν επιβεβαιώθηκε κανένα TradingView READY.
@@ -13,7 +13,7 @@
 ## Κάλυψη
 
 - Εβδομαδιαίο Top 5: NZDCAD, AUDJPY, GBPJPY, AUDCHF, AUDUSD.
-- OANDA shortlist Top 5: EURJPY, GBPJPY, EURUSD, USDCHF, EURCAD.
+- OANDA shortlist Top 5: EURJPY, USDCHF, GBPJPY, EURUSD, CHFJPY.
 - Πρόσθετοι Trend υποψήφιοι με TV UNVERIFIED ή READY στο τελευταίο report: κανένας.
 - Μοναδικά ζευγάρια: 9. Ελέγχθηκαν όλες οι γραμμές Trend του report, συμπεριλαμβανομένου του πίνακα όλων των 28 Forex pairs.
 - Bitcoin/ETH/SOL και HTF Reversal εξαιρούνται από αυτόν τον Trend έλεγχο.
@@ -28,9 +28,9 @@
 | AUDCHF | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
 | AUDUSD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
 | EURJPY | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
-| EURUSD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
 | USDCHF | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
-| EURCAD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
+| EURUSD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
+| CHFJPY | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED |
 
 Το UNKNOWN σημαίνει ότι δεν επέστρεψε ο δείκτης BRC stage. Οι παύλες αντιστοιχούν σε null, όχι σε τιμές αγοράς. Δεν επαναχρησιμοποιήθηκαν προηγούμενα δεδομένα. Για όλα τα tv_ready=false τα Entry/SL/TP/RR παραμένουν null στο JSON και δεν δημοσιεύονται επίπεδα συναλλαγής. Δεν δημοσιεύονται raw OHLC candles.
 
