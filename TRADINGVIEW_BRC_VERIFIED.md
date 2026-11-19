@@ -1,7 +1,7 @@
 # TradingView BRC — ανεξάρτητος ωριαίος έλεγχος Trend
 
-**Ώρα Ελλάδας:** 19/11/2026, 21:36:07 (Europe/Athens)  
-**UTC:** 2026-11-19T19:36:07Z  
+**Ώρα Ελλάδας:** 19/11/2026, 22:32:12 (Europe/Athens)  
+**UTC:** 2026-11-19T20:32:12Z  
 **Κατάσταση:** TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED.
 
 Το συνδεδεμένο TradingView MCP μπλόκαρε και τις 8 κλήσεις πριν από την εκτέλεση. Η πρώτη (AUDCAD) επέστρεψε ημερήσιο όριο χρήσης και cooldown 10 λεπτών, οι υπόλοιπες ενεργό cooldown. Δεν επιστράφηκαν metainfo ή last_values· δεν ταυτοποιήθηκε δείκτης από απόκριση και δεν επιβεβαιώθηκε TradingView READY.
@@ -13,7 +13,7 @@
 ## Κάλυψη
 
 - Weekly Top 5: AUDCAD, AUDJPY, GBPAUD, AUDUSD, GBPUSD.
-- OANDA Top 5: GBPUSD, AUDUSD, AUDCHF, USDCHF, EURAUD.
+- OANDA Top 5: GBPUSD, USDCHF, AUDUSD, AUDCHF, EURAUD.
 - Trend TV UNVERIFIED / READY στο report εισόδου: κανένας.
 - Πρόσθετοι εκτός πεντάδων: κανένας.
 - Μοναδικά ζευγάρια: 8. Εξετάστηκαν όλες οι γραμμές Trend και ο πίνακας όλων των 28 Forex pairs. Crypto και HTF Reversal εξαιρούνται.
@@ -25,8 +25,8 @@
 | GBPAUD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 | AUDUSD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 | GBPUSD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
-| AUDCHF | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 | USDCHF | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
+| AUDCHF | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 | EURAUD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 
 UNKNOWN σημαίνει μη διαθέσιμο BRC stage. Οι παύλες είναι null, όχι τιμές αγοράς. Δεν χρησιμοποιήθηκαν παλιά δεδομένα ή raw OHLC candles. Entry/SL/TP/RR είναι null για όλα τα tv_ready=false.
