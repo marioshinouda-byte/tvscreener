@@ -1,10 +1,10 @@
 # TradingView BRC — ανεξάρτητος ωριαίος έλεγχος Trend
 
-**Ώρα Ελλάδας:** 19/11/2026, 23:28:31 (Europe/Athens)  
-**UTC:** 2026-11-19T21:28:31Z  
+**Ώρα Ελλάδας:** 19/11/2026, 23:31:11 (Europe/Athens)  
+**UTC:** 2026-11-19T21:31:11Z  
 **Κατάσταση:** TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED.
 
-Το συνδεδεμένο TradingView MCP μπλόκαρε και τις 7 κλήσεις πριν από την εκτέλεση. Η πρώτη (AUDCAD) επέστρεψε ημερήσιο όριο χρήσης και cooldown 10 λεπτών, οι υπόλοιπες ενεργό cooldown. Δεν επιστράφηκαν metainfo ή last_values· δεν ταυτοποιήθηκε δείκτης από απόκριση και δεν επιβεβαιώθηκε TradingView READY.
+Το συνδεδεμένο TradingView MCP μπλόκαρε και τις 8 κλήσεις πριν από την εκτέλεση. Η πρώτη (AUDCAD) επέστρεψε ημερήσιο όριο χρήσης και cooldown 10 λεπτών, οι υπόλοιπες ενεργό cooldown. Δεν επιστράφηκαν metainfo ή last_values· δεν ταυτοποιήθηκε δείκτης από απόκριση και δεν επιβεβαιώθηκε TradingView READY.
 
 **Ζητούμενος δείκτης:** BRC TV Triple TF Audit v1, `USER;ae27f010fee5413b8f5d1cc39e592cde`.  
 **Παράμετροι:** OANDA:PAIR, timeframe=1h, calc_bars_count=500, return_bars=1.  
@@ -13,10 +13,15 @@
 ## Κάλυψη
 
 - Weekly Top 5: AUDCAD, AUDJPY, GBPAUD, AUDUSD, GBPUSD.
-- OANDA Top 5: GBPUSD, AUDUSD, EURAUD, AUDCAD, AUDCHF.
-- Trend TV UNVERIFIED / READY στο report εισόδου: κανένας.
-- Πρόσθετοι εκτός πεντάδων: κανένας.
-- Μοναδικά ζευγάρια: 7. Εξετάστηκαν όλες οι γραμμές Trend και ο πίνακας όλων των 28 Forex pairs. Crypto και HTF Reversal εξαιρούνται.
+- Αρχική OANDA Top 5: GBPUSD, AUDUSD, EURAUD, AUDCAD, AUDCHF.
+- Ανανεωμένη OANDA Top 5 μετά το πρώτο νέο scan: GBPUSD, AUDUSD, AUDCAD, GBPJPY, EURAUD.
+- Trend TV UNVERIFIED / READY στο report μετά το πρώτο νέο scan: EURAUD (TV UNVERIFIED).
+- Πρόσθετοι Trend READY / TV UNVERIFIED εκτός πεντάδων: κανένας.
+- Προστέθηκε στην ίδια εκτέλεση από την ανανεωμένη πεντάδα: GBPJPY.
+- Διατηρήθηκε από την αρχική λίστα: AUDCHF.
+- Μοναδικά ζευγάρια: 8. Εξετάστηκαν όλες οι γραμμές Trend και ο πίνακας όλων των 28 Forex pairs. Crypto και HTF Reversal εξαιρούνται.
+
+Το EURAUD καλύφθηκε από την αρχική κλήση TradingView MCP. Το νέο Yahoo/OANDA Trend report το μπλόκαρε ως TV UNVERIFIED· η ένδειξη αυτή δεν αποτελεί επιβεβαιωμένο TradingView READY.
 
 | Pair | Πηγή | H1 open UTC | Direction | EMA | D1/H4 | ADX H4/H1 | BRC | Zone | Κλεισμένη H1 τιμή | tv_ready | Status |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -27,6 +32,7 @@
 | GBPUSD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 | EURAUD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 | AUDCHF | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
+| GBPJPY | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 
 UNKNOWN σημαίνει μη διαθέσιμο BRC stage. Οι παύλες είναι null, όχι τιμές αγοράς. Δεν χρησιμοποιήθηκαν παλιά δεδομένα ή raw OHLC candles. Entry/SL/TP/RR είναι null για όλα τα tv_ready=false.
 
