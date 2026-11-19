@@ -1,6 +1,6 @@
 # OANDA — Top 5 προς έλεγχο
 
-**Δημιουργήθηκε:** 19/11/2026 09:28 (ώρα Ελλάδας)
+**Δημιουργήθηκε:** 19/11/2026 10:24 (ώρα Ελλάδας)
 
 **Υποψήφια:** 5 από 28 ζευγάρια
 
@@ -10,11 +10,11 @@
 
 | # | Ζευγάρι | Κατεύθυνση ελέγχου | Ranking /100 | W1 | D1 | H4 | H1 | EMA50 TV | ADX H4 | ADX H1 | Προηγούμενο H1 OANDA (Αθήνα) | OANDA update |
 |---:|---|---|---:|---|---|---|---|---|---:|---:|---|---|
-| 1 | **CADCHF** | LONG (WATCH ONLY) | 57.4 | BUY | BUY | STRONG BUY | BUY | 3/3 verified fields | 27.2 | 11.5 | 19/11 08:00 | RECENT |
-| 2 | **USDCHF** | LONG (WATCH ONLY) | 51.6 | BUY | BUY | BUY | BUY | 3/3 verified fields | 41.3 | 15.9 | 19/11 08:00 | RECENT |
-| 3 | **AUDCAD** | SHORT (WATCH ONLY) | 50.7 | SELL | SELL | SELL | SELL | 3/3 verified fields | 43.6 | 34.0 | 19/11 08:00 | RECENT |
-| 4 | **AUDNZD** | SHORT (WATCH ONLY) | 49.3 | NEUTRAL | SELL | SELL | SELL | 3/3 verified fields | 38.2 | 43.9 | 19/11 08:00 | RECENT |
-| 5 | **AUDCHF** | SHORT (WATCH ONLY) | 48.4 | SELL | SELL | SELL | NEUTRAL | 3/3 verified fields | 20.6 | 22.1 | 19/11 08:00 | RECENT |
+| 1 | **CADCHF** | LONG (WATCH ONLY) | 58.3 | BUY | BUY | STRONG BUY | BUY | 3/3 verified fields | 27.2 | 10.8 | 19/11 09:00 | RECENT |
+| 2 | **AUDCHF** | SHORT (WATCH ONLY) | 54.8 | SELL | STRONG SELL | SELL | SELL | 3/3 verified fields | 20.6 | 21.4 | 19/11 09:00 | RECENT |
+| 3 | **AUDNZD** | SHORT (WATCH ONLY) | 53.7 | SELL | SELL | SELL | STRONG SELL | 3/3 verified fields | 37.9 | 43.3 | 19/11 09:00 | RECENT |
+| 4 | **EURAUD** | LONG (WATCH ONLY) | 52.7 | BUY | BUY | BUY | STRONG BUY | 3/3 verified fields | 34.5 | 31.2 | 19/11 09:00 | RECENT |
+| 5 | **AUDCAD** | SHORT (WATCH ONLY) | 52.5 | SELL | SELL | SELL | SELL | 3/3 verified fields | 43.5 | 32.6 | 19/11 09:00 | RECENT |
 
 Η λίστα είναι υποψήφια για χειροκίνητο τελικό έλεγχο μόνο αυτών των γραφημάτων. Δεν προκύπτουν Entry/SL/TP χωρίς ανεξάρτητη επιβεβαίωση πραγματικών OHLC, BRC, spread και ειδήσεων.
 Κατά το Σαββατοκύριακο οι Forex ενδείξεις μπορεί να αντανακλούν το κλείσιμο της Παρασκευής.
