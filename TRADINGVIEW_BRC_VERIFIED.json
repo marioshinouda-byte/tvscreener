@@ -2,7 +2,7 @@
   "schema_version": 1,
   "script_id": "USER;ae27f010fee5413b8f5d1cc39e592cde",
   "source": "TradingView MCP Pine indicator",
-  "generated_at": "2026-11-19T17:30:59Z",
+  "generated_at": "2026-11-19T18:24:54Z",
   "method": "Independent TradingView Pine OANDA D1 H4 H1 audit, derived values only",
   "pairs": [
     {
@@ -132,8 +132,8 @@
       "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active"
     },
     {
-      "pair": "EURAUD",
-      "symbol": "OANDA:EURAUD",
+      "pair": "USDCHF",
+      "symbol": "OANDA:USDCHF",
       "source": "TradingView Pine",
       "h1_open_at": null,
       "direction": null,
