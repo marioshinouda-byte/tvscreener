@@ -1,6 +1,6 @@
 # OANDA — Top 5 προς έλεγχο
 
-**Δημιουργήθηκε:** 19/11/2026 14:27 (ώρα Ελλάδας)
+**Δημιουργήθηκε:** 19/11/2026 14:36 (ώρα Ελλάδας)
 
 **Υποψήφια:** 5 από 28 ζευγάρια
 
@@ -10,11 +10,11 @@
 
 | # | Ζευγάρι | Κατεύθυνση ελέγχου | Ranking /100 | W1 | D1 | H4 | H1 | EMA50 TV | ADX H4 | ADX H1 | Προηγούμενο H1 OANDA (Αθήνα) | OANDA update |
 |---:|---|---|---:|---|---|---|---|---|---:|---:|---|---|
-| 1 | **CADCHF** | LONG (WATCH ONLY) | 60.7 | BUY | BUY | STRONG BUY | STRONG BUY | 3/3 verified fields | 28.4 | 10.8 | 19/11 13:00 | RECENT |
-| 2 | **AUDNZD** | SHORT (WATCH ONLY) | 60.2 | SELL | SELL | SELL | SELL | 3/3 verified fields | 39.0 | 45.8 | 19/11 13:00 | RECENT |
-| 3 | **EURNZD** | SHORT (WATCH ONLY) | 55.3 | BUY | SELL | STRONG SELL | STRONG SELL | 3/3 verified fields | 23.0 | 40.6 | 19/11 13:00 | RECENT |
-| 4 | **AUDCAD** | SHORT (WATCH ONLY) | 54.8 | SELL | SELL | SELL | SELL | 3/3 verified fields | 43.3 | 29.0 | 19/11 13:00 | RECENT |
-| 5 | **EURCAD** | SHORT (WATCH ONLY) | 51.0 | SELL | SELL | SELL | STRONG SELL | 3/3 verified fields | 26.4 | 17.6 | 19/11 13:00 | RECENT |
+| 1 | **CADCHF** | LONG (WATCH ONLY) | 60.7 | BUY | BUY | STRONG BUY | STRONG BUY | 3/3 verified fields | 28.5 | 11.0 | 19/11 13:00 | RECENT |
+| 2 | **AUDNZD** | SHORT (WATCH ONLY) | 57.9 | SELL | SELL | SELL | SELL | 3/3 verified fields | 39.0 | 45.8 | 19/11 13:00 | RECENT |
+| 3 | **EURCAD** | SHORT (WATCH ONLY) | 52.3 | SELL | SELL | STRONG SELL | STRONG SELL | 3/3 verified fields | 26.5 | 17.6 | 19/11 13:00 | RECENT |
+| 4 | **EURNZD** | SHORT (WATCH ONLY) | 51.9 | BUY | SELL | STRONG SELL | SELL | 3/3 verified fields | 23.0 | 40.6 | 19/11 13:00 | RECENT |
+| 5 | **AUDCAD** | SHORT (WATCH ONLY) | 51.4 | SELL | SELL | SELL | SELL | 3/3 verified fields | 43.3 | 29.0 | 19/11 13:00 | RECENT |
 
 Η λίστα είναι υποψήφια για χειροκίνητο τελικό έλεγχο μόνο αυτών των γραφημάτων. Δεν προκύπτουν Entry/SL/TP χωρίς ανεξάρτητη επιβεβαίωση πραγματικών OHLC, BRC, spread και ειδήσεων.
 Κατά το Σαββατοκύριακο οι Forex ενδείξεις μπορεί να αντανακλούν το κλείσιμο της Παρασκευής.
