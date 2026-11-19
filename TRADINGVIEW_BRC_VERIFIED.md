@@ -1,10 +1,10 @@
 # TradingView BRC — ανεξάρτητος ωριαίος έλεγχος Trend
 
-**Ώρα Ελλάδας:** 19/11/2026, 17:24:13 (Europe/Athens)  
-**UTC:** 2026-11-19T15:24:13Z  
+**Ώρα Ελλάδας:** 19/11/2026, 18:27:26 (Europe/Athens)  
+**UTC:** 2026-11-19T16:27:26Z  
 **Κατάσταση:** TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED.
 
-Το συνδεδεμένο TradingView MCP μπλόκαρε και τις 10 κλήσεις πριν από την εκτέλεση. Η πρώτη (AUDCAD) επέστρεψε ημερήσιο όριο χρήσης και cooldown 10 λεπτών, οι υπόλοιπες ενεργό cooldown. Δεν επιστράφηκαν metainfo ή last_values· δεν ταυτοποιήθηκε δείκτης από απόκριση και δεν επιβεβαιώθηκε TradingView READY.
+Το συνδεδεμένο TradingView MCP μπλόκαρε και τις 8 κλήσεις πριν από την εκτέλεση. Η πρώτη (AUDCAD) επέστρεψε ημερήσιο όριο χρήσης και cooldown 10 λεπτών, οι υπόλοιπες ενεργό cooldown. Δεν επιστράφηκαν metainfo ή last_values· δεν ταυτοποιήθηκε δείκτης από απόκριση και δεν επιβεβαιώθηκε TradingView READY.
 
 **Ζητούμενος δείκτης:** BRC TV Triple TF Audit v1, `USER;ae27f010fee5413b8f5d1cc39e592cde`.  
 **Παράμετροι:** OANDA:PAIR, timeframe=1h, calc_bars_count=500, return_bars=1.  
@@ -13,10 +13,10 @@
 ## Κάλυψη
 
 - Weekly Top 5: AUDCAD, AUDJPY, GBPAUD, AUDUSD, GBPUSD.
-- OANDA Top 5: CADCHF, USDCHF, GBPCAD, AUDNZD, EURAUD.
+- OANDA Top 5: GBPUSD, AUDCAD, USDCHF, CADCHF, EURAUD.
 - Trend TV UNVERIFIED / READY στο report εισόδου: κανένας.
 - Πρόσθετοι εκτός πεντάδων: κανένας.
-- Μοναδικά ζευγάρια: 10. Εξετάστηκαν όλες οι γραμμές Trend και ο πίνακας όλων των 28 Forex pairs. Crypto και HTF Reversal εξαιρούνται.
+- Μοναδικά ζευγάρια: 8. Εξετάστηκαν όλες οι γραμμές Trend και ο πίνακας όλων των 28 Forex pairs. Crypto και HTF Reversal εξαιρούνται.
 
 | Pair | Πηγή | H1 open UTC | Direction | EMA | D1/H4 | ADX H4/H1 | BRC | Zone | Κλεισμένη H1 τιμή | tv_ready | Status |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -25,10 +25,8 @@
 | GBPAUD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 | AUDUSD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 | GBPUSD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
-| CADCHF | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 | USDCHF | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
-| GBPCAD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
-| AUDNZD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
+| CADCHF | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 | EURAUD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 
 UNKNOWN σημαίνει μη διαθέσιμο BRC stage. Οι παύλες είναι null, όχι τιμές αγοράς. Δεν χρησιμοποιήθηκαν παλιά δεδομένα ή raw OHLC candles. Entry/SL/TP/RR είναι null για όλα τα tv_ready=false.
