@@ -1,10 +1,10 @@
 # TradingView BRC — ανεξάρτητος ωριαίος έλεγχος Trend
 
-**Ώρα Ελλάδας:** 21/11/2026, 00:31:57 (Europe/Athens)  
-**UTC:** 2026-11-20T22:31:57Z  
+**Ώρα Ελλάδας:** 21/11/2026, 01:28:52 (Europe/Athens)  
+**UTC:** 2026-11-20T23:28:52Z  
 **Κατάσταση:** TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED.
 
-Και οι 8 απαιτούμενες κλήσεις μπλοκαρίστηκαν πριν από την εκτέλεση. Η πρώτη (AUDUSD) επέστρεψε ημερήσιο όριο χρήσης και cooldown 10 λεπτών· οι υπόλοιπες ενεργό cooldown. Δεν επιστράφηκαν `metainfo` ή `last_values`, δεν ταυτοποιήθηκε δείκτης από απόκριση και δεν επιβεβαιώθηκε TradingView READY.
+Και οι 7 απαιτούμενες κλήσεις μπλοκαρίστηκαν πριν από την εκτέλεση. Η πρώτη (AUDUSD) επέστρεψε ημερήσιο όριο χρήσης και cooldown 10 λεπτών· οι υπόλοιπες ενεργό cooldown. Δεν επιστράφηκαν `metainfo` ή `last_values`, δεν ταυτοποιήθηκε δείκτης από απόκριση και δεν επιβεβαιώθηκε TradingView READY.
 
 **Ζητούμενος δείκτης:** BRC TV Triple TF Audit v1 — `USER;ae27f010fee5413b8f5d1cc39e592cde`.  
 **Παράμετροι ανά ζευγάρι:** `OANDA:PAIR` · `timeframe=1h` · `calc_bars_count=500` · `return_bars=1`.  
@@ -12,12 +12,12 @@
 
 ## Κάλυψη από τα αρχεία εισόδου
 
-- Report εισόδου: **Τελευταία ενημέρωση:** 20/11/2026 23:34 (Europe/Athens)
+- Report εισόδου: **Τελευταία ενημέρωση:** 21/11/2026 00:32 (Europe/Athens)
 - Weekly Top 5: AUDUSD, AUDCHF, AUDJPY, AUDCAD, EURJPY.
-- OANDA Top 5: AUDNZD, AUDCAD, AUDJPY, EURAUD, GBPJPY.
+- OANDA Top 5: AUDNZD, EURAUD, AUDCAD, EURJPY, AUDJPY.
 - Trend READY / TV UNVERIFIED: κανένα στο report εισόδου.
 - Πρόσθετοι υποψήφιοι READY / TV UNVERIFIED εκτός πεντάδων: κανένας.
-- Μοναδικά ζευγάρια: 8. Ελέγχθηκαν όλες οι γραμμές Trend και ο πίνακας των 28 Forex pairs. Crypto και HTF Reversal εξαιρούνται από το συγκεκριμένο Trend audit.
+- Μοναδικά ζευγάρια: 7. Ελέγχθηκαν όλες οι γραμμές Trend και ο πίνακας των 28 Forex pairs. Crypto και HTF Reversal εξαιρούνται από το συγκεκριμένο Trend audit.
 
 | Pair | Πηγή | H1 open UTC | Direction | EMA | D1/H4 | ADX H4/H1 | BRC | Zone | Κλεισμένη H1 τιμή | tv_ready | Status |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -28,7 +28,6 @@
 | EURJPY | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 | AUDNZD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 | EURAUD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
-| GBPJPY | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 
 `UNKNOWN` και `—` σημαίνουν μη διαθέσιμα δεδομένα, με `null` στο JSON. Δεν χρησιμοποιήθηκαν παλιές τιμές ως νέες ούτε δημοσιεύτηκαν raw OHLC candles. Για κάθε `tv_ready=false`, Entry/SL/TP/RR παραμένουν `null`.
 
