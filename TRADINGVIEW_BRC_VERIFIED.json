@@ -2,7 +2,7 @@
   "schema_version": 1,
   "script_id": "USER;ae27f010fee5413b8f5d1cc39e592cde",
   "source": "TradingView MCP Pine indicator",
-  "generated_at": "2026-11-20T21:33:29Z",
+  "generated_at": "2026-11-20T22:31:58Z",
   "method": "Independent TradingView Pine OANDA D1 H4 H1 audit, derived values only",
   "pairs": [
     {
@@ -111,27 +111,6 @@
       "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active"
     },
     {
-      "pair": "EURAUD",
-      "symbol": "OANDA:EURAUD",
-      "source": "TradingView Pine",
-      "h1_open_at": null,
-      "direction": null,
-      "tv_ready": false,
-      "brc_stage": null,
-      "ema_passes": null,
-      "d1_structure": null,
-      "h4_structure": null,
-      "adx_h4": null,
-      "adx_h1": null,
-      "zone": null,
-      "entry": null,
-      "stop": null,
-      "target": null,
-      "rr": null,
-      "last_closed_h1_close": null,
-      "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active"
-    },
-    {
       "pair": "AUDNZD",
       "symbol": "OANDA:AUDNZD",
       "source": "TradingView Pine",
@@ -153,8 +132,29 @@
       "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active"
     },
     {
-      "pair": "GBPAUD",
-      "symbol": "OANDA:GBPAUD",
+      "pair": "EURAUD",
+      "symbol": "OANDA:EURAUD",
+      "source": "TradingView Pine",
+      "h1_open_at": null,
+      "direction": null,
+      "tv_ready": false,
+      "brc_stage": null,
+      "ema_passes": null,
+      "d1_structure": null,
+      "h4_structure": null,
+      "adx_h4": null,
+      "adx_h1": null,
+      "zone": null,
+      "entry": null,
+      "stop": null,
+      "target": null,
+      "rr": null,
+      "last_closed_h1_close": null,
+      "status": "TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active"
+    },
+    {
+      "pair": "GBPJPY",
+      "symbol": "OANDA:GBPJPY",
       "source": "TradingView Pine",
       "h1_open_at": null,
       "direction": null,
