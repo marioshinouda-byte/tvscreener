@@ -1,9 +1,9 @@
 # TradingView BRC — ανεξάρτητος ωριαίος έλεγχος Trend
 
-**Ώρα Ελλάδας:** 20/11/2026, 02:29:49 (Europe/Athens)  
-**UTC:** 2026-11-20T00:29:49Z  
-**Πρόσβαση TradingView Pine:** επιτυχής για 7/7 ζευγάρια.  
-**Ανεξάρτητο TV READY:** 0/7.
+**Ώρα Ελλάδας:** 20/11/2026, 02:33:45 (Europe/Athens)  
+**UTC:** 2026-11-20T00:33:45Z  
+**Πρόσβαση TradingView Pine:** επιτυχής για 8/8 ζευγάρια.  
+**Ανεξάρτητο TV READY:** 0/8.
 
 Όλες οι κλήσεις επέστρεψαν success=true, το ακριβές ζητούμενο σύμβολο OANDA, τον ταυτοποιημένο δείκτη και τα αναμενόμενα metainfo.plots. Χρησιμοποιήθηκε αποκλειστικά το last_values της τελευταίας κλεισμένης H1, όχι το τελευταίο forming candle του values[].
 
@@ -13,11 +13,15 @@
 
 ## Κάλυψη
 
-- Weekly Top 5: AUDCAD, AUDJPY, GBPAUD, AUDUSD, GBPUSD.
-- OANDA Top 5: AUDCAD, EURAUD, AUDUSD, AUDCHF, AUDJPY.
-- Trend TV UNVERIFIED / READY στο report εισόδου: EURAUD (TV UNVERIFIED).
-- Πρόσθετοι εκτός πεντάδων: κανένας.
-- Μοναδικά ζευγάρια: 7. Εξετάστηκαν όλες οι γραμμές Trend και ο πίνακας όλων των 28 Forex pairs. Crypto και HTF Reversal εξαιρούνται.
+- Weekly Top 5 κατά την αρχική ανάγνωση: AUDCAD, AUDJPY, GBPAUD, AUDUSD, GBPUSD. Αυτά τα ζευγάρια διατηρήθηκαν στην κάλυψη του audit.
+- Αρχική OANDA Top 5: AUDCAD, EURAUD, AUDUSD, AUDCHF, AUDJPY.
+- Ανανεωμένη OANDA Top 5 μετά το πρώτο νέο scan: EURAUD, AUDCAD, AUDCHF, AUDJPY, AUDNZD.
+- Trend TV UNVERIFIED / READY στο αρχικό report εισόδου: EURAUD (TV UNVERIFIED).
+- Πρόσθετοι Trend READY / TV UNVERIFIED εκτός αρχικών πεντάδων: κανένας.
+- Προστέθηκε στην ίδια εκτέλεση από την ανανεωμένη πεντάδα: AUDNZD.
+- Μοναδικά ζευγάρια: 8. Εξετάστηκαν όλες οι γραμμές Trend και ο πίνακας όλων των 28 Forex pairs. Crypto και HTF Reversal εξαιρούνται.
+
+Το πρώτο νέο Yahoo/OANDA scan απέρριψε 28/28 ζευγάρια ως YF-H1-MISMATCH: δεν βρέθηκε το ίδιο κλεισμένο H1 κερί OANDA/Yahoo. Το παραγόμενο WEEKLY_FOREX_TOP5.json επέστρεψε κενό top5. Η ανεξάρτητη TradingView Pine κάλυψη παραμένει διαθέσιμη για όλη την αρχική πεντάδα και την ανανεωμένη OANDA λίστα. Η νέα εκτέλεση μετά το JSON push ελέγχεται χωριστά για ολοκλήρωση, hashes και κατάσταση πηγών.
 
 ## Ανεξάρτητος πίνακας TradingView Pine
 
@@ -30,8 +34,9 @@
 | GBPUSD | TradingView Pine | 2026-11-19T23:00:00Z | SHORT | 3/3 | 0 / -1 | 46.30 / 41.76 | 5 WAIT NEW RETEST | 1.31203 | 1.3086 | 0 | false | WATCH / WAIT NEW RETEST / NO TV READY |
 | EURAUD | TradingView Pine | 2026-11-19T23:00:00Z | LONG | 3/3 | 1 / 1 | 36.48 / 40.63 | 5 WAIT NEW RETEST | 1.64566 | 1.64782 | 0 | false | WATCH / WAIT NEW RETEST / NO TV READY |
 | AUDCHF | TradingView Pine | 2026-11-19T23:00:00Z | SHORT | 3/3 | 0 / -1 | 23.07 / 31.93 | 3 RETEST | 0.56202 | 0.56194 | 0 | false | WATCH / RETEST / NO TV READY |
+| AUDNZD | TradingView Pine | 2026-11-19T23:00:00Z | SHORT | 3/3 | -1 / -1 | 41.50 / 40.64 | 5 WAIT NEW RETEST | 1.2133 | 1.21448 | 0 | false | WATCH / WAIT NEW RETEST / NO TV READY |
 
-Η κοινή H1 άνοιξε 2026-11-19T23:00:00Z και έκλεισε 2026-11-20T00:00:00Z. Κατά την επικύρωση (2026-11-20T00:28:40Z) η ηλικία κλεισίματος ήταν 1720 δευτερόλεπτα, εντός του ορίου 0–2 ωρών με ανοχή 2 λεπτών. Οι αποκρίσεις δήλωσαν ότι το τελευταίο bar σχηματιζόταν ακόμη· αυτό αποκλείστηκε.
+Η κοινή H1 άνοιξε 2026-11-19T23:00:00Z και έκλεισε 2026-11-20T00:00:00Z. Κατά την επικύρωση (2026-11-20T00:32:37Z) η ηλικία κλεισίματος ήταν 1957 δευτερόλεπτα, εντός του ορίου 0–2 ωρών με ανοχή 2 λεπτών. Οι αποκρίσεις δήλωσαν ότι το τελευταίο bar σχηματιζόταν ακόμη· αυτό αποκλείστηκε.
 
 **Structure:** 1 BULL · 0 NEUTRAL · -1 BEAR. Τα ADX στον πίνακα εμφανίζονται στρογγυλοποιημένα σε 2 δεκαδικά· το JSON διατηρεί την ακρίβεια του TradingView. Entry/SL/TP/RR είναι null για κάθε tv_ready=false. Δεν χρησιμοποιήθηκαν δεδομένα προηγούμενου audit.
 
