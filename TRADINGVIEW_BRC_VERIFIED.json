@@ -2,7 +2,7 @@
   "schema_version": 1,
   "script_id": "USER;ae27f010fee5413b8f5d1cc39e592cde",
   "source": "TradingView MCP Pine indicator",
-  "generated_at": "2026-11-20T00:29:50Z",
+  "generated_at": "2026-11-20T00:33:46Z",
   "method": "Independent TradingView Pine OANDA D1 H4 H1 audit, derived values only",
   "pairs": [
     {
@@ -151,6 +151,27 @@
       "rr": null,
       "last_closed_h1_close": 0.56194,
       "status": "WATCH / RETEST / NO TV READY"
+    },
+    {
+      "pair": "AUDNZD",
+      "symbol": "OANDA:AUDNZD",
+      "source": "TradingView Pine",
+      "h1_open_at": "2026-11-19T23:00:00Z",
+      "direction": "SHORT",
+      "tv_ready": false,
+      "brc_stage": 5,
+      "ema_passes": 3,
+      "d1_structure": -1,
+      "h4_structure": -1,
+      "adx_h4": 41.49604188191531,
+      "adx_h1": 40.635907798007494,
+      "zone": 1.2133,
+      "entry": null,
+      "stop": null,
+      "target": null,
+      "rr": null,
+      "last_closed_h1_close": 1.21448,
+      "status": "WATCH / WAIT NEW RETEST / NO TV READY"
     }
   ]
 }
