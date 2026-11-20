@@ -1,7 +1,7 @@
 # TradingView BRC — ανεξάρτητος ωριαίος έλεγχος Trend
 
-**Ώρα Ελλάδας:** 20/11/2026, 17:24:21 (Europe/Athens)  
-**UTC:** 2026-11-20T15:24:21Z  
+**Ώρα Ελλάδας:** 20/11/2026, 18:31:09 (Europe/Athens)  
+**UTC:** 2026-11-20T16:31:09Z  
 **Κατάσταση:** TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED.
 
 Και οι 8 απαιτούμενες κλήσεις μπλοκαρίστηκαν πριν από την εκτέλεση. Η πρώτη (AUDUSD) επέστρεψε ημερήσιο όριο χρήσης και cooldown 10 λεπτών· οι υπόλοιπες ενεργό cooldown. Δεν επιστράφηκαν metainfo ή last_values, δεν ταυτοποιήθηκε δείκτης από απόκριση και δεν επιβεβαιώθηκε TradingView READY.
@@ -13,8 +13,8 @@
 ## Κάλυψη
 
 - Weekly Top 5: AUDUSD, AUDCHF, AUDJPY, AUDCAD, EURJPY.
-- OANDA Top 5: EURAUD, AUDJPY, AUDNZD, GBPJPY, AUDCAD.
-- Trend READY / TV UNVERIFIED στο report εισόδου: EURJPY.
+- OANDA Top 5: EURAUD, AUDJPY, GBPAUD, GBPJPY, AUDCAD.
+- Trend READY / TV UNVERIFIED στο report εισόδου: κανένας.
 - Πρόσθετοι READY / TV UNVERIFIED εκτός πεντάδων: κανένας.
 - Μοναδικά ζευγάρια: 8. Ελέγχθηκαν όλες οι γραμμές Trend και ο πίνακας των 28 Forex pairs. Crypto και HTF Reversal εξαιρούνται.
 
@@ -26,7 +26,7 @@
 | AUDCAD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 | EURJPY | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 | EURAUD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
-| AUDNZD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
+| GBPAUD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 | GBPJPY | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 
 UNKNOWN σημαίνει μη διαθέσιμο BRC stage· οι παύλες είναι null. Δεν χρησιμοποιήθηκαν παλιά δεδομένα ή raw OHLC candles. Entry/SL/TP/RR είναι null για κάθε tv_ready=false.
