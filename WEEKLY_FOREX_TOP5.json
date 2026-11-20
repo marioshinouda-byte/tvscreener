@@ -1,13 +1,5 @@
 {
   "week": "2026-W47",
-  "top5": [
-    "AUDCAD",
-    "AUDJPY",
-    "GBPAUD",
-    "AUDUSD",
-    "GBPUSD"
-  ],
-  "hot_new": [
-    "EURAUD"
-  ]
+  "top5": [],
+  "hot_new": []
 }
