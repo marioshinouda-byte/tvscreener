@@ -1,7 +1,7 @@
 # TradingView BRC — ανεξάρτητος ωριαίος έλεγχος Trend
 
-**Ώρα Ελλάδας:** 20/11/2026, 22:28:13 (Europe/Athens)  
-**UTC:** 2026-11-20T20:28:13Z  
+**Ώρα Ελλάδας:** 20/11/2026, 23:33:27 (Europe/Athens)  
+**UTC:** 2026-11-20T21:33:27Z  
 **Κατάσταση:** TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED.
 
 Και οι 8 απαιτούμενες κλήσεις μπλοκαρίστηκαν πριν από την εκτέλεση. Η πρώτη (AUDUSD) επέστρεψε ημερήσιο όριο χρήσης και cooldown 10 λεπτών· οι υπόλοιπες ενεργό cooldown. Δεν επιστράφηκαν metainfo ή last_values, δεν ταυτοποιήθηκε δείκτης από απόκριση και δεν επιβεβαιώθηκε TradingView READY.
@@ -12,9 +12,9 @@
 
 ## Κάλυψη από τα αρχεία εισόδου
 
-- Report εισόδου: 20/11/2026 22:15 (Europe/Athens).
+- Report εισόδου: 20/11/2026 22:28 (Europe/Athens).
 - Weekly Top 5: AUDUSD, AUDCHF, AUDJPY, AUDCAD, EURJPY.
-- OANDA Top 5: AUDJPY, AUDCAD, AUDNZD, EURAUD, GBPJPY.
+- OANDA Top 5: AUDJPY, AUDCAD, EURAUD, AUDNZD, GBPAUD.
 - Trend READY / TV UNVERIFIED: κανένας.
 - Πρόσθετοι READY / TV UNVERIFIED εκτός πεντάδων: κανένας.
 - Μοναδικά ζευγάρια: 8. Ελέγχθηκαν όλες οι γραμμές Trend και ο πίνακας των 28 Forex pairs. Crypto και HTF Reversal εξαιρούνται.
@@ -26,9 +26,9 @@
 | AUDJPY | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 | AUDCAD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 | EURJPY | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
-| AUDNZD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 | EURAUD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
-| GBPJPY | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
+| AUDNZD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
+| GBPAUD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 
 UNKNOWN σημαίνει μη διαθέσιμο BRC stage· οι παύλες είναι null. Δεν χρησιμοποιήθηκαν παλιά δεδομένα ή raw OHLC candles. Entry/SL/TP/RR είναι null για κάθε tv_ready=false.
 
