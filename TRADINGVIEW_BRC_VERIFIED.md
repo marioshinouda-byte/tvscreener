@@ -1,47 +1,40 @@
 # TradingView BRC — ανεξάρτητος ωριαίος έλεγχος Trend
 
-**Ώρα Ελλάδας:** 20/11/2026, 03:31:50 (Europe/Athens)  
-**UTC:** 2026-11-20T01:31:50Z  
-**TradingView Pine:** 2/7 επιτυχείς κλήσεις, 5/7 TV UNAVAILABLE.  
-**Ανεξάρτητο TV READY:** 0/7.
+**Ώρα Ελλάδας:** 20/11/2026, 04:30:19 (Europe/Athens)  
+**UTC:** 2026-11-20T02:30:19Z  
+**Κατάσταση:** TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED.
 
-Τα EURAUD και AUDCAD επέστρεψαν πραγματικά TradingView Pine δεδομένα με success=true, ακριβές OANDA symbol, ταυτοποιημένο δείκτη και σωστά metainfo.plots. Τα AUDCHF, AUDJPY, AUDUSD, AUDNZD και GBPAUD δεν επέστρεψαν metainfo ή last_values. Η κλήση AUDCHF μπλοκαρίστηκε από ημερήσιο όριο TOOL_QUOTA_EXCEEDED και cooldown 10 λεπτών· οι άλλες τέσσερις από ενεργό cooldown. Για αυτά γράφονται TV UNAVAILABLE, tv_ready=false και null στα μη διαθέσιμα πεδία.
+Το συνδεδεμένο TradingView MCP μπλόκαρε και τις 7 κλήσεις πριν από την εκτέλεση. Η πρώτη (AUDUSD) επέστρεψε ημερήσιο όριο χρήσης και cooldown 10 λεπτών, οι υπόλοιπες ενεργό cooldown. Δεν επιστράφηκαν metainfo ή last_values· δεν ταυτοποιήθηκε δείκτης από απόκριση και δεν επιβεβαιώθηκε TradingView READY.
 
-**Δείκτης:** BRC TV Triple TF Audit v1, `USER;ae27f010fee5413b8f5d1cc39e592cde`.  
+**Ζητούμενος δείκτης:** BRC TV Triple TF Audit v1, `USER;ae27f010fee5413b8f5d1cc39e592cde`.  
 **Παράμετροι:** OANDA:PAIR, timeframe=1h, calc_bars_count=500, return_bars=1.  
-**Πηγή:** TradingView Pine. Παράγωγα audit signals μόνο, χωρίς raw OHLC candles.
+**Πηγή παραγώγων όταν είναι διαθέσιμα:** TradingView Pine.
 
 ## Κάλυψη
 
-- Κατά την αρχική ανάγνωση το WEEKLY_FOREX_TOP5.json είχε top5=[].
-- Weekly Top 5 που επανήλθε μετά το πρώτο νέο scan: AUDUSD, AUDCHF, AUDJPY, AUDCAD, AUDNZD.
-- Αρχική OANDA Top 5: EURAUD, AUDCAD, AUDCHF, AUDJPY, AUDUSD.
-- Ανανεωμένη OANDA Top 5: AUDCAD, AUDJPY, AUDCHF, GBPAUD, EURAUD.
-- Trend TV UNVERIFIED / READY στο report μετά το πρώτο νέο scan: κανένας.
-- Προστέθηκαν στην ίδια εκτέλεση από τις ανανεωμένες λίστες: AUDNZD, GBPAUD.
+- Weekly Top 5: AUDUSD, AUDCHF, AUDJPY, AUDCAD, AUDNZD.
+- OANDA Top 5: AUDCAD, AUDCHF, GBPAUD, AUDNZD, EURAUD.
+- Trend TV UNVERIFIED / READY στο report εισόδου: κανένας.
+- Πρόσθετοι READY / TV UNVERIFIED εκτός πεντάδων: κανένας.
 - Μοναδικά ζευγάρια: 7. Εξετάστηκαν όλες οι γραμμές Trend και ο πίνακας όλων των 28 Forex pairs. Crypto και HTF Reversal εξαιρούνται.
 
-Το πρώτο νέο scan αποκατέστησε τη διασταύρωση Yahoo OHLC/OANDA H1 σε 28/28 ζευγάρια και επανέφερε την εβδομαδιαία πεντάδα. Η νέα εκτέλεση μετά το JSON push ελέγχεται χωριστά για ολοκλήρωση, source/report hashes και κατάσταση πηγών.
+| Pair | Πηγή | H1 open UTC | Direction | EMA | D1/H4 | ADX H4/H1 | BRC | Zone | Κλεισμένη H1 τιμή | tv_ready | Status |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| AUDUSD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: daily usage limit; MCP cooldown 10 minutes |
+| AUDCHF | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
+| AUDJPY | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
+| AUDCAD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
+| AUDNZD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
+| GBPAUD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
+| EURAUD | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 
-| Pair | Πηγή | H1 open UTC | Direction | EMA | D1/H4 structure | ADX H4/H1 | BRC | Zone | Κλεισμένη H1 τιμή | verified_ready | tv_ready | Status |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| EURAUD | TradingView Pine | 2026-11-20T00:00:00Z | LONG | 3/3 | 1 / 1 | 36.48 / 42.19 | 5 WAIT NEW RETEST | 1.64566 | 1.64848 | 0 | false | WATCH / WAIT NEW RETEST / NO TV READY |
-| AUDCAD | TradingView Pine | 2026-11-20T00:00:00Z | SHORT | 3/3 | -1 / -1 | 45.67 / 42.92 | 5 WAIT NEW RETEST | 0.95609 | 0.95416 | 0 | false | WATCH / WAIT NEW RETEST / NO TV READY |
-| AUDCHF | TradingView Pine | — | — | — | — / — | — / — | UNKNOWN | — | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: daily usage limit; MCP cooldown 10 minutes |
-| AUDJPY | TradingView Pine | — | — | — | — / — | — / — | UNKNOWN | — | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
-| AUDUSD | TradingView Pine | — | — | — | — / — | — / — | UNKNOWN | — | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
-| AUDNZD | TradingView Pine | — | — | — | — / — | — / — | UNKNOWN | — | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
-| GBPAUD | TradingView Pine | — | — | — | — / — | — / — | UNKNOWN | — | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
-
-Για τις δύο επιτυχείς αποκρίσεις χρησιμοποιήθηκε αποκλειστικά το last_values από την H1 που άνοιξε 2026-11-20T00:00:00Z και έκλεισε 2026-11-20T01:00:00Z. Κατά την αρχική επικύρωση (2026-11-20T01:26:23Z) η ηλικία κλεισίματος ήταν 1583 δευτερόλεπτα. Η παλαιότητα επανελέγχθηκε πριν από τη δημοσίευση, εντός 0–2 ωρών με ανοχή 2 λεπτών. Το forming candle του values[] αποκλείστηκε.
-
-**Structure:** 1 BULL · 0 NEUTRAL · -1 BEAR. Τα ADX στον πίνακα εμφανίζονται με 2 δεκαδικά· το JSON κρατά την ακρίβεια του TradingView. UNKNOWN και παύλες σημαίνουν null, όχι τιμές αγοράς. Entry/SL/TP/RR είναι null για κάθε tv_ready=false. Δεν χρησιμοποιήθηκαν δεδομένα προηγούμενου audit.
+UNKNOWN σημαίνει μη διαθέσιμο BRC stage. Οι παύλες είναι null, όχι τιμές αγοράς. Δεν χρησιμοποιήθηκαν παλιά δεδομένα ή raw OHLC candles. Entry/SL/TP/RR είναι null για όλα τα tv_ready=false.
 
 **BRC:** 0 NO ALIGNMENT · 1 WAIT BREAK · 2 BREAK · 3 RETEST · 4 READY · 5 WAIT NEW RETEST.
 
 READY ισχύει μόνο όταν συμφωνούν η ανεξάρτητη TradingView Pine audit και το Yahoo/OANDA Trend BRC για το **ΙΔΙΟ κλεισμένο H1, direction και zone**. Το GitHub READY μόνο του δεν αρκεί.
 
-Το tv_ready=true απαιτεί success=true, ακριβές OANDA symbol και ταυτοποιημένο δείκτη, κλεισμένο H1 με ηλικία κλεισίματος 0–2 ώρες (ανοχή 2 λεπτών), verified_ready=1, BRC=4, EMA=3/3, ίδια direction σε D1/H4 structure, ADX H4/H1 ≥20, θετικά πεπερασμένα zone/entry/SL/TP, σωστό προσανατολισμό SL/TP και RR ≥1.2, ελεγμένο και από τις αποστάσεις entry/stop/target.
+Το tv_ready=true απαιτεί success=true, ακριβές OANDA symbol και ταυτοποιημένο δείκτη, last_values από κλεισμένο H1 με ηλικία κλεισίματος 0–2 ώρες (ανοχή 2 λεπτών), verified_ready=1, BRC=4, EMA=3/3, ίδια direction σε D1/H4 structure, ADX H4/H1 ≥20, θετικά πεπερασμένα zone/entry/SL/TP, σωστό προσανατολισμό SL/TP και RR ≥1.2. Χρησιμοποιείται μόνο last_values, ποτέ forming candle του values[].
 
 Το JSON push εκκινεί νέο fail-closed scan. Η ολοκλήρωση ελέγχεται μετά το push από το workflow και νέα εγγραφή υγείας. Το Trend audit δεν επιβεβαιώνει HTF Reversal, δεν ενεργοποιεί READY alerts και δεν δίνει εντολές συναλλαγών.
 
