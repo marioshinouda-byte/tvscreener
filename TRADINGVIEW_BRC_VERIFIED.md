@@ -1,7 +1,7 @@
 # TradingView BRC — ανεξάρτητος ωριαίος έλεγχος Trend
 
-**Ώρα Ελλάδας:** 21/11/2026, 07:27:00 (Europe/Athens)  
-**UTC:** 2026-11-21T05:27:00Z  
+**Ώρα Ελλάδας:** 21/11/2026, 08:33:13 (Europe/Athens)  
+**UTC:** 2026-11-21T06:33:13Z  
 **Κατάσταση:** TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED.
 
 Και οι 5 απαιτούμενες κλήσεις μπλοκαρίστηκαν πριν από την εκτέλεση. Η πρώτη (AUDNZD) επέστρεψε ημερήσιο όριο χρήσης και cooldown 10 λεπτών· οι υπόλοιπες ενεργό cooldown. Δεν επιστράφηκαν `metainfo` ή `last_values`, δεν ταυτοποιήθηκε δείκτης από απόκριση και δεν επιβεβαιώθηκε TradingView READY.
@@ -12,12 +12,12 @@
 
 ## Κάλυψη από τα αρχεία εισόδου
 
-- Report εισόδου: **Τελευταία ενημέρωση:** 21/11/2026 06:29 (Europe/Athens)
-- Weekly Top 5 (2026-W47): **κενό στο τρέχον [WEEKLY_FOREX_TOP5.json](WEEKLY_FOREX_TOP5.json)** (`top5=[]`, `hot_new=[]`). Το report εισόδου απορρίπτει και τα 28 Forex pairs ως `YF-STALE`. Η λίστα του παρόντος audit βασίζεται αποκλειστικά στα τρέχοντα αρχεία εισόδου.
+- Report εισόδου: **Τελευταία ενημέρωση:** 21/11/2026 07:27 (Europe/Athens)
+- Weekly Top 5 (2026-W47): **κενό στο τρέχον [WEEKLY_FOREX_TOP5.json](WEEKLY_FOREX_TOP5.json)** (`top5=[]`, `hot_new=[]`). Το report εισόδου απορρίπτει 28/28 Forex pairs ως `YF-STALE`.
 - OANDA Top 5: AUDNZD, EURAUD, AUDCAD, EURJPY, AUDJPY. Και οι 5 γραμμές του shortlist εισόδου έχουν feed status `STALE`.
 - Trend READY / TV UNVERIFIED: κανένα στο report εισόδου.
 - Πρόσθετοι υποψήφιοι READY / TV UNVERIFIED εκτός πεντάδων: κανένας.
-- Μοναδικά ζευγάρια προς audit: 5. Ελέγχθηκαν όλες οι γραμμές Trend και ο πίνακας των 28 Forex pairs. Crypto και HTF Reversal εξαιρούνται από το συγκεκριμένο Trend audit.
+- Μοναδικά ζευγάρια προς audit: 5. Ελέγχθηκαν όλες οι γραμμές Trend και ο πίνακας των 28 Forex pairs. Η λίστα βασίζεται στα τρέχοντα αρχεία εισόδου. Crypto και HTF Reversal εξαιρούνται.
 
 | Pair | Πηγή | H1 open UTC | Direction | EMA | D1/H4 | ADX H4/H1 | BRC | Zone | Κλεισμένη H1 τιμή | tv_ready | Status |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -27,16 +27,16 @@
 | EURJPY | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 | AUDJPY | TradingView Pine | — | — | — | — | — | UNKNOWN | — | — | false | TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED: MCP cooldown active |
 
-`UNKNOWN` και `—` σημαίνουν μη διαθέσιμα δεδομένα, με `null` στο JSON. Δεν επαναχρησιμοποιήθηκαν τιμές προηγούμενου TradingView audit ούτε παρουσιάστηκαν παλιά δεδομένα ως νέα. Για κάθε `tv_ready=false`, Entry/SL/TP/RR παραμένουν `null`. Δημοσιεύονται μόνο παράγωγα audit signals και όχι πλήρη raw OHLC candles.
+`UNKNOWN` και `—` δηλώνουν μη διαθέσιμα δεδομένα, με `null` στο JSON. Δεν επαναχρησιμοποιήθηκαν τιμές προηγούμενου audit ούτε παρουσιάστηκαν παλιά δεδομένα ως νέα. Για κάθε `tv_ready=false`, Entry/SL/TP/RR παραμένουν `null`. Δημοσιεύονται μόνο παράγωγα audit signals, όχι πλήρη raw OHLC candles.
 
-**BRC:** 0 NO ALIGNMENT · 1 WAIT BREAK · 2 BREAK · 3 RETEST · 4 READY · 5 WAIT NEW RETEST. Δεν αποδίδεται αριθμητικό στάδιο όταν το TradingView δεν το επέστρεψε.
+**BRC:** 0 NO ALIGNMENT · 1 WAIT BREAK · 2 BREAK · 3 RETEST · 4 READY · 5 WAIT NEW RETEST. Δεν αποδίδεται αριθμητικό στάδιο χωρίς απόκριση TradingView.
 
 ## Κανόνας ανεξάρτητης επιβεβαίωσης
 
-**READY ισχύει μόνο όταν συμφωνούν η TradingView Pine audit και το υπάρχον Yahoo/OANDA Trend BRC για το ΙΔΙΟ κλεισμένο H1, direction και zone.** Το GitHub READY μόνο του δεν επαρκεί. Το `tv_ready` αφορά το ανεξάρτητο σκέλος TradingView· το `tradingview_gate.py` διασταυρώνει τη συμφωνία με το Trend BRC.
+**READY ισχύει μόνο όταν συμφωνούν η TradingView Pine audit και το υπάρχον Yahoo/OANDA Trend BRC για το ΙΔΙΟ κλεισμένο H1, direction και zone.** Το GitHub READY μόνο του δεν επαρκεί. Το `tradingview_gate.py` ελέγχει τη συμφωνία των δύο σκελών.
 
-Απαιτούνται επιτυχής κλήση, ακριβές σύμβολο και ταυτοποιημένος δείκτης, τελευταία κλεισμένη H1 από `last_values` με ηλικία από το κλείσιμο 0–2 ώρες (ανοχή έως 2 λεπτά), `verified_ready=1`, `brc_stage=4`, EMA 3/3, D1/H4 structure προς την ίδια κατεύθυνση, ADX H4/H1 ≥20, θετικές πεπερασμένες zone/Entry/SL/TP, σωστός προσανατολισμός SL/TP και RR ≥1.2. Το `h1_open_at` προκύπτει από το UTC unix timestamp `last_values.t`. Δεν χρησιμοποιείται το forming candle από `values[]`. Το `generated_at` είναι η πραγματική ώρα ενημέρωσης του snapshot.
+Το ανεξάρτητο `tv_ready=true` απαιτεί επιτυχή κλήση, ακριβές σύμβολο και ταυτοποιημένο δείκτη, τελευταία κλεισμένη H1 από `last_values` με ηλικία κλεισίματος 0–2 ώρες (ανοχή έως 2 λεπτά), `verified_ready=1`, `brc_stage=4`, EMA 3/3, D1/H4 structure προς την ίδια κατεύθυνση, ADX H4/H1 ≥20, θετικές πεπερασμένες zone/Entry/SL/TP, σωστό προσανατολισμό SL/TP και RR ≥1.2. Το `h1_open_at` είναι UTC ISO8601 από το unix seconds `last_values.t`. Δεν χρησιμοποιείται το forming candle από `values[]`. Το `generated_at` είναι η πραγματική ώρα ενημέρωσης του snapshot.
 
-Το JSON push εκκινεί νέο fail-closed scan· η ολοκλήρωση ελέγχεται μετά το push από το workflow και νέα εγγραφή υγείας. Το Trend audit δεν επιβεβαιώνει HTF Reversal. Δεν ενεργοποιήθηκαν READY alerts και δεν δόθηκαν εντολές συναλλαγών.
+Το JSON push εκκινεί νέο fail-closed scan· η ολοκλήρωση ελέγχεται μέσω workflow και νέας εγγραφής υγείας. Το Trend audit δεν επιβεβαιώνει HTF Reversal. Δεν ενεργοποιήθηκαν READY alerts και δεν δόθηκαν εντολές συναλλαγών.
 
 [Τελευταίο report](LATEST_FOREX_SCAN.md) · [Snapshot JSON](TRADINGVIEW_BRC_VERIFIED.json)
