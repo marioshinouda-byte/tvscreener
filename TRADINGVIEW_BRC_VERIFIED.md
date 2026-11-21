@@ -1,7 +1,7 @@
 # TradingView BRC — ανεξάρτητος ωριαίος έλεγχος Trend
 
-**Ώρα Ελλάδας:** 21/11/2026, 08:33:13 (Europe/Athens)  
-**UTC:** 2026-11-21T06:33:13Z  
+**Ώρα Ελλάδας:** 21/11/2026, 09:30:37 (Europe/Athens)  
+**UTC:** 2026-11-21T07:30:37Z  
 **Κατάσταση:** TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED.
 
 Και οι 5 απαιτούμενες κλήσεις μπλοκαρίστηκαν πριν από την εκτέλεση. Η πρώτη (AUDNZD) επέστρεψε ημερήσιο όριο χρήσης και cooldown 10 λεπτών· οι υπόλοιπες ενεργό cooldown. Δεν επιστράφηκαν `metainfo` ή `last_values`, δεν ταυτοποιήθηκε δείκτης από απόκριση και δεν επιβεβαιώθηκε TradingView READY.
@@ -12,7 +12,7 @@
 
 ## Κάλυψη από τα αρχεία εισόδου
 
-- Report εισόδου: **Τελευταία ενημέρωση:** 21/11/2026 07:27 (Europe/Athens)
+- Report εισόδου: **Τελευταία ενημέρωση:** 21/11/2026 08:33 (Europe/Athens)
 - Weekly Top 5 (2026-W47): **κενό στο τρέχον [WEEKLY_FOREX_TOP5.json](WEEKLY_FOREX_TOP5.json)** (`top5=[]`, `hot_new=[]`). Το report εισόδου απορρίπτει 28/28 Forex pairs ως `YF-STALE`.
 - OANDA Top 5: AUDNZD, EURAUD, AUDCAD, EURJPY, AUDJPY. Και οι 5 γραμμές του shortlist εισόδου έχουν feed status `STALE`.
 - Trend READY / TV UNVERIFIED: κανένα στο report εισόδου.
