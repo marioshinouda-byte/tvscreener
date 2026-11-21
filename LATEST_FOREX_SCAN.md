@@ -1,6 +1,6 @@
 # Latest Forex Scan
 
-**Τελευταία ενημέρωση:** 21/11/2026 18:32 (Europe/Athens)
+**Τελευταία ενημέρωση:** 21/11/2026 19:27 (Europe/Athens)
 
 **Pairs:** 28  |  **Aligned:** 0  |  **A+ READY:** 0
 
@@ -36,7 +36,7 @@
 | EURAUD | YF-STALE |
 | EURNZD | YF-STALE |
 | GBPJPY | YF-STALE |
-| GBPCHF | N/A |
+| GBPCHF | YF-STALE |
 | GBPCAD | YF-STALE |
 | GBPAUD | YF-STALE |
 | GBPNZD | YF-STALE |
@@ -52,7 +52,7 @@
 | CHFJPY | YF-STALE |
 
 
-> ⚠️ YF-STALE: 27 ζευγάρια (EURUSD, GBPUSD, USDJPY, USDCHF, USDCAD, AUDUSD, NZDUSD, EURGBP, EURJPY, EURCHF, EURCAD, EURAUD, EURNZD, GBPJPY, GBPCAD, GBPAUD, GBPNZD, AUDJPY, AUDCHF, AUDCAD, AUDNZD, NZDJPY, NZDCHF, NZDCAD, CADJPY, CADCHF, CHFJPY) έχουν μη έγκυρο/παλιό κλεισμένο H1 (όριο 4 ώρες). Δεν παράγονται σήματα από παλιά δεδομένα.
+> ⚠️ YF-STALE: 28 ζευγάρια (EURUSD, GBPUSD, USDJPY, USDCHF, USDCAD, AUDUSD, NZDUSD, EURGBP, EURJPY, EURCHF, EURCAD, EURAUD, EURNZD, GBPJPY, GBPCHF, GBPCAD, GBPAUD, GBPNZD, AUDJPY, AUDCHF, AUDCAD, AUDNZD, NZDJPY, NZDCHF, NZDCAD, CADJPY, CADCHF, CHFJPY) έχουν μη έγκυρο/παλιό κλεισμένο H1 (όριο 4 ώρες). Δεν παράγονται σήματα από παλιά δεδομένα.
 
 Κανένα A+ READY στο τρέχον scan.
 
@@ -93,9 +93,9 @@
 
 | Asset | Market | Price | W1 | D1 | H4 | H1 | Direction | W1 Context |
 |---|---|---:|---|---|---|---|---|---|
-| **BTC** | COINBASE:BTCUSD | 59,935.38 | STRONG SELL | SELL | SELL | NEUTRAL | **—** | NEUTRAL |
-| **ETH** | COINBASE:ETHUSD | 1,681.20 | STRONG SELL | SELL | SELL | SELL | **SHORT** | ✅ SUPPORTS |
-| **SOL** | COINBASE:SOLUSD | 70.3000 | STRONG SELL | SELL | SELL | NEUTRAL | **—** | NEUTRAL |
+| **BTC** | COINBASE:BTCUSD | 60,112.96 | STRONG SELL | SELL | SELL | BUY | **—** | NEUTRAL |
+| **ETH** | COINBASE:ETHUSD | 1,682.71 | STRONG SELL | SELL | SELL | NEUTRAL | **—** | NEUTRAL |
+| **SOL** | COINBASE:SOLUSD | 70.6400 | SELL | SELL | SELL | BUY | **—** | NEUTRAL |
 
 ## HTF Reversal — ξεχωριστό mode
 
