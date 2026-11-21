@@ -1,7 +1,7 @@
 # TradingView BRC — ανεξάρτητος ωριαίος έλεγχος Trend
 
-**Ώρα Ελλάδας:** 21/11/2026, 04:27:49 (Europe/Athens)  
-**UTC:** 2026-11-21T02:27:49Z  
+**Ώρα Ελλάδας:** 21/11/2026, 05:30:44 (Europe/Athens)  
+**UTC:** 2026-11-21T03:30:44Z  
 **Κατάσταση:** TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED.
 
 Και οι 5 απαιτούμενες κλήσεις μπλοκαρίστηκαν πριν από την εκτέλεση. Η πρώτη (AUDNZD) επέστρεψε ημερήσιο όριο χρήσης και cooldown 10 λεπτών· οι υπόλοιπες ενεργό cooldown. Δεν επιστράφηκαν `metainfo` ή `last_values`, δεν ταυτοποιήθηκε δείκτης από απόκριση και δεν επιβεβαιώθηκε TradingView READY.
@@ -12,9 +12,9 @@
 
 ## Κάλυψη από τα αρχεία εισόδου
 
-- Report εισόδου: **Τελευταία ενημέρωση:** 21/11/2026 03:28 (Europe/Athens)
-- Weekly Top 5 (2026-W47): **κενό στο τρέχον [WEEKLY_FOREX_TOP5.json](WEEKLY_FOREX_TOP5.json)** (`top5=[]`, `hot_new=[]`). Το report εισόδου απορρίπτει και τα 28 Forex pairs ως `YF-STALE`. Η σημερινή λίστα βασίζεται αποκλειστικά στα τρέχοντα αρχεία εισόδου.
-- OANDA Top 5: AUDNZD, EURAUD, AUDCAD, EURJPY, AUDJPY.
+- Report εισόδου: **Τελευταία ενημέρωση:** 21/11/2026 04:28 (Europe/Athens)
+- Weekly Top 5 (2026-W47): **κενό στο τρέχον [WEEKLY_FOREX_TOP5.json](WEEKLY_FOREX_TOP5.json)** (`top5=[]`, `hot_new=[]`). Το report εισόδου απορρίπτει και τα 28 Forex pairs ως `YF-STALE`. Η λίστα του παρόντος audit βασίζεται αποκλειστικά στα τρέχοντα αρχεία εισόδου.
+- OANDA Top 5: AUDNZD, EURAUD, AUDCAD, EURJPY, AUDJPY. Και οι 5 γραμμές του shortlist εισόδου έχουν feed status `STALE`.
 - Trend READY / TV UNVERIFIED: κανένα στο report εισόδου.
 - Πρόσθετοι υποψήφιοι READY / TV UNVERIFIED εκτός πεντάδων: κανένας.
 - Μοναδικά ζευγάρια προς audit: 5. Ελέγχθηκαν όλες οι γραμμές Trend και ο πίνακας των 28 Forex pairs. Crypto και HTF Reversal εξαιρούνται από το συγκεκριμένο Trend audit.
