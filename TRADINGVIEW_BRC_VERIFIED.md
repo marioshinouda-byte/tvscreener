@@ -1,7 +1,7 @@
 # TradingView BRC — ανεξάρτητος ωριαίος έλεγχος Trend
 
-**Ώρα Ελλάδας:** 22/11/2026, 04:31:55 (Europe/Athens)  
-**UTC:** 2026-11-22T02:31:55Z  
+**Ώρα Ελλάδας:** 22/11/2026, 05:29:17 (Europe/Athens)  
+**UTC:** 2026-11-22T03:29:17Z  
 **Κατάσταση:** TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED.
 
 Και οι 5 νέες κλήσεις μπλοκαρίστηκαν πριν από την εκτέλεση του Pine. Η πρώτη (AUDNZD) επέστρεψε ημερήσιο όριο χρήσης και cooldown 10 λεπτών· οι υπόλοιπες ενεργό cooldown. Δεν επιστράφηκαν metainfo ή last_values και δεν επιβεβαιώθηκε TradingView READY.
@@ -10,8 +10,8 @@
 
 ## Κάλυψη υποψηφίων
 
-- Report εισόδου: **22/11/2026 03:31 (Europe/Athens)**.
-- [WEEKLY_FOREX_TOP5.json](WEEKLY_FOREX_TOP5.json), 2026-W47: **κενό**, `top5=[]`, `hot_new=[]`. Το report εισόδου απορρίπτει 28/28 ζευγάρια (27 YF-STALE · GBPCHF: N/A). Δεν χρησιμοποιήθηκε παλιότερη πεντάδα.
+- Report εισόδου: **22/11/2026 05:12 (Europe/Athens)**.
+- [WEEKLY_FOREX_TOP5.json](WEEKLY_FOREX_TOP5.json), 2026-W47: **κενό**, `top5=[]`, `hot_new=[]`. Το report εισόδου απορρίπτει 28/28 ζευγάρια (27 YF-STALE · EURGBP: N/A). Δεν χρησιμοποιήθηκε παλιότερη πεντάδα.
 - [OANDA_SHORTLIST.md](OANDA_SHORTLIST.md): **AUDNZD, EURAUD, AUDCAD, EURJPY, AUDJPY**, 5/5 STALE στο αρχείο εισόδου.
 - Ελέγχθηκαν όλες οι Trend ενότητες και ο πίνακας των 28 Forex pairs: **κανένα επιπλέον A+ READY Trend ή BRC=TV UNVERIFIED**.
 - Μοναδική λίστα: **5 ζευγάρια**. Bitcoin/ETH/SOL και HTF Reversal εξαιρούνται.
