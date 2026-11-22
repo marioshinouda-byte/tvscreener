@@ -1,16 +1,16 @@
 # TradingView BRC — ανεξάρτητος ωριαίος έλεγχος Trend
 
-**Ώρα Ελλάδας:** 22/11/2026, 14:24:53 (Europe/Athens)  
-**UTC:** 2026-11-22T12:24:53Z  
+**Ώρα Ελλάδας:** 22/11/2026, 15:29:18 (Europe/Athens)  
+**UTC:** 2026-11-22T13:29:18Z  
 **Κατάσταση:** TV UNAVAILABLE / TOOL_QUOTA_EXCEEDED.
 
-Και οι 5 νέες κλήσεις μπλοκαρίστηκαν πριν από την εκτέλεση του Pine. Η πρώτη (AUDNZD) επέστρεψε ημερήσιο όριο χρήσης και cooldown 10 λεπτών· οι υπόλοιπες ενεργό cooldown. Δεν επιστράφηκαν metainfo ή last_values και δεν επιβεβαιώθηκε TradingView READY.
+Και οι 5 νέες κλήσεις μπλοκαρίστηκαν πριν από την εκτέλεση του Pine. Η πρώτη (AUDNZD) επέστρεψε ημερήσιο όριο χρήσης και cooldown 10 λεπτών· οι υπόλοιπες ενεργό cooldown. Δεν επιστράφηκαν metainfo ή last_values. Δεν ταυτοποιήθηκε δείκτης από τρέχουσα απόκριση και δεν επιβεβαιώθηκε TradingView READY.
 
-Ζητούμενος δείκτης: **BRC TV Triple TF Audit v1**, `USER;ae27f010fee5413b8f5d1cc39e592cde`. Κλήση ανά ζευγάρι: `symbol=OANDA:PAIR`, `timeframe=1h`, `calc_bars_count=500`, `return_bars=1`. Δεν ταυτοποιήθηκε δείκτης από τρέχουσα απόκριση. Πηγή παραγώγων, όταν επιστρέφονται: **TradingView Pine**.
+Ζητούμενος δείκτης: **BRC TV Triple TF Audit v1**, `USER;ae27f010fee5413b8f5d1cc39e592cde`. Ανά ζευγάρι κλήθηκε με `symbol=OANDA:PAIR`, `timeframe=1h`, `calc_bars_count=500`, `return_bars=1`. Πηγή παραγώγων, όταν επιστρέφονται: **TradingView Pine**.
 
 ## Κάλυψη υποψηφίων
 
-- Report εισόδου: **22/11/2026 13:30 (Europe/Athens)**.
+- Report εισόδου: **22/11/2026 14:25 (Europe/Athens)**.
 - [WEEKLY_FOREX_TOP5.json](WEEKLY_FOREX_TOP5.json), 2026-W47: **κενό**, `top5=[]`, `hot_new=[]`. Το report εισόδου απορρίπτει 28/28 ζευγάρια (28 YF-STALE). Δεν χρησιμοποιήθηκε παλιότερη πεντάδα.
 - [OANDA_SHORTLIST.md](OANDA_SHORTLIST.md): **AUDNZD, EURAUD, AUDCAD, EURJPY, AUDJPY**, 5/5 STALE στο αρχείο εισόδου.
 - Ελέγχθηκαν όλες οι Trend ενότητες και ο πίνακας των 28 Forex pairs: **κανένα επιπλέον A+ READY Trend ή BRC=TV UNVERIFIED**.
