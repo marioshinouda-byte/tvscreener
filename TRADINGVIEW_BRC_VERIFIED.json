@@ -2,7 +2,7 @@
   "schema_version": 1,
   "script_id": "USER;ae27f010fee5413b8f5d1cc39e592cde",
   "source": "TradingView MCP Pine indicator",
-  "generated_at": "2026-11-22T00:29:28Z",
+  "generated_at": "2026-11-22T00:36:45Z",
   "method": "Independent TradingView Pine OANDA D1 H4 H1 audit, derived values only",
   "pairs": [
     {
@@ -24,7 +24,7 @@
       "target": null,
       "rr": null,
       "last_closed_h1_close": 1.20998,
-      "status": "STALE H1 / WAIT NEW RETEST / NO TV READY; verified_ready=0; closed H1 age 26.47h; H4 structure not aligned"
+      "status": "STALE H1 / WAIT NEW RETEST / NO TV READY; verified_ready=0; closed H1 age 26.58h; H4 structure not aligned"
     },
     {
       "pair": "EURAUD",
@@ -45,7 +45,7 @@
       "target": null,
       "rr": null,
       "last_closed_h1_close": 1.65681,
-      "status": "STALE H1 / WAIT NEW RETEST / NO TV READY; verified_ready=0; closed H1 age 26.47h"
+      "status": "STALE H1 / WAIT NEW RETEST / NO TV READY; verified_ready=0; closed H1 age 26.58h"
     },
     {
       "pair": "AUDCAD",
@@ -66,7 +66,7 @@
       "target": null,
       "rr": null,
       "last_closed_h1_close": 0.94952,
-      "status": "STALE H1 / WAIT NEW RETEST / NO TV READY; verified_ready=0; closed H1 age 26.47h"
+      "status": "STALE H1 / WAIT NEW RETEST / NO TV READY; verified_ready=0; closed H1 age 26.58h"
     },
     {
       "pair": "EURJPY",
@@ -87,7 +87,7 @@
       "target": null,
       "rr": null,
       "last_closed_h1_close": 173.912,
-      "status": "STALE H1 / WAIT NEW RETEST / NO TV READY; verified_ready=0; closed H1 age 26.47h"
+      "status": "STALE H1 / WAIT NEW RETEST / NO TV READY; verified_ready=0; closed H1 age 26.58h"
     },
     {
       "pair": "AUDJPY",
@@ -108,7 +108,7 @@
       "target": null,
       "rr": null,
       "last_closed_h1_close": 104.962,
-      "status": "STALE H1 / WAIT NEW RETEST / NO TV READY; verified_ready=0; closed H1 age 26.47h"
+      "status": "STALE H1 / WAIT NEW RETEST / NO TV READY; verified_ready=0; closed H1 age 26.58h"
     }
   ]
 }
