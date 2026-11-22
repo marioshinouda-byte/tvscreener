@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "status": "completed",
-  "completed_at": "2026-11-22T10:29:14.943537+00:00",
-  "run_id": "45012619802",
-  "trigger": "push",
-  "report_sha256": "4782865465a389477e06ee7f5ffa7bb5a9c0630105946d2367493bb3509964e5",
+  "completed_at": "2026-11-22T11:21:11.362954+00:00",
+  "run_id": "45016835539",
+  "trigger": "schedule",
+  "report_sha256": "25e4ea5290dc8f3def66212fe9690d5cec3b6120217e0d4c82b26e68d976bf47",
   "source_sha256": "e7fbd519985be4b78924518ffbb43743c84f8489b86d9ec4e812c2cfe65774be"
 }

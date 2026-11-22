@@ -1,6 +1,6 @@
 # Latest Forex Scan
 
-**Τελευταία ενημέρωση:** 22/11/2026 12:29 (Europe/Athens)
+**Τελευταία ενημέρωση:** 22/11/2026 13:21 (Europe/Athens)
 
 **Pairs:** 28  |  **Aligned:** 0  |  **A+ READY:** 0
 
@@ -31,14 +31,14 @@
 | NZDUSD | YF-STALE |
 | EURGBP | YF-STALE |
 | EURJPY | YF-STALE |
-| EURCHF | YF-STALE |
+| EURCHF | N/A |
 | EURCAD | YF-STALE |
 | EURAUD | YF-STALE |
 | EURNZD | YF-STALE |
 | GBPJPY | YF-STALE |
 | GBPCHF | YF-STALE |
 | GBPCAD | YF-STALE |
-| GBPAUD | N/A |
+| GBPAUD | YF-STALE |
 | GBPNZD | YF-STALE |
 | AUDJPY | YF-STALE |
 | AUDCHF | YF-STALE |
@@ -52,7 +52,7 @@
 | CHFJPY | YF-STALE |
 
 
-> ⚠️ YF-STALE: 27 ζευγάρια (EURUSD, GBPUSD, USDJPY, USDCHF, USDCAD, AUDUSD, NZDUSD, EURGBP, EURJPY, EURCHF, EURCAD, EURAUD, EURNZD, GBPJPY, GBPCHF, GBPCAD, GBPNZD, AUDJPY, AUDCHF, AUDCAD, AUDNZD, NZDJPY, NZDCHF, NZDCAD, CADJPY, CADCHF, CHFJPY) έχουν μη έγκυρο/παλιό κλεισμένο H1 (όριο 4 ώρες). Δεν παράγονται σήματα από παλιά δεδομένα.
+> ⚠️ YF-STALE: 27 ζευγάρια (EURUSD, GBPUSD, USDJPY, USDCHF, USDCAD, AUDUSD, NZDUSD, EURGBP, EURJPY, EURCAD, EURAUD, EURNZD, GBPJPY, GBPCHF, GBPCAD, GBPAUD, GBPNZD, AUDJPY, AUDCHF, AUDCAD, AUDNZD, NZDJPY, NZDCHF, NZDCAD, CADJPY, CADCHF, CHFJPY) έχουν μη έγκυρο/παλιό κλεισμένο H1 (όριο 4 ώρες). Δεν παράγονται σήματα από παλιά δεδομένα.
 
 Κανένα A+ READY στο τρέχον scan.
 
@@ -93,9 +93,9 @@
 
 | Asset | Market | Price | W1 | D1 | H4 | H1 | Direction | W1 Context |
 |---|---|---:|---|---|---|---|---|---|
-| **BTC** | COINBASE:BTCUSD | 60,805.44 | STRONG SELL | SELL | NEUTRAL | BUY | **—** | NEUTRAL |
-| **ETH** | COINBASE:ETHUSD | 1,707.34 | STRONG SELL | SELL | NEUTRAL | BUY | **—** | NEUTRAL |
-| **SOL** | COINBASE:SOLUSD | 70.4900 | SELL | SELL | NEUTRAL | BUY | **—** | NEUTRAL |
+| **BTC** | COINBASE:BTCUSD | 60,813.71 | STRONG SELL | SELL | NEUTRAL | BUY | **—** | NEUTRAL |
+| **ETH** | COINBASE:ETHUSD | 1,706.65 | STRONG SELL | SELL | NEUTRAL | BUY | **—** | NEUTRAL |
+| **SOL** | COINBASE:SOLUSD | 70.6600 | SELL | SELL | NEUTRAL | BUY | **—** | NEUTRAL |
 
 ## HTF Reversal — ξεχωριστό mode
 
