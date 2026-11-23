@@ -1,5 +1,11 @@
 {
   "week": "2026-W48",
-  "top5": [],
+  "top5": [
+    "NZDCHF",
+    "AUDCAD",
+    "AUDCHF",
+    "AUDJPY",
+    "AUDUSD"
+  ],
   "hot_new": []
 }
