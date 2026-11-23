@@ -1,6 +1,6 @@
 # OANDA — Top 5 προς έλεγχο
 
-**Δημιουργήθηκε:** 22/11/2026 22:29 (ώρα Ελλάδας)
+**Δημιουργήθηκε:** 23/11/2026 02:51 (ώρα Ελλάδας)
 
 **Υποψήφια:** 5 από 28 ζευγάρια
 
@@ -10,11 +10,11 @@
 
 | # | Ζευγάρι | Κατεύθυνση ελέγχου | Ranking /100 | W1 | D1 | H4 | H1 | EMA50 TV | ADX H4 | ADX H1 | Προηγούμενο H1 OANDA (Αθήνα) | OANDA update |
 |---:|---|---|---:|---|---|---|---|---|---:|---:|---|---|
-| 1 | **AUDNZD** | SHORT (WATCH ONLY) | 65.9 | SELL | STRONG SELL | STRONG SELL | STRONG SELL | 3/3 verified fields | 48.2 | 44.1 | 20/11 22:00 | STALE |
-| 2 | **EURAUD** | LONG (WATCH ONLY) | 65.5 | BUY | STRONG BUY | STRONG BUY | BUY | 3/3 verified fields | 41.6 | 53.8 | 20/11 22:00 | STALE |
-| 3 | **AUDCAD** | SHORT (WATCH ONLY) | 65.0 | SELL | STRONG SELL | STRONG SELL | SELL | 3/3 verified fields | 50.2 | 51.4 | 20/11 22:00 | STALE |
-| 4 | **EURJPY** | SHORT (WATCH ONLY) | 64.8 | SELL | STRONG SELL | STRONG SELL | SELL | 3/3 verified fields | 41.2 | 35.3 | 20/11 22:00 | STALE |
-| 5 | **AUDJPY** | SHORT (WATCH ONLY) | 64.1 | SELL | STRONG SELL | STRONG SELL | SELL | 3/3 verified fields | 47.2 | 51.2 | 20/11 22:00 | STALE |
+| 1 | **GBPNZD** | LONG (WATCH ONLY) | 57.6 | BUY | STRONG BUY | BUY | BUY | 3/3 verified fields | 21.0 | 25.1 | 23/11 01:00 | RECENT |
+| 2 | **NZDCHF** | SHORT (WATCH ONLY) | 52.7 | SELL | SELL | SELL | SELL | 3/3 verified fields | 21.5 | 32.3 | 23/11 01:00 | RECENT |
+| 3 | **USDCAD** | LONG (WATCH ONLY) | 52.3 | BUY | BUY | BUY | BUY | 3/3 verified fields | 26.6 | 16.1 | 23/11 01:00 | RECENT |
+| 4 | **AUDCHF** | SHORT (WATCH ONLY) | 52.0 | SELL | SELL | SELL | SELL | 3/3 verified fields | 32.2 | 52.0 | 23/11 01:00 | RECENT |
+| 5 | **NZDJPY** | SHORT (WATCH ONLY) | 51.4 | SELL | SELL | SELL | SELL | 3/3 verified fields | 28.3 | 27.4 | 23/11 01:00 | RECENT |
 
 Η λίστα είναι υποψήφια για χειροκίνητο τελικό έλεγχο μόνο αυτών των γραφημάτων. Δεν προκύπτουν Entry/SL/TP χωρίς ανεξάρτητη επιβεβαίωση πραγματικών OHLC, BRC, spread και ειδήσεων.
 Κατά το Σαββατοκύριακο οι Forex ενδείξεις μπορεί να αντανακλούν το κλείσιμο της Παρασκευής.
