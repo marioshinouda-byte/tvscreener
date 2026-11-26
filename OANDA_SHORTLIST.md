@@ -1,6 +1,6 @@
 # OANDA — Top 5 προς έλεγχο
 
-**Δημιουργήθηκε:** 26/11/2026 17:12 (ώρα Ελλάδας)
+**Δημιουργήθηκε:** 27/11/2026 01:51 (ώρα Ελλάδας)
 
 **Υποψήφια:** 3 από 28 ζευγάρια
 
@@ -10,9 +10,9 @@
 
 | # | Ζευγάρι | Κατεύθυνση ελέγχου | Ranking /100 | W1 | D1 | H4 | H1 | EMA50 TV | ADX H4 | ADX H1 | Προηγούμενο H1 OANDA (Αθήνα) | OANDA update |
 |---:|---|---|---:|---|---|---|---|---|---:|---:|---|---|
-| 1 | **NZDCHF** | SHORT (WATCH ONLY) | 46.7 | STRONG SELL | SELL | SELL | SELL | 3/3 verified fields | 31.6 | 19.3 | 26/11 16:00 | RECENT |
-| 2 | **NZDCAD** | SHORT (WATCH ONLY) | 46.5 | SELL | SELL | SELL | NEUTRAL | 3/3 verified fields | 32.2 | 15.4 | 26/11 16:00 | RECENT |
-| 3 | **GBPAUD** | LONG (WATCH ONLY) | 35.2 | BUY | BUY | BUY | NEUTRAL | 2/3 verified fields | 20.9 | 17.3 | 26/11 16:00 | RECENT |
+| 1 | **NZDCAD** | SHORT (WATCH ONLY) | 53.8 | SELL | SELL | SELL | SELL | 3/3 verified fields | 32.8 | 12.6 | 27/11 00:00 | RECENT |
+| 2 | **NZDCHF** | SHORT (WATCH ONLY) | 49.3 | STRONG SELL | SELL | SELL | NEUTRAL | 3/3 verified fields | 31.2 | 13.9 | 27/11 00:00 | RECENT |
+| 3 | **EURCAD** | SHORT (WATCH ONLY) | 42.5 | SELL | SELL | SELL | NEUTRAL | 2/3 verified fields | 34.8 | 28.8 | 27/11 00:00 | RECENT |
 
 Η λίστα είναι υποψήφια για χειροκίνητο τελικό έλεγχο μόνο αυτών των γραφημάτων. Δεν προκύπτουν Entry/SL/TP χωρίς ανεξάρτητη επιβεβαίωση πραγματικών OHLC, BRC, spread και ειδήσεων.
 Κατά το Σαββατοκύριακο οι Forex ενδείξεις μπορεί να αντανακλούν το κλείσιμο της Παρασκευής.
